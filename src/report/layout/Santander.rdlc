@@ -1,0 +1,1600 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>ae7b7691-8e88-4482-b994-21de52f7aa5f</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="list1">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>0.07938cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>7.70149cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.54cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.54cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.5cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.54001cm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>12.46808cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox31">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style />
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox31</rd:DefaultName>
+                          <Style>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Rectangle Name="list1_Contents">
+                          <ReportItems>
+                            <Rectangle Name="rectangle1">
+                              <ReportItems>
+                                <Textbox Name="textbox10">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!IssuedDateCaption.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.13537cm</Top>
+                                  <Left>5.02456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>2.86125cm</Width>
+                                  <Style />
+                                </Textbox>
+                                <Textbox Name="textbox11">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!Fechas1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                            <Format>d</Format>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.10009cm</Top>
+                                  <Left>8.22014cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>1.8cm</Width>
+                                  <ZIndex>1</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox23">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>2.75367cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>2</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox22">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr2.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>3.17667cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>3</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox21">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr3.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>3.59968cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>4</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox20">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr7.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>5.29168cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.16634in</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>5</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox19">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr6.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>4.86868cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>6</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox18">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr5.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>4.44567cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>7</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox17">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustAddr4.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>4.02267cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>8</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox16">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CustVATRegNo.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>2.33067cm</Top>
+                                  <Left>12.62456cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>3.15cm</Width>
+                                  <ZIndex>9</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox46">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                            <FontWeight>Bold</FontWeight>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>1.78323cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>10</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox47">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr2.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>2.20623cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>11</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox48">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr3.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>2.62924cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>12</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox49">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr7.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>4.32124cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.16634in</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>13</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox50">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr6.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>3.89824cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>14</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox51">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr5.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>3.47523cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>15</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox52">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompAddr4.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>3.05223cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.5cm</Width>
+                                  <ZIndex>16</ZIndex>
+                                  <Style>
+                                    <VerticalAlign>Middle</VerticalAlign>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox53">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!CompVATRegNo.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>1.36023cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>3.15cm</Width>
+                                  <ZIndex>17</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox15">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!Vto1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                            <Format>d</Format>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.13537cm</Top>
+                                  <Left>13.71963cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>1.8cm</Width>
+                                  <ZIndex>18</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox24">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!Importe1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                            <Format>#,0.00'€';(#,0.00'€');'(None)'</Format>
+                                            <rd:FormatSymbolCulture>es-ES</rd:FormatSymbolCulture>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.13537cm</Top>
+                                  <Left>15.704cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>1.8cm</Width>
+                                  <ZIndex>19</ZIndex>
+                                  <Visibility>
+                                    <Hidden>=iif((First(Fields!Importe1.Value = 0)),true,false)</Hidden>
+                                  </Visibility>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox25">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!IssuedDueDateCaption.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.13537cm</Top>
+                                  <Left>10.27701cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>3.26623cm</Width>
+                                  <ZIndex>20</ZIndex>
+                                  <Style />
+                                </Textbox>
+                                <Textbox Name="textbox26">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">="Adjuntamos a la presente pagaré número"+First(Fields!NumPag.Value)+" con fecha de "+First(Fields!DrawDate.Value)+" y un importe de "+First(Fields!NumberText1.Value)+" en concepto de pago de las siguientes facturas: "</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style>
+                                        <TextAlign>Left</TextAlign>
+                                      </Style>
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>6.66632cm</Top>
+                                  <Left>0.36658cm</Left>
+                                  <Height>2.14279cm</Height>
+                                  <Width>16.75798cm</Width>
+                                  <ZIndex>21</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox27">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">=First(Fields!Facturas1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>9.13537cm</Top>
+                                  <Left>0.34202cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>4.57671cm</Width>
+                                  <ZIndex>22</ZIndex>
+                                  <Style>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox41">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">="Apreciados señores"</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>6.10221cm</Top>
+                                  <Left>0.37154cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>12.32063cm</Width>
+                                  <ZIndex>23</ZIndex>
+                                  <Style>
+                                    <Border>
+                                      <Style>None</Style>
+                                    </Border>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox42">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">="Atentamente"</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>10.33525cm</Top>
+                                  <Left>0.37154cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>12.32063cm</Width>
+                                  <ZIndex>24</ZIndex>
+                                  <Style>
+                                    <Border>
+                                      <Style>None</Style>
+                                    </Border>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Textbox Name="textbox43">
+                                  <KeepTogether>true</KeepTogether>
+                                  <Paragraphs>
+                                    <Paragraph>
+                                      <TextRuns>
+                                        <TextRun>
+                                          <Value EvaluationMode="Auto">="Fdo. "+First(Fields!CompAddr1.Value)</Value>
+                                          <Style>
+                                            <FontSize>9pt</FontSize>
+                                          </Style>
+                                        </TextRun>
+                                      </TextRuns>
+                                      <Style />
+                                    </Paragraph>
+                                  </Paragraphs>
+                                  <Top>11.71108cm</Top>
+                                  <Left>0.3898cm</Left>
+                                  <Height>0.423cm</Height>
+                                  <Width>12.32063cm</Width>
+                                  <ZIndex>25</ZIndex>
+                                  <Style>
+                                    <Border>
+                                      <Style>None</Style>
+                                    </Border>
+                                    <PaddingLeft>2pt</PaddingLeft>
+                                    <PaddingRight>2pt</PaddingRight>
+                                  </Style>
+                                </Textbox>
+                                <Tablix Name="Tablix3">
+                                  <TablixBody>
+                                    <TablixColumns>
+                                      <TablixColumn>
+                                        <Width>2.5cm</Width>
+                                      </TablixColumn>
+                                    </TablixColumns>
+                                    <TablixRows>
+                                      <TablixRow>
+                                        <Height>0.6cm</Height>
+                                        <TablixCells>
+                                          <TablixCell>
+                                            <CellContents>
+                                              <Textbox Name="CustAddr">
+                                                <CanGrow>true</CanGrow>
+                                                <KeepTogether>true</KeepTogether>
+                                                <Paragraphs>
+                                                  <Paragraph>
+                                                    <TextRuns>
+                                                      <TextRun>
+                                                        <Value EvaluationMode="Auto" />
+                                                        <Style />
+                                                      </TextRun>
+                                                    </TextRuns>
+                                                    <Style />
+                                                  </Paragraph>
+                                                </Paragraphs>
+                                                <Visibility>
+                                                  <Hidden>=Code.SetData(Cstr(Fields!CustAddr1.Value) + Chr(177) + 
+Cstr(Fields!Dia.Value) + Chr(177) +
+Cstr(Fields!Mes.Value) + Chr(177) +
+Cstr(Fields!Anyo.Value) + Chr(177) +
+Cstr(Fields!PrintAmt.Value) + Chr(177) +
+Cstr(Fields!NumberText1.Value) + Chr(177) +
+Cstr(Fields!Dia2.Value) + Chr(177) +
+Cstr(Fields!Mes2.Value) + Chr(177) +
+Cstr(Fields!Anyo2.Value)
+,1)</Hidden>
+                                                </Visibility>
+                                                <Style>
+                                                  <Border>
+                                                    <Color>LightGrey</Color>
+                                                    <Style>Solid</Style>
+                                                  </Border>
+                                                  <PaddingLeft>2pt</PaddingLeft>
+                                                  <PaddingRight>2pt</PaddingRight>
+                                                  <PaddingTop>2pt</PaddingTop>
+                                                  <PaddingBottom>2pt</PaddingBottom>
+                                                </Style>
+                                              </Textbox>
+                                            </CellContents>
+                                          </TablixCell>
+                                        </TablixCells>
+                                      </TablixRow>
+                                    </TablixRows>
+                                  </TablixBody>
+                                  <TablixColumnHierarchy>
+                                    <TablixMembers>
+                                      <TablixMember />
+                                    </TablixMembers>
+                                  </TablixColumnHierarchy>
+                                  <TablixRowHierarchy>
+                                    <TablixMembers>
+                                      <TablixMember>
+                                        <Group Name="Detalles" />
+                                      </TablixMember>
+                                    </TablixMembers>
+                                  </TablixRowHierarchy>
+                                  <Top>6.88654cm</Top>
+                                  <Left>7.66075cm</Left>
+                                  <Height>0.6cm</Height>
+                                  <Width>2.5cm</Width>
+                                  <ZIndex>26</ZIndex>
+                                  <Style>
+                                    <Border>
+                                      <Style>None</Style>
+                                    </Border>
+                                  </Style>
+                                </Tablix>
+                              </ReportItems>
+                              <DataElementOutput>ContentsOnly</DataElementOutput>
+                              <Height>12.46808cm</Height>
+                              <Width>7.01634in</Width>
+                              <Visibility>
+                                <Hidden>=IIF(Fields!NumberText2.Value="",FALSE,TRUE)</Hidden>
+                              </Visibility>
+                              <Style />
+                            </Rectangle>
+                          </ReportItems>
+                          <KeepTogether>true</KeepTogether>
+                          <Style />
+                        </Rectangle>
+                        <ColSpan>5</ColSpan>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell />
+                    <TablixCell />
+                    <TablixCell />
+                    <TablixCell />
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="list1_Details_Group">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!EntryNo_CustLedgEntry.Value</GroupExpression>
+                    </GroupExpressions>
+                    <PageBreak>
+                      <BreakLocation>Between</BreakLocation>
+                    </PageBreak>
+                  </Group>
+                  <TablixMembers>
+                    <TablixMember>
+                      <TablixHeader>
+                        <Size>0.07938cm</Size>
+                        <CellContents>
+                          <Textbox Name="Textbox2">
+                            <CanGrow>true</CanGrow>
+                            <KeepTogether>true</KeepTogether>
+                            <Paragraphs>
+                              <Paragraph>
+                                <TextRuns>
+                                  <TextRun>
+                                    <Value EvaluationMode="Auto" />
+                                    <Style />
+                                  </TextRun>
+                                </TextRuns>
+                                <Style />
+                              </Paragraph>
+                            </Paragraphs>
+                            <rd:DefaultName>Textbox2</rd:DefaultName>
+                            <Style>
+                              <PaddingLeft>2pt</PaddingLeft>
+                              <PaddingRight>2pt</PaddingRight>
+                              <PaddingTop>2pt</PaddingTop>
+                              <PaddingBottom>2pt</PaddingBottom>
+                            </Style>
+                          </Textbox>
+                        </CellContents>
+                      </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <TablixHeader>
+                            <Size>0.07938cm</Size>
+                            <CellContents>
+                              <Textbox Name="Group11">
+                                <CanGrow>true</CanGrow>
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value EvaluationMode="Auto" />
+                                        <Style />
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>Group11</rd:DefaultName>
+                                <Style>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                          <TablixMembers>
+                            <TablixMember>
+                              <TablixHeader>
+                                <Size>0.07938cm</Size>
+                                <CellContents>
+                                  <Textbox Name="Group1">
+                                    <CanGrow>true</CanGrow>
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value EvaluationMode="Auto" />
+                                            <Style />
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style />
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <rd:DefaultName>Group1</rd:DefaultName>
+                                    <Style>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                      <PaddingTop>2pt</PaddingTop>
+                                      <PaddingBottom>2pt</PaddingBottom>
+                                    </Style>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                              <TablixMembers>
+                                <TablixMember />
+                              </TablixMembers>
+                            </TablixMember>
+                          </TablixMembers>
+                        </TablixMember>
+                      </TablixMembers>
+                    </TablixMember>
+                  </TablixMembers>
+                  <DataElementOutput>Output</DataElementOutput>
+                  <KeepTogether>true</KeepTogether>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>DataSet_Result</DataSetName>
+            <PageBreak>
+              <BreakLocation>End</BreakLocation>
+            </PageBreak>
+            <Height>12.46808cm</Height>
+            <Width>18.13902cm</Width>
+            <Style />
+          </Tablix>
+        </ReportItems>
+        <Height>12.46808cm</Height>
+        <Style />
+      </Body>
+      <Width>18.6075cm</Width>
+      <Page>
+        <PageFooter>
+          <Height>4.81542cm</Height>
+          <PrintOnFirstPage>true</PrintOnFirstPage>
+          <PrintOnLastPage>true</PrintOnLastPage>
+          <ReportItems>
+            <Textbox Name="textbox45">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(2,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.2107cm</Top>
+              <Left>4.54378cm</Left>
+              <Height>0.423cm</Height>
+              <Width>1.61926cm</Width>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox12">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(1,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.00357cm</Top>
+              <Left>3.56572cm</Left>
+              <Height>0.523cm</Height>
+              <Width>11.88666cm</Width>
+              <ZIndex>1</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox38">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(5,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>n2</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.2107cm</Top>
+              <Left>12.33488cm</Left>
+              <Height>0.423cm</Height>
+              <Width>3.18475cm</Width>
+              <ZIndex>2</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox54">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(3,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.2107cm</Top>
+              <Left>6.63827cm</Left>
+              <Height>0.423cm</Height>
+              <Width>2.03491cm</Width>
+              <ZIndex>3</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox55">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(4,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.2107cm</Top>
+              <Left>9.03258cm</Left>
+              <Height>0.423cm</Height>
+              <Width>2.06926cm</Width>
+              <ZIndex>4</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox14">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(6,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.54515cm</Top>
+              <Left>3.77023cm</Left>
+              <Height>0.623cm</Height>
+              <Width>11.70145cm</Width>
+              <ZIndex>5</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox56">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(7,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.36454cm</Top>
+              <Left>4.54378cm</Left>
+              <Height>0.423cm</Height>
+              <Width>6.97955cm</Width>
+              <ZIndex>6</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox57">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(8,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.36454cm</Top>
+              <Left>13.7053cm</Left>
+              <Height>0.423cm</Height>
+              <Width>2.06926cm</Width>
+              <ZIndex>7</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox58">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value EvaluationMode="Auto">=Code.GetData(9,1)</Value>
+                      <Style>
+                        <FontSize>9pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.36454cm</Top>
+              <Left>17.01449cm</Left>
+              <Height>0.423cm</Height>
+              <Width>1.59301cm</Width>
+              <ZIndex>8</ZIndex>
+              <Style>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+              </Style>
+            </Textbox>
+          </ReportItems>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+          </Style>
+        </PageFooter>
+        <PageHeight>29.7cm</PageHeight>
+        <PageWidth>21cm</PageWidth>
+        <InteractiveHeight>11in</InteractiveHeight>
+        <InteractiveWidth>8.5in</InteractiveWidth>
+        <LeftMargin>1.5cm</LeftMargin>
+        <TopMargin>2cm</TopMargin>
+        <BottomMargin>2cm</BottomMargin>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Shared Data1 as Object
+Shared Data2 as Object
+Shared Data3 as Object
+Shared Data4 as Object
+
+Public Function GetData(Num as Integer, Group as integer) as Object
+if Group = 1 then
+   Return Cstr(Choose(Num, Split(Cstr(Data1),Chr(177))))
+End If
+
+if Group = 2 then
+   Return Cstr(Choose(Num, Split(Cstr(Data2),Chr(177))))
+End If
+
+if Group = 3 then
+   Return Cstr(Choose(Num, Split(Cstr(Data3),Chr(177))))
+End If
+
+if Group = 4 then
+   Return Cstr(Choose(Num, Split(Cstr(Data4),Chr(177))))
+End If
+End Function
+
+Public Function SetData(NewData as Object,Group as integer)
+  if Group = 1 and NewData &gt; "" Then
+      Data1 = NewData
+  End If
+
+  if Group = 2 and NewData &gt; "" Then
+      Data2 = NewData
+  End If
+
+  if Group = 3 and NewData &gt; "" Then
+      Data3 = NewData
+  End If
+
+  if Group = 4 and NewData &gt; "" Then
+      Data4 = NewData
+  End If
+
+  Return True
+End Function
+
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>94a95f79-6ad9-44a0-8cbc-593b1a043d6f</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="DocumentNo_CustLedgEntry">
+          <DataField>DocumentNo_CustLedgEntry</DataField>
+        </Field>
+        <Field Name="BillNo_CustLedgEntry">
+          <DataField>BillNo_CustLedgEntry</DataField>
+        </Field>
+        <Field Name="DrawCity">
+          <DataField>DrawCity</DataField>
+        </Field>
+        <Field Name="PrintAmt">
+          <DataField>PrintAmt</DataField>
+        </Field>
+        <Field Name="CurrencyCode">
+          <DataField>CurrencyCode</DataField>
+        </Field>
+        <Field Name="DrawDate">
+          <DataField>DrawDate</DataField>
+        </Field>
+        <Field Name="DueDate_CustLedgEntry">
+          <DataField>DueDate_CustLedgEntry</DataField>
+        </Field>
+        <Field Name="Dia">
+          <DataField>Dia</DataField>
+        </Field>
+        <Field Name="Mes">
+          <DataField>Mes</DataField>
+        </Field>
+        <Field Name="Anyo">
+          <DataField>Anyo</DataField>
+        </Field>
+        <Field Name="Dia2">
+          <DataField>Dia2</DataField>
+        </Field>
+        <Field Name="Mes2">
+          <DataField>Mes2</DataField>
+        </Field>
+        <Field Name="Anyo2">
+          <DataField>Anyo2</DataField>
+        </Field>
+        <Field Name="NumberText1">
+          <DataField>NumberText1</DataField>
+        </Field>
+        <Field Name="PostingDate_CustLedgEntry">
+          <DataField>PostingDate_CustLedgEntry</DataField>
+        </Field>
+        <Field Name="PaymentMethod">
+          <DataField>PaymentMethod</DataField>
+        </Field>
+        <Field Name="CustBankAccName">
+          <DataField>CustBankAccName</DataField>
+        </Field>
+        <Field Name="CustBankAccBankAccNoDetails">
+          <DataField>CustBankAccBankAccNoDetails</DataField>
+        </Field>
+        <Field Name="CustVATRegNo">
+          <DataField>CustVATRegNo</DataField>
+        </Field>
+        <Field Name="CustAddr6">
+          <DataField>CustAddr6</DataField>
+        </Field>
+        <Field Name="CustAddr7">
+          <DataField>CustAddr7</DataField>
+        </Field>
+        <Field Name="CustAddr5">
+          <DataField>CustAddr5</DataField>
+        </Field>
+        <Field Name="CustAddr4">
+          <DataField>CustAddr4</DataField>
+        </Field>
+        <Field Name="CustAddr2">
+          <DataField>CustAddr2</DataField>
+        </Field>
+        <Field Name="CustAddr3">
+          <DataField>CustAddr3</DataField>
+        </Field>
+        <Field Name="CustAddr1">
+          <DataField>CustAddr1</DataField>
+        </Field>
+        <Field Name="CompVATRegNo">
+          <DataField>CompVATRegNo</DataField>
+        </Field>
+        <Field Name="CompAddr6">
+          <DataField>CompAddr6</DataField>
+        </Field>
+        <Field Name="CompAddr7">
+          <DataField>CompAddr7</DataField>
+        </Field>
+        <Field Name="CompAddr5">
+          <DataField>CompAddr5</DataField>
+        </Field>
+        <Field Name="CompAddr4">
+          <DataField>CompAddr4</DataField>
+        </Field>
+        <Field Name="CompAddr2">
+          <DataField>CompAddr2</DataField>
+        </Field>
+        <Field Name="CompAddr3">
+          <DataField>CompAddr3</DataField>
+        </Field>
+        <Field Name="CompAddr1">
+          <DataField>CompAddr1</DataField>
+        </Field>
+        <Field Name="CurrencyTxt">
+          <DataField>CurrencyTxt</DataField>
+        </Field>
+        <Field Name="NumberText2">
+          <DataField>NumberText2</DataField>
+        </Field>
+        <Field Name="EntryNo_CustLedgEntry">
+          <DataField>EntryNo_CustLedgEntry</DataField>
+        </Field>
+        <Field Name="EmptyStringCaption">
+          <DataField>EmptyStringCaption</DataField>
+        </Field>
+        <Field Name="StatedAddressCaption">
+          <DataField>StatedAddressCaption</DataField>
+        </Field>
+        <Field Name="WithTheFollowingDetailsCaption">
+          <DataField>WithTheFollowingDetailsCaption</DataField>
+        </Field>
+        <Field Name="RelatedtoCaption">
+          <DataField>RelatedtoCaption</DataField>
+        </Field>
+        <Field Name="InvoiceNoCaption">
+          <DataField>InvoiceNoCaption</DataField>
+        </Field>
+        <Field Name="IssuedDateCaption">
+          <DataField>IssuedDateCaption</DataField>
+        </Field>
+        <Field Name="IssuedDueDateCaption">
+          <DataField>IssuedDueDateCaption</DataField>
+        </Field>
+        <Field Name="NumPag">
+          <DataField>NumPag</DataField>
+        </Field>
+        <Field Name="Facturas1">
+          <DataField>Facturas1</DataField>
+        </Field>
+        <Field Name="Facturas2">
+          <DataField>Facturas2</DataField>
+        </Field>
+        <Field Name="Facturas3">
+          <DataField>Facturas3</DataField>
+        </Field>
+        <Field Name="Facturas4">
+          <DataField>Facturas4</DataField>
+        </Field>
+        <Field Name="Facturas5">
+          <DataField>Facturas5</DataField>
+        </Field>
+        <Field Name="Facturas6">
+          <DataField>Facturas6</DataField>
+        </Field>
+        <Field Name="Facturas7">
+          <DataField>Facturas7</DataField>
+        </Field>
+        <Field Name="Facturas8">
+          <DataField>Facturas8</DataField>
+        </Field>
+        <Field Name="Facturas9">
+          <DataField>Facturas9</DataField>
+        </Field>
+        <Field Name="Facturas10">
+          <DataField>Facturas10</DataField>
+        </Field>
+        <Field Name="Fechas1">
+          <DataField>Fechas1</DataField>
+        </Field>
+        <Field Name="Fechas2">
+          <DataField>Fechas2</DataField>
+        </Field>
+        <Field Name="Fechas3">
+          <DataField>Fechas3</DataField>
+        </Field>
+        <Field Name="Fechas4">
+          <DataField>Fechas4</DataField>
+        </Field>
+        <Field Name="Fechas5">
+          <DataField>Fechas5</DataField>
+        </Field>
+        <Field Name="Fechas6">
+          <DataField>Fechas6</DataField>
+        </Field>
+        <Field Name="Fechas7">
+          <DataField>Fechas7</DataField>
+        </Field>
+        <Field Name="Fechas8">
+          <DataField>Fechas8</DataField>
+        </Field>
+        <Field Name="Fechas9">
+          <DataField>Fechas9</DataField>
+        </Field>
+        <Field Name="Fechas10">
+          <DataField>Fechas10</DataField>
+        </Field>
+        <Field Name="Vto1">
+          <DataField>Vto1</DataField>
+        </Field>
+        <Field Name="Vto2">
+          <DataField>Vto2</DataField>
+        </Field>
+        <Field Name="Vto3">
+          <DataField>Vto3</DataField>
+        </Field>
+        <Field Name="Vto4">
+          <DataField>Vto4</DataField>
+        </Field>
+        <Field Name="Vto5">
+          <DataField>Vto5</DataField>
+        </Field>
+        <Field Name="Vto6">
+          <DataField>Vto6</DataField>
+        </Field>
+        <Field Name="Vto7">
+          <DataField>Vto7</DataField>
+        </Field>
+        <Field Name="Vto8">
+          <DataField>Vto8</DataField>
+        </Field>
+        <Field Name="Vto9">
+          <DataField>Vto9</DataField>
+        </Field>
+        <Field Name="Vto10">
+          <DataField>Vto10</DataField>
+        </Field>
+        <Field Name="Importe1">
+          <DataField>Importe1</DataField>
+        </Field>
+        <Field Name="Importe1Format">
+          <DataField>Importe1Format</DataField>
+        </Field>
+        <Field Name="Importe2">
+          <DataField>Importe2</DataField>
+        </Field>
+        <Field Name="Importe2Format">
+          <DataField>Importe2Format</DataField>
+        </Field>
+        <Field Name="Importe3">
+          <DataField>Importe3</DataField>
+        </Field>
+        <Field Name="Importe3Format">
+          <DataField>Importe3Format</DataField>
+        </Field>
+        <Field Name="Importe4">
+          <DataField>Importe4</DataField>
+        </Field>
+        <Field Name="Importe4Format">
+          <DataField>Importe4Format</DataField>
+        </Field>
+        <Field Name="Importe5">
+          <DataField>Importe5</DataField>
+        </Field>
+        <Field Name="Importe5Format">
+          <DataField>Importe5Format</DataField>
+        </Field>
+        <Field Name="Importe6">
+          <DataField>Importe6</DataField>
+        </Field>
+        <Field Name="Importe6Format">
+          <DataField>Importe6Format</DataField>
+        </Field>
+        <Field Name="Importe7">
+          <DataField>Importe7</DataField>
+        </Field>
+        <Field Name="Importe7Format">
+          <DataField>Importe7Format</DataField>
+        </Field>
+        <Field Name="Importe8">
+          <DataField>Importe8</DataField>
+        </Field>
+        <Field Name="Importe8Format">
+          <DataField>Importe8Format</DataField>
+        </Field>
+        <Field Name="Importe9">
+          <DataField>Importe9</DataField>
+        </Field>
+        <Field Name="Importe9Format">
+          <DataField>Importe9Format</DataField>
+        </Field>
+        <Field Name="Importe10">
+          <DataField>Importe10</DataField>
+        </Field>
+        <Field Name="Importe10Format">
+          <DataField>Importe10Format</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

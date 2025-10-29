@@ -1,0 +1,49 @@
+INSTRUCCIONES PARA CONFIGURAR EL LAYOUT DE WORD DEL REPORTE "Lista Fijaciones OPIs Semanal"
+
+1. ABRIR MICROSOFT WORD
+
+2. ACTIVAR LA PESTAÑA "CORRESPONDENCIA" (MAILINGS)
+
+3. CREAR LA ESTRUCTURA DEL DOCUMENTO CON LOS SIGUIENTES CAMPOS:
+
+=== ENCABEZADO DEL DOCUMENTO ===
+Lista de Fijaciones OPIs - Semana «NumeroSemana»
+Desde: «FechaDesde» hasta: «FechaHasta»
+Total OPIs: «TotalOpis»
+
+[DEBUG] Registros CabFijacion: «DebugCabCount» - «DebugMessage»
+
+=== SECCIÓN DE CAMPAÑAS A RETIRAR ===
+«TableStart:CampanasRetirar»
+CAMPAÑA A RETIRAR:
+- Nombre: «CampanaNombre»
+- Acción: «TirarCampana»
+- Fecha Retirada: «FechaRetirada»
+- Observaciones: «ObservacionesCampana»
+- Flag Tirar: «TirarCampanaFlag»
+[DEBUG] Count Campañas: «DebugCampanasCount» - «DebugCampanasMsg»
+«TableEnd:CampanasRetirar»
+
+=== SECCIÓN DE ÓRDENES DE FIJACIÓN ===
+«TableStart:Orden_fijacion»
+ORDEN DE FIJACIÓN:
+- Cliente: «Nombre»
+- Fecha Fijación: «FechaFijacion»
+- Nº OPIs: «NumOpis»
+- Descripción: «Descripcion»
+- Nº Proyecto: «NProyecto»
+- Nombre Comercial: «NombreComercial»
+- Retirar Campaña: «RetirarCampana»
+- Observaciones: «Observaciones»
+- Guardar o Tirar: «GuardarOTirar»
+[DEBUG] Count Órdenes: «DebugOrdenCount» - «DebugOrdenMsg»
+«TableEnd:Orden_fijacion»
+
+4. PASOS PARA INSERTAR LOS CAMPOS:
+   a) Correspondencia > Insertar campo de combinación
+   b) Escribir exactamente el nombre del campo (case-sensitive)
+   c) Para tablas, usar TableStart:NombreTabla y TableEnd:NombreTabla
+
+5. GUARDAR EL ARCHIVO COMO: ListaFijacionesOpisSemanal.docx
+
+NOTA: Los nombres de los campos deben coincidir EXACTAMENTE con los nombres de las columnas en el código AL. 

@@ -1,0 +1,63 @@
+{
+  "id": "43635513-cb1d-447c-bc2b-a8495e96a0b7",
+  "name": "Funciones",
+  "publisher": "Grupo Malla by Andreu",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "target": "OnPrem",
+  "dependencies": [
+    {
+      "id": "7a7d3479-e693-4f3d-8336-aac424523182",
+      "name": "Malla Wave 2.0",
+      "publisher": "Grupo Malla by Andreu",
+      "version": "2.1.6.1"
+    },
+    {
+      "id": "8fc50dfb-d338-4fd9-9499-5e44cc8cbf50",
+      "publisher": "Microsoft",
+      "name": "Email - SMTP API",
+      "version": "27.0.0.0"
+    },
+    {
+      "id": "68e13fa3-217a-4be0-9141-99e5bf0ca818",
+      "publisher": "Microsoft",
+      "name": "Email - SMTP Connector",
+      "version": "27.0.0.0"
+    },
+    {"id": "97dcb0c2-10e0-4848-a938-474d3183d943",
+    "name": "DropBox",
+    "publisher": "Grupo Malla by Andreu",
+    "version": "1.0.0.3"
+  },
+  {
+    "id": "23bf6eb4-cbe5-49f6-8b41-0b18502f9d48",
+    "name": "B2Bconnector",
+    "publisher": "Invinet Sistemes 2003, S.L.",
+    "version": "21.1.174.66"
+    }
+
+
+    ],
+  "screenshots": [],
+  "preprocessorSymbols": ["CLEAN27"],
+  "platform": "27.0.0.0",
+  "application": "27.0.0.0",
+  "idRanges": [
+    
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "16.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}
