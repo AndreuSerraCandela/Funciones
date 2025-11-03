@@ -766,7 +766,7 @@ report 50016 "Contrato"
 
                         trigger OnAfterGetRecord()
                         var
-
+                            TipoRecurso: Record "Tipo Recurso";
                         begin
                             PostedShipmentDate := 0D;
                             if Quantity <> 0 THEN
@@ -799,8 +799,12 @@ report 50016 "Contrato"
                             "Unit of Measure" := '';
                             if Type = Type::Resource then begin
                                 if rRecurs.Get("No.") Then begin
-                                    If rRecurs.Medidas <> '' Then
-                                        "Unit of Measure" := rRecurs."Tipo Recurso" + ' ' + rRecurs.Medidas;
+                                    If Not TipoRecurso.Get(rRecurs."Tipo Recurso") Then
+                                        TipoRecurso.Init();
+                                    If (TipoRecurso."Tiene Medidas") and (rRecurs.Medidas <> '') Then
+                                        "Unit of Measure" := rRecurs."Tipo Recurso" + ' ' + rRecurs.Medidas
+                                    else
+                                        "Unit of Measure" := rRecurs."Tipo Recurso";
                                 end;
                             end;
                             if wToTal2 = wToTal2::"Solo Totales" Then begin
@@ -2042,8 +2046,8 @@ report 50016 "Contrato"
 
         If "Sales Invoice Header"."Prepayment %" <> 0 then
             If "Sales Invoice Header"."Prepayment Due Date" <> 0D Then begin
-                CapEntregaA1 := 'Fecha Vto:';
-                TextoPrepago1 := Format("Sales Invoice Header"."Prepayment Due Date", 0, '<Day,2>/<Month,2>/<Year4>');
+                // CapEntregaA1 := 'Fecha Vto:';
+                // TextoPrepago1 := Format("Sales Invoice Header"."Prepayment Due Date", 0, '<Day,2>/<Month,2>/<Year4>');
             end;
 
         if "Sales Invoice Header"."Prepayment %" = 100 THEN

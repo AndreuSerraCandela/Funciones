@@ -289,26 +289,10 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
         rContr: Record 36;
         Avisos: Text;
 
-    var
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         Notification: Notification;
-        Text001: Label 'Este documento tiene un proyecto asociado. ¿Desea revisarlo?';
-        Text002: Label 'Ver Proyecto';
-
-
-    trigger OnOpenPage()
-    BEGIN
-        if UserMgt.GetSalesFilter <> '' THEN BEGIN
-            Rec.FILTERGROUP(2);
-            Rec.SETRANGE("Responsibility Center", UserMgt.GetSalesFilter);
-            Rec.FILTERGROUP(0);
-        END;
-
-        AplicarFiltros;                       //$001
-    END;
-
-
-    var
+        Text001: Label 'El albarán no está a 0';
+        Text002: Label 'Ver albarán';
         TotalSalesLine: Record 37;
         TotalSalesLineLCY: Record 37;
         cust: Record Customer;
@@ -323,6 +307,26 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
         TotImp: Decimal;
         TotCont: Decimal;
 
+
+    trigger OnOpenPage()
+    BEGIN
+        if UserMgt.GetSalesFilter <> '' THEN BEGIN
+            Rec.FILTERGROUP(2);
+            Rec.SETRANGE("Responsibility Center", UserMgt.GetSalesFilter);
+            Rec.FILTERGROUP(0);
+        END;
+
+        AplicarFiltros;                       //$001
+    END;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        If (ABS(TotalSalesLine.Amount) > 0)
+                and (Abs(TotalSalesLineLCY.Amount) < 1) then begin
+            sendDocumentNotification();
+        end;
+    end;
+
     procedure Albaran_Factura(): Text
     begin
         CalcularTotales(Rec."No.");              //FCL-17/05/04
@@ -336,9 +340,6 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
                 DocumentType := DocumentType::Shipment;
         end else
             DocumentType := DocumentType::Invoice;
-        If (ABS(TotalSalesLine.Amount) > 0)
-        and (Abs(TotalSalesLineLCY.Amount) < 1) then
-            Message('Ojo, este albarán no está a 0');
 
         exit(Format(DocumentType));
     end;
@@ -457,18 +458,17 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
             UNTIL r37.NEXT = 0;
     END;
 
-    trigger OnAfterGetRecord()
+    procedure sendDocumentNotification()
     begin
         // Mostrar notificación si hay proyecto asociado
-        if Rec."Nº Proyecto" <> '' then begin
-            Notification.Id := 'PROJECT_NOTIFICATION';
-            Notification.Message := Text001;
-            Notification.Scope := NotificationScope::LocalScope;
-            Notification.AddAction(Text002, Codeunit::"Notification Handler", 'OpenProjectCard');
-            Notification.SetData('ProjectNo', Rec."Nº Proyecto");
-            NotificationLifecycleMgt.SendNotification(Notification, Rec.RecordId);
-        end else
-            NotificationLifecycleMgt.RecallNotificationsForRecord(Rec.RecordId, false);
+
+        Notification.Id := CreateGuid();
+        Notification.Message := Text001;
+        Notification.Scope := NotificationScope::LocalScope;
+        Notification.AddAction(Text002, Codeunit::ControldeEventos, 'OpenDocumentCard');
+        Notification.SetData('DocumentNo', Rec."No.");
+        NotificationLifecycleMgt.SendNotification(Notification, Rec.RecordId);
+
     end;
 
 }
