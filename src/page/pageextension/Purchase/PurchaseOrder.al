@@ -133,8 +133,9 @@ pageextension 80114 "PedidoCompraKuara" extends "Purchase Order"
                 trigger OnAction()
                 var
                     FromDocNo: Code[20];
+                    Control: Codeunit "ControlProcesos";
                 begin
-                    FromDocNo := Rec.RenoveDocument();
+                    FromDocNo := Control.RenoveDocument(Rec);
                     if Rec.Get(Rec."Document Type", Rec."No.") then;
                     Rec."Pedido Original" := FromDocNo;
                     Rec.Modify();

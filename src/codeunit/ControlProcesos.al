@@ -1007,6 +1007,7 @@ codeunit 50019 ControlProcesos
         GLBudgetName: Record "G/L Budget Name";
         GLAccount: Record "G/L Account";
         Budget: Page Budget;
+        SourceText: Text;
     begin
         GLAccount.ChangeCompany(Empresa);
         if not GLAccount.Get(SourceNo) then
@@ -1015,8 +1016,10 @@ codeunit 50019 ControlProcesos
         if not GLBudgetName.Get(BudgetName) then
             Error(glSourceDataDoesNotExistErr, GLBudgetName.TableCaption, BudgetName);
         Budget.SetBudgetName(BudgetName);
-        Budget.SetGLAccountFilter(SourceNo);
+        SourceText := SourceNo;
+        Budget.SetGLAccountFilter(SourceText);
         Budget.Run;
+        SourceText := '';
     end;
 
     local procedure ShowAzureAIForecast()
@@ -1511,8 +1514,10 @@ codeunit 50019 ControlProcesos
     VAR TotalSalesLine: Record 37; var TotalSalesLineLCY: Record 37);
     VAR
         SalesLineQty: Decimal;
-        TempVATAmountLine: Record 290 TEMPORARY;
-        TempVATAmountLineRemainder: Record 290 TEMPORARY;
+#pragma warning disable AL0432
+        TempVATAmountLine: Record "VAT Amount Line" Temporary;
+        TempVATAmountLineRemainder: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         SalesLine: Record 37;
         SalesSetup: Record 311;
         gCurrency: Record "Currency";
@@ -1591,9 +1596,11 @@ codeunit 50019 ControlProcesos
     /// <param name="SalesLineQty">Decimal.</param>
     /// <param name="VAR TempVATAmountLine">Record "VAT Amount Line" TEMPORARY.</param>
     /// <param name="VAR TempVATAmountLineRemainder">Temporary Record "VAT Amount Line".</param>
+#pragma warning disable AL0432
     procedure DivideAmount(SalesHeader: Record "Sales Header"; VAR SalesLine: Record "Sales Line";
 QtyType: Option General,Invoicing,Shipping; SalesLineQty: Decimal; VAR TempVATAmountLine: Record "VAT Amount Line" TEMPORARY;
 VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
+#pragma warning restore AL0432
     var
         OriginalDeferralAmount: Decimal;
     Begin
@@ -2707,5 +2714,933 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
                 end;
             until Company.Next() = 0;
     end;
+    //Orden publicidad
+    PROCEDURE ActualizarLineas(var Rec: Record "Cab. orden publicidad"; pActualizarTarifas: Boolean): Boolean;
+    VAR
+        wOpciones: Option Cancelar,Recalcular,Eliminar;
+        txt01: Label 'Recalcular lineas,Eliminar lineas';
+        rLinOrden: Record "Lin. orden publicidad";
+        cMedios: Codeunit "Gestion medios";
+    BEGIN
+
+        rLinOrden.RESET;
+        rLinOrden.SETRANGE("Tipo orden", Rec."Tipo orden");
+        rLinOrden.SETRANGE("No. orden", Rec.No);
+        rLinOrden.SETRANGE(rLinOrden."Importe manual", FALSE);
+        if rLinOrden.FIND('-') THEN BEGIN
+
+            wOpciones := STRMENU(txt01);
+
+            CASE wOpciones OF
+                wOpciones::Cancelar:
+                    EXIT(FALSE);
+                wOpciones::Recalcular:
+                    BEGIN
+                        rLinOrden.DELETEALL;
+                        if pActualizarTarifas THEN
+                            REc.CopiaTarifasTamaño;
+                        cMedios.GenerarLineasOrden(Rec, 0D, 0D, 0);  // Genera todas las lineas otra vez
+                        EXIT(TRUE);
+                    END;
+                wOpciones::Eliminar:
+                    BEGIN
+                        rLinOrden.DELETEALL(TRUE);
+                        if pActualizarTarifas THEN
+                            Rec.CopiaTarifasTamaño;
+                        EXIT(TRUE);
+                    END;
+            END;
+        END
+        ELSE BEGIN
+            if pActualizarTarifas THEN
+                Rec.CopiaTarifasTamaño;
+            EXIT(TRUE);
+        END;
+    END;
+    //Lineas de produccion
+    procedure CrearLineaProduccion(var Rec: Record "Job Planning Line"; Material: Text[30]; Agrupando: Boolean; Var LineasAgrupar: Record "Job Planning Line")
+    var
+        Prod: Record "Recursos de Producción";
+        ResourceProd: Record Resource;
+        ResourceOtra: Record Resource;
+        ResourceOtra2: Record Resource;
+        ProdTemp: Record "Recursos de Producción" temporary;
+        L: Integer;
+        LL: Integer;
+        Linea: Record "Job Planning Line";
+        TR: Record "Tipo Recurso";
+        T: Code[20];
+        rDet: Record 1003;
+        rLin: Record 1003 temporary;
+        Resource: Record Resource;
+        LineaTmp: Record "Job Planning Line" temporary;
+        Crear: Boolean;
+        RecId: RecordId;
+    begin
+        If ResourceOtra2.Get(Rec."No.") Then begin
+            If ResourceOtra2."Empresa Origen" <> '' Then begin
+                ResourceOtra2.ChangeCompany(ResourceOtra2."Empresa Origen");
+                ResourceOtra2.Get(ResourceOtra2."Nº En Empresa origen");
+            end;
+        end;
+        Linea.SetRange("Job No.", Rec."Job No.");
+        Linea.SetRange("Es Produccion", true);
+        Case Material of
+            'Cartel':
+                Linea.SetRange(Cartel, true);
+            'Lona':
+                Linea.SetRange(Lona, true);
+            'Vinilo':
+                Linea.SetRange(Vinilo, true);
+            'Otros':
+                Linea.SetRange(Otros, true);
+        end;
+        If Not Rec.Insert(true) then
+            Rec.Modify(true);
+        Crear := true;
+        If (Linea.Findfirst) Then
+            Repeat
+                If ResourceOtra.Get(Linea."No.") Then begin
+                    If ResourceOtra."Empresa Origen" <> '' Then ResourceOtra.ChangeCompany(ResourceOtra."Empresa Origen");
+                    ResourceOtra.Get(ResourceOtra."Nº En Empresa origen");
+                end;
+                If ResourceOtra2."Tipo Recurso" = ResourceOtra."Tipo Recurso" Then
+                    Crear := Confirm('Ya existe una linea de producción para este material, ¿Desea crear otra?');
+            until Linea.Next() = 0;
+        Rec.Get(Rec."Job No.", Rec."Job Task No.", Rec."Line No.");
+        Commit();
+        If Crear Then Begin
+            Resource.Get(Rec."No.");
+            if Resource."Empresa Origen" <> '' Then Prod.ChangeCompany(Resource."Empresa Origen");
+            Prod.SetRange("Tipo de Soporte", Resource."Tipo Recurso");
+            Prod.SetRange(Material, Material);
+            if Prod.FindFirst() Then begin
+                ProdTemp := Prod;
+                ProdTemp."Recurso No." := Prod."Recurso No.";
+                ProdTemp.Compra := Prod.Compra;
+                ProdTemp.Venta := Prod.Venta;
+                ProdTemp."Descuento Compra" := Prod."Descuento Compra";
+                ProdTemp."Descuento Venta" := Prod."Descuento Venta";
+                ProdTemp."Precio Unitario" := Prod."Precio Unitario";
+                ProdTemp."Empresa Origen" := Resource."Empresa Origen";
+                ProdTemp.Insert();
+                Commit();
+                Page.RunModal(0, ProdTemp);
+            end else // si no encuentra el material, da error
+                ERROR('No se ha encontrado el material para este tipo de soporte');
+            Linea.SetRange("Job No.", Rec."Job No.");
+            Linea.SetRange(Cartel);
+            Linea.SetRange("Es Produccion");
+            Linea.SetRange(Lona);
+            Linea.SetRange(Vinilo);
+            Linea.SetRange(Otros);
+            T := '10';
+            if Linea.FindLast() Then begin
+                LL := Rec."Line No.";
+                L := Linea."Line No.";
+                T := Linea."Job Task No.";
+            end;
+
+            Linea.Init();
+            Linea."Es Produccion" := true;
+            Linea.Cartel := Material = 'Cartel';
+            Linea.Lona := Material = 'Lona';
+            Linea.Vinilo := Material = 'Vinilo';
+            Linea.Otros := Material = 'Otros';
+            Linea."Job No." := Rec."Job No.";
+            Linea."Job Task No." := T;
+            if Prod.Incluida then
+                Linea."Crear pedidos" := Linea."Crear pedidos"::"De Compra"
+            else
+                Linea."Crear pedidos" := Linea."Crear pedidos"::"De Compra Y De Venta";
+            Linea."Line No." := l + 10000;
+            Linea."Type" := Linea."Type"::Resource;
+            If ProdTemp."Empresa Origen" <> '' Then begin
+                ResourceProd.SetRange("Empresa Origen", ProdTemp."Empresa Origen");
+                ResourceProd.SetRange("Nº En Empresa origen", ProdTemp."Recurso No.");
+                ResourceProd.FindFirst();
+                Linea.Validate("No.", ResourceProd."No.");
+            end else
+                Linea.Validate("No.", Prodtemp."Recurso No.");
+            Linea.Validate(Quantity, 1);
+            if Prod.Incluida then Linea."Origin Line No." := LL;
+            if Prod.Incluida = false then begin
+                Linea.Validate("Unit Price", Prodtemp.Venta);
+                Linea.Validate("% Dto. Venta", Prodtemp."Descuento Venta");
+            end;
+            Linea.Validate("Unit Cost", Prodtemp.Compra);
+            Linea.Validate("% Dto. Compra", Prodtemp."Descuento Compra");
+            If ProdTemp."Empresa Origen" <> '' Then TR.ChangeCompany(ProdTemp."Empresa Origen");
+            TR.Get(Prod."Tipo de Soporte");
+            If Prod.Descripcion <> '' Then
+                Linea.Description := Prod.Descripcion;
+            Linea.Validate("Shortcut Dimension 3 Code", TR."Cód. Principal");
+            Linea.Insert();
+            If Agrupando Then begin
+                if LineasAgrupar.FindFirst() then
+                    repeat
+                        LineaTmp := LineasAgrupar;
+                        LineaTmp.LineaProduccion := RecId;
+                        LineaTmp.Insert();
+                    until LineasAgrupar.Next() = 0;
+            end else begin
+                LineaTmp := Rec;
+                LineaTmp.Insert();
+            end;
+            Commit();
+            ProduccionNuevaxLinea(Rec, Prod.Empresa, LineaTmp);
+            Rec.Get(Rec."Job No.", Rec."Job Task No.", Rec."Line No.");
+            Rec.LineaProduccion := Linea.RecordId;
+            Rec.Modify();
+        End else begin
+            RecId := Linea.RecordId;
+            If Agrupando Then begin
+                if LineasAgrupar.FindFirst() then
+                    repeat
+                        LineaTmp := LineasAgrupar;
+                        LineaTmp.LineaProduccion := RecId;
+                        LineaTmp.Insert();
+                    until LineasAgrupar.Next() = 0;
+            end else
+                If Linea.FindSet() Then
+                    repeat
+                        LineaTmp := Linea;
+                        If LineaTmp.Insert() then;
+                    until Linea.Next() = 0;
+            LineaTmp := Rec;
+            If LineaTmp.Insert() Then;
+            Linea.Reset;
+            Linea.get(RecId);
+            ProduccionNuevaxLinea(Rec, Prod.Empresa, LineaTmp);
+            Rec.Get(Rec."Job No.", Rec."Job Task No.", Rec."Line No.");
+            Rec.LineaProduccion := Linea.RecordId;
+            Rec.Modify();
+        end;
+
+    end;
+    //Produccion
+    PROCEDURE Mirar_Estado(var Rec: Record "Job Planning Line");
+    var
+        Tipo: Record "Tipo Recurso";
+        Res: Record Resource;
+        rDia: Record "Diario Reserva";
+        Job: Record "Job";
+    BEGIN
+        //$001
+        if ((Rec.Type = Rec.Type::Resource) AND (Rec."No." <> '')) THEN BEGIN
+            if Res.GET(Rec."No.") THEN
+                Res.TESTFIELD(Blocked, FALSE);
+            If Not Tipo.GET(Res."Tipo Recurso") THEN
+                Tipo.Init();
+            If Not ((Res."Recurso Agrupado") Or (Tipo."Crea Reservas")) THEN
+                Rec."Sin Producción" := TRUE;
+            if Rec."Recurso Agrupado" then exit;
+            if Res."Producción" then exit;
+            if Not Tipo."Crea Reservas" then exit;
+            if Rec."Planning Date" = 0D then exit;
+            if Rec."Fecha Final" = 0D then exit;
+            rDia.RESET;
+            CLEAR(rDia);
+            rDia.SETCURRENTKEY("Nº Recurso", Fecha);
+            rDia.SETRANGE("Nº Recurso", Rec."No.");
+            rDia.SETRANGE(Fecha, Rec."Planning Date", Rec."Fecha Final");
+            if rDia.FINDFIRST THEN BEGIN
+                Job.GET(rDia."Nº Proyecto");
+                MESSAGE('Este recurso ya está %1 en el proyecto %2 \' +
+                        'Campaña: %3\' +
+                        'No se permitirá la creación de nuevas reservas en del %4 al %5. \' +
+                        'Téngalo en cuenta.', rDia.Estado, rDia."Nº Proyecto", Job.Description, Format(Rec."Planning Date", 0, '<Day,2> de <Month,2> de <Year>'), Format(Rec."Fecha Final", 0, '<Day,2> de <Month,2> de <Year>'));
+            END;
+        END;
+    END;
+
+    PROCEDURE TraeCodDivisa(var Rec: Record "Job Planning Line"): Code[10];
+    VAR
+        rProy: Record 167;
+    BEGIN
+        //FCL-24/02/04. Migración de 2.0. a 3.70.
+
+        if (Rec."Job No." = rProy."No.") THEN
+            EXIT(rProy."Cód. divisa")
+        ELSE
+            if rProy.GET(Rec."Job No.") THEN
+                EXIT(rProy."Cód. divisa")
+            ELSE
+                EXIT('');
+    END;
+
+    PROCEDURE RevisaOpciones();
+    BEGIN
+        //   { No se si en las lineas lo tengo que dejar... Pte Lloren‡
+        //   // $003
+        //   CASE Tipo OF
+        //     Tipo::"Por Campa¤a": BEGIN
+        //              "Fija/Papel" := "Fija/Papel"::Papel;
+        //            END;
+        //     Tipo::Otros: BEGIN            // unico caso que se tocan las otras opciones
+        //              "Fija/Papel" := 0;
+        //              Subtipo      := 0;
+        //              "Soporte de" := 0;
+        //            END;
+        //     ELSE BEGIN
+        //            if ("Soporte de" = "Soporte de"::Fijación) THEN
+        //              "Fija/Papel" := "Fija/Papel"::Papel
+        //            ELSE
+        //              "Fija/Papel" := "Fija/Papel"::Fija;
+        //          END;
+        //   END;
+        //   }
+    END;
+
+    PROCEDURE BorrarecursosRelacionados(var Rec: Record "Job Planning Line"; Num: Integer; JobNum: Code[20]);
+    VAR
+        ProduccionesRelacionadas: Record "Produccines Relacionadas";
+        Job: Record Job;
+        rRecRerlOtra: Record "Produccines Relacionadas";
+        Resource: Record Resource;
+        Contrato: Record "Sales Header";
+    BEGIN
+        ProduccionesRelacionadas.SETRANGE(ProduccionesRelacionadas."Line No.", Num);
+        ProduccionesRelacionadas.SETRANGE(ProduccionesRelacionadas."Job No.", JobNum);
+        Job.Get(JobNum);
+        If Contrato.Get(Contrato."Document Type"::Order, Job."Nº Contrato") then
+            If Contrato.Estado = Contrato.Estado::Firmado THEN
+                ERROR('No se puede eliminar una producción de un contrato firmado');
+        if ProduccionesRelacionadas.FINDFIRST THEN
+            REPEAT
+                If ProduccionesRelacionadas.Empresa <> CompanyName tHEN begin
+                    rRecRerlOtra.ChangeCompany(ProduccionesRelacionadas.Empresa);
+                    If Resource.Get(ProduccionesRelacionadas."No.") Then
+                        Resource.ChangeCompany(ProduccionesRelacionadas.Empresa);
+                    If Resource.Get(Rec."Recurso en Empresa Origen") Then begin
+                        rRecRerlOtra.SETRANGE(rRecRerlOtra."No.", Resource."No.");
+                        rRecRerlOtra.SETRANGE(rRecRerlOtra."Job No.", ProduccionesRelacionadas."Job No.2");
+                        rRecRerlOtra.DeleteAll();
+                    end;
+                end;
+            UNTIL ProduccionesRelacionadas.NEXT = 0;
+        ProduccionesRelacionadas.DELETEALL;
+    END;
+
+    PROCEDURE BorrarecursosRelacionados(var Rec: Record "Job Planning Line"; Num: Integer; JobNum: Code[20]; Num2: Integer; JobNum2: Code[20]);
+    VAR
+        ProduccionesRelacionadas: Record "Produccines Relacionadas";
+        rRecRerlOtra: Record "Produccines Relacionadas";
+        Resource: Record Resource;
+        Job: Record Job;
+        Contrato: Record "Sales Header";
+    BEGIN
+        ProduccionesRelacionadas.SETRANGE(ProduccionesRelacionadas."Line No.", Num);
+        ProduccionesRelacionadas.SETRANGE(ProduccionesRelacionadas."Job No.", JobNum);
+        if ProduccionesRelacionadas.FINDFIRST THEN
+            REPEAT
+                If ProduccionesRelacionadas.Empresa <> CompanyName tHEN begin
+                    rRecRerlOtra.ChangeCompany(ProduccionesRelacionadas.Empresa);
+                    Resource.Get(ProduccionesRelacionadas."No.");
+                    Resource.ChangeCompany(ProduccionesRelacionadas.Empresa);
+                    If Resource.Get(Rec."Recurso en Empresa Origen") Then begin
+                        rRecRerlOtra.SETRANGE(rRecRerlOtra."No.", Resource."No.");
+                        rRecRerlOtra.SETRANGE(rRecRerlOtra."Job No.", JobNum2);
+                        if rRecRerlOtra.FindFirst() then Error('No se puede eliminar una producción de un recurso que ha sido asignado en otra empresa. Primero debe borrar en %1 el proyecto %2', ProduccionesRelacionadas.Empresa, JobNum2);
+                    end;
+                end;
+            UNTIL ProduccionesRelacionadas.NEXT = 0;
+        Job.Get(JobNum);
+        If Contrato.Get(Contrato."Document Type"::Order, Job."Nº Contrato") then
+            If Contrato.Estado = Contrato.Estado::Firmado THEN
+                ERROR('No se puede eliminar una producción de un contrato firmado');
+        ProduccionesRelacionadas.SETRANGE("Line No.", Num);
+        ProduccionesRelacionadas.SETRANGE("Job No.", JobNum);
+        ProduccionesRelacionadas.SETRANGE("Line No.2", Num2);
+        ProduccionesRelacionadas.SETRANGE("Job No.2", JobNum2);
+        ProduccionesRelacionadas.DELETEALL;
+
+    END;
+
+    PROCEDURE Produccion(var Rec: Record "Job Planning Line");
+    VAR
+        Felije: Page "Elige Proyecto";
+        rJobPl: Record 1003 TEMPORARY;
+        rRes: Record 156;
+        rJobPl2: Record 1003;
+        Linea: Integer;
+
+    BEGIN
+        if rRes.GET(Rec."No.") THEN BEGIN
+            Linea := Rec."Line No.";
+            if NOT rRes.Producción THEN BEGIN
+                rJobPl2.SETRANGE(rJobPl2."Job No.", Rec."Job No.");
+                rJobPl2.SETRANGE(rJobPl2."Origin Line No.", Rec."Line No.");
+                if rJobPl2.FINDFIRST THEN
+                    REPEAT
+                        Linea := rJobPl2."Line No.";
+                        if rRes.GET(rJobPl2."No.") THEN BEGIN
+                            if rRes.Producción THEN rJobPl2.FINDLAST;
+                        END;
+                    UNTIL rJobPl2.NEXT = 0;
+            END;
+            if rRes.Producción THEN BEGIN
+                rJobPl."Job No." := Rec."Job No.";
+                rJobPl."Job Task No." := Rec."Job Task No.";
+                rJobPl."Line No." := Linea;
+                rJobPl."Planning Date" := Rec."Planning Date";
+                rJobPl."Document No." := Rec."Document No.";
+                rJobPl.Type := Rec.Type;
+                rJobPl."No." := rRes."No.";
+                rJobPl.INSERT;
+                COMMIT;
+                CLEAR(Felije);
+                Felije.CargaLinea(rJobPl);
+                Felije.RUNMODAL;
+            END;
+        END;
+    END;
+
+    PROCEDURE ProduccionNuevaxLinea(var Rec: Record "Job Planning Line"; Empresa: Text; Var r1003: Record 1003 Temporary);
+    VAR
+        Felije: Page "Elige Proyecto";
+        rJobPl: Record 1003 TEMPORARY;
+        rRes: Record 156;
+        rRes2: Record 156;
+        rJobPl2: Record 1003;
+        Linea: Integer;
+        Actual: Boolean;
+        rProdu: Record "Produccines Relacionadas";
+    BEGIN
+
+        if rRes.GET(Rec."No.") THEN BEGIN
+            rRes2.Get(Rec."No.");
+            Linea := Rec."Line No.";
+            if NOT rRes.Producción THEN BEGIN
+                rJobPl2.SETRANGE(rJobPl2."Job No.", Rec."Job No.");
+                rJobPl2.SETRANGE(rJobPl2."Origin Line No.", Rec."Line No.");
+                if rJobPl2.FINDFIRST THEN
+                    REPEAT
+                        Linea := rJobPl2."Line No.";
+                        if rRes.GET(rJobPl2."No.") THEN BEGIN
+                            if rRes.Producción THEN rJobPl2.FINDLAST;
+                        END;
+                    UNTIL rJobPl2.NEXT = 0;
+            END;
+            if rRes.Producción THEN BEGIN
+                rJobPl."Job No." := Rec."Job No.";
+                rJobPl."Job Task No." := Rec."Job Task No.";
+                rJobPl."Line No." := Linea;
+                rJobPl."Planning Date" := Rec."Planning Date";
+                rJobPl."Document No." := Rec."Document No.";
+                rJobPl.Type := Rec.Type;
+                rJobPl."No." := rRes."No.";
+                rJobPl.INSERT;
+                //Miro si solo hay una linea
+                if r1003.FindFirst() Then begin
+                    if r1003.FINDFIRST THEN
+                        repeat
+                            if rProdu.GET(Rec."Line No.", Rec."Job No.", r1003."Line No.", r1003."Job No.") THEN rProdu.DELETE;
+                            rProdu.INIT;
+                            rProdu."Line No." := Rec."Line No.";
+                            rProdu."Job No." := Rec."Job No.";
+                            rProdu."No." := Rec."No.";
+                            rProdu."Line No.2" := r1003."Line No.";
+                            case Rec.Type of
+                                Rec.Type::"Activo fijo":
+                                    rProdu.Type := rProdu.Type::"Activo Fijo";
+                                Rec.Type::Familia:
+                                    rProdu.Type := rProdu.Type::Familia;
+                                Rec.Type::"G/L Account":
+                                    rProdu.Type := rProdu.Type::Cuenta;
+                                Rec.Type::Item:
+                                    rProdu.Type := rProdu.Type::Producto;
+                                Rec.Type::Resource:
+                                    rProdu.Type := rProdu.Type::Recurso;
+                                Rec.Type::Text:
+                                    rProdu.Type := rProdu.Type::Texto;
+                            End;
+                            rProdu."Job No.2" := r1003."Job No.";
+                            case r1003.Type of
+                                r1003.Type::"Activo fijo":
+                                    rProdu.Type2 := rProdu.Type2::"Activo Fijo";
+                                r1003.Type::Familia:
+                                    rProdu.Type2 := rProdu.Type2::Familia;
+                                r1003.Type::"G/L Account":
+                                    rProdu.Type2 := rProdu.Type2::Cuenta;
+                                r1003.Type::Item:
+                                    rProdu.Type2 := rProdu.Type2::Producto;
+                                r1003.Type::Resource:
+                                    rProdu.Type2 := rProdu.Type2::Recurso;
+                                r1003.Type::Text:
+                                    rProdu.Type2 := rProdu.Type2::Texto;
+                            End;
+                            rProdu."Job No.2" := r1003."Job No.";
+                            rProdu.Empresa := Empresa;
+                            if Empresa <> COMPANYNAME THEN rRes.CHANGECOMPANY(Empresa);
+                            if Not rRes.GET(r1003."No.") THEN rRes.Init;
+                            If Rres2."Empresa Origen" <> '' Then Begin
+                                rRes2.ChangeCompany(Rres2."Empresa Origen");
+                                rRes2.Get(rRes2."Nº En Empresa origen");
+                            end;
+                            if rRes2."Tipo Recurso" = rRes."Tipo Recurso" Then begin
+                                rProdu.Description := Rec.Description;
+                                rProdu."Description 2" := r1003.Description;
+                                rProdu."No.2" := r1003."No.";
+                                if Not rRes.Producción THEN
+                                    rProdu.INSERT;
+                            end else
+                                Error(' No se puede relacionar un recurso de tipo %1 con un recurso de tipo %2', rRes2."Tipo Recurso", rRes."Tipo Recurso");
+                        until r1003.Next() = 0;
+                    Commit();
+                    exit;
+                end;
+
+            END;
+        END;
+    END;
+
+
+    PROCEDURE ProduccionNueva(var Rec: Record "Job Planning Line"; Empresa: Text; Proyecto: Code[20]);
+    VAR
+        Felije: Page "Elige Proyecto";
+        rJobPl: Record 1003 TEMPORARY;
+        rRes: Record 156;
+        rRes2: Record 156;
+        rJobPl2: Record 1003;
+        Linea: Integer;
+        r1003: Record 1003;
+        Actual: Boolean;
+        rProdu: Record "Produccines Relacionadas";
+
+    BEGIN
+
+        if rRes.GET(Rec."No.") THEN BEGIN
+            rRes2.Get(Rec."No.");
+            Linea := Rec."Line No.";
+            if NOT rRes.Producción THEN BEGIN
+                rJobPl2.SETRANGE(rJobPl2."Job No.", Rec."Job No.");
+                rJobPl2.SETRANGE(rJobPl2."Origin Line No.", Rec."Line No.");
+                if rJobPl2.FINDFIRST THEN
+                    REPEAT
+                        Linea := rJobPl2."Line No.";
+                        if rRes.GET(rJobPl2."No.") THEN BEGIN
+                            if rRes.Producción THEN rJobPl2.FINDLAST;
+                        END;
+                    UNTIL rJobPl2.NEXT = 0;
+            END;
+            if rRes.Producción THEN BEGIN
+                rJobPl."Job No." := Rec."Job No.";
+                rJobPl."Job Task No." := Rec."Job Task No.";
+                rJobPl."Line No." := Linea;
+                rJobPl."Planning Date" := Rec."Planning Date";
+                rJobPl."Document No." := Rec."Document No.";
+                rJobPl.Type := Rec.Type;
+                rJobPl."No." := rRes."No.";
+                rJobPl.INSERT;
+                Actual := (Proyecto = Rec."Job No.");
+                //Miro si solo hay una linea
+                if Empresa <> COMPANYNAME THEN
+                    r1003.CHANGECOMPANY(Empresa);
+                r1003.RESET;
+                r1003.SETRANGE(r1003."Job No.", Proyecto);
+                if Actual THEN
+                    r1003.SETFILTER(r1003."Line No.", '<>%1', Rec."Line No.");
+
+                if r1003.FindFirst() Then begin
+                    if r1003.FINDFIRST THEN
+                        repeat
+                            if rProdu.GET(Rec."Line No.", Rec."Job No.", r1003."Line No.", r1003."Job No.") THEN rProdu.DELETE;
+                            rProdu.INIT;
+                            rProdu."Line No." := Rec."Line No.";
+                            rProdu."Job No." := Rec."Job No.";
+                            rProdu."No." := Rec."No.";
+                            rProdu."Line No.2" := r1003."Line No.";
+                            case Rec.Type of
+                                Rec.Type::"Activo fijo":
+                                    rProdu.Type := rProdu.Type::"Activo Fijo";
+                                Rec.Type::Familia:
+                                    rProdu.Type := rProdu.Type::Familia;
+                                Rec.Type::"G/L Account":
+                                    rProdu.Type := rProdu.Type::Cuenta;
+                                Rec.Type::Item:
+                                    rProdu.Type := rProdu.Type::Producto;
+                                Rec.Type::Resource:
+                                    rProdu.Type := rProdu.Type::Recurso;
+                                Rec.Type::Text:
+                                    rProdu.Type := rProdu.Type::Texto;
+                            End;
+                            rProdu."Job No.2" := r1003."Job No.";
+                            case r1003.Type of
+                                r1003.Type::"Activo fijo":
+                                    rProdu.Type2 := rProdu.Type2::"Activo Fijo";
+                                r1003.Type::Familia:
+                                    rProdu.Type2 := rProdu.Type2::Familia;
+                                r1003.Type::"G/L Account":
+                                    rProdu.Type2 := rProdu.Type2::Cuenta;
+                                r1003.Type::Item:
+                                    rProdu.Type2 := rProdu.Type2::Producto;
+                                r1003.Type::Resource:
+                                    rProdu.Type2 := rProdu.Type2::Recurso;
+                                r1003.Type::Text:
+                                    rProdu.Type2 := rProdu.Type2::Texto;
+                            End;
+                            rProdu."Job No.2" := r1003."Job No.";
+                            rProdu.Empresa := Empresa;
+                            if Empresa <> COMPANYNAME THEN rRes.CHANGECOMPANY(Empresa);
+                            if Not rRes.GET(r1003."No.") THEN rRes.Init;
+                            if rRes2."Tipo Recurso" = rRes."Tipo Recurso" Then begin
+                                rProdu.Description := Rec.Description;
+                                rProdu."Description 2" := r1003.Description;
+                                rProdu."No.2" := r1003."No.";
+                                if Not rRes.Producción THEN
+                                    rProdu.INSERT;
+                            end;
+                        until r1003.Next() = 0;
+                    Commit();
+                    exit;
+                end;
+                COMMIT;
+                CLEAR(Felije);
+                Felije.CargaLinea(rJobPl, Empresa, Proyecto);
+                Felije.RUNMODAL;
+            END;
+        END;
+    END;
+
+    PROCEDURE BuscarecursosRelacionados(Num: Integer; JobNum: Code[20]; ResNum: Code[20]): Boolean;
+    VAR
+        rRecRerl: Record "Produccines Relacionadas";
+
+    BEGIN
+        rRecRerl.SETRANGE(rRecRerl."Line No.", Num);
+        rRecRerl.SETRANGE(rRecRerl."Job No.", JobNum);
+        rRecRerl.SETRANGE(rRecRerl."No.", ResNum);
+        EXIT(rRecRerl.FINDFIRST);
+    END;
+    //Imagenes OrdenFijacion
+    procedure FormBase64ToUrl(Base64: text; Filename: Text; var Id: Integer) ReturnValue: Text
+    VAR
+        Outstr: OutStream;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Token: Text;
+        RestApiC: Codeunit Restapi;
+        JsonObj: JsonObject;
+        UrlToken: JsonToken;
+        RequestType: Option Get,patch,put,post,delete;
+        FileMgt: Codeunit "File Management";
+        Json: Text;
+        IdToken: JsonToken;
+        Ok: Boolean;
+    begin
+        GeneralLedgerSetup.Get();
+        case FileMgt.GetExtension(Filename) of
+            'jpg', 'png', 'bmp', 'tif':
+                Base64 := 'image/' + FileMgt.GetExtension(Filename) + ';base64,' + Base64;
+            else
+                Base64 := 'application/' + FileMgt.GetExtension(Filename) + ';base64,' + Base64;
+        end;
+
+        Repeat
+
+            JsonObj.add('base64', base64);
+            jsonobj.add('filename', filename);
+            JsonObj.WriteTo(Json);
+            Json := RestApiC.RestApiImagenes('https://base64-api.deploy.malla.es/' + 'save', RequestType::Post, Json);
+            Clear(JsonObj);
+            //Request failed with status code 400
+            if Json = 'Request failed with status code 400' then
+                Error('Error al guardar el archivo');
+            Ok := JsonObj.ReadFrom(Json);
+            if not Ok then
+                sleep(5000);
+        Until Ok;
+        JsonObj.Get('url', UrlToken);
+        JsonObj.Get('_id', IdToken);
+        ReturnValue := UrlToken.AsValue().AsText;
+        Id := IdToken.AsValue().AsInteger;
+        exit(ReturnValue);
+    end;
+    /// <summary>
+    /// ToBase64StringOcr.
+    /// </summary>
+    /// <param name="bUrl">Text.</param>
+    /// <returns>Return value of type Text.</returns>
+    procedure ToBase64StringOcr(bUrl: Text): Text
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        JsonObj: JsonObject;
+        Json: Text;
+        RestapiC: Codeunit RestApi;
+        RequestType: Option Get,patch,put,post,delete;
+        base64Token: JsonToken;
+        base64: Text;
+    begin
+        GeneralLedgerSetup.Get();
+        JsonObj.add('url', bUrl);
+        JsonObj.WriteTo(Json);
+        Json := RestApiC.RestApiImagenes('https://base64-api.deploy.malla.es/' + 'fetch', RequestType::Post, Json);
+
+        // Verificar si la respuesta es HTML (error 502, 404, etc.)
+        if (StrPos(Json, '<!doctype html>') > 0) or
+           (StrPos(Json, '<html>') > 0) or
+           (StrPos(Json, 'NGINX 502 Error') > 0) or
+           (StrPos(Json, 'Error') > 0) then begin
+            exit(''); // Devolver cadena vacía si es una página de error
+        end;
+
+        // Verificar si la respuesta es JSON válido
+        if not JsonObj.ReadFrom(Json) then begin
+            // Si no es JSON válido, intentar extraer base64 directamente
+            if (StrLen(Json) > 2) and (Json[1] = '"') and (Json[StrLen(Json)] = '"') then
+                base64 := CopyStr(Json, 2, StrLen(Json) - 2)
+            else
+                base64 := Json;
+        end else begin
+            // Si es JSON válido, intentar obtener el campo base64
+            if JsonObj.Get('base64', base64Token) then
+                base64 := base64Token.AsValue().AsText()
+            else
+                base64 := CopyStr(Json, 2, StrLen(Json) - 2);
+        end;
+
+        exit(base64);
+    end;
+
+    /// <summary>
+    /// DeleteId.
+    /// </summary>
+    /// <param name="Id">Integer.</param>
+    /// <returns>Return value of type Text.</returns>
+    procedure DeleteId(Id: Integer): Text
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        JsonObj: JsonObject;
+        Json: Text;
+        RestapiC: Codeunit RestApi;
+        RequestType: Option Get,patch,put,post,delete;
+        base64Token: JsonToken;
+        base64: Text;
+    begin
+        GeneralLedgerSetup.Get();
+        Json := RestApiC.RestApiImagenes('https://base64-api.deploy.malla.es/' + 'delete/' + Format(Id), RequestType::delete, '');
+        //Clear(JsonObj);
+        //JsonObj.ReadFrom(Json);
+        //JsonObj.Get('base64', base64Token);
+        exit(Json);
+
+    end;
+
+    procedure Export(var Rec: Record "Imagenes Orden fijación"; ShowFileDialog: Boolean) Result: Text
+    var
+        TempBlob: Codeunit "Temp Blob";
+        FileManagement: Codeunit "File Management";
+        DocumentStream: OutStream;
+        FullFileName: Text;
+        IsHandled: Boolean;
+        Base64Convert: Codeunit "Base64 Convert";
+        Ins: Instream;
+
+    begin
+        If Rec.Url <> '' Then begin
+            TempBlob.CreateOutStream(DocumentStream);
+            Base64Convert.FromBase64(ToBase64StringOcr(Rec.Url), DocumentStream);
+            TempBlob.CreateInStream(Ins);
+            Rec.Image.ImportStream(Ins, Rec.Nombre + '.' + Rec."Extension");
+        end;
+        exit(Result);
+    end;
+
+    procedure SaveAttachmentRecRef(var Rec: Record "Imagenes Orden fijación"; RecRef: RecordRef; FileName: Text; TempBlob: Codeunit "Temp Blob")
+    begin
+        SaveAttachment(Rec, RecRef, FileName, TempBlob, true);
+    end;
+
+    procedure InsertAttachment(var Rec: Record "Imagenes Orden fijación"; DocStream: InStream; RecRef: RecordRef; FileName: Text; AllowDuplicateFileName: Boolean)
+    var
+        IsHandled: Boolean;
+        Base64Convert: Codeunit "Base64 Convert";
+        Base64: Text;
+        IncomingFileName: Text;
+        FileManagement: Codeunit "File Management";
+    begin
+
+        IncomingFileName := FileName;
+
+        Rec.Validate(Extension, FileManagement.GetExtension(IncomingFileName));
+        Rec.Validate("Nombre", CopyStr(FileManagement.GetFileNameWithoutExtension(IncomingFileName), 1, MaxStrLen(Rec."Nombre")));
+
+
+
+        Base64 := Base64Convert.ToBase64(DocStream);
+        Rec.Url := FormBase64ToUrl(Base64, Filename, Rec."Nº Imagen");
+        Rec.Id := Rec."Nº Imagen";
+        Rec.Insert(true);
+    end;
+
+    procedure InsertAttachment(var Rec: Record "Imagenes Orden fijación"; DocStream: InStream; FileName: Text; AllowDuplicateFileName: Boolean)
+    var
+        IsHandled: Boolean;
+        Base64Convert: Codeunit "Base64 Convert";
+        Base64: Text;
+        IncomingFileName: Text;
+        FileManagement: Codeunit "File Management";
+    begin
+
+        IncomingFileName := FileName;
+
+        Rec.Validate(Extension, FileManagement.GetExtension(IncomingFileName));
+        Rec.Validate("Nombre", CopyStr(FileManagement.GetFileNameWithoutExtension(IncomingFileName), 1, MaxStrLen(Rec."Nombre")));
+
+
+
+        Base64 := Base64Convert.ToBase64(DocStream);
+        Rec.Url := FormBase64ToUrl(Base64, Filename, Rec."Nº Imagen");
+        Rec.Id := Rec."Nº Imagen";
+        Rec.Insert(true);
+    end;
+
+    procedure SaveAttachment(var Rec: Record "Imagenes Orden fijación"; RecRef: RecordRef; FileName: Text; TempBlob: Codeunit "Temp Blob"; AllowDuplicateFileName: Boolean)
+    var
+        DocStream: InStream;
+        EmptyFileNameErr: Label 'Please choose a file to attach.';
+        NoContentErr: Label 'The selected file has no content. Please choose another file.';
+    begin
+
+        if FileName = '' then
+            Error(EmptyFileNameErr);
+        // Validate file/media is not empty
+        if not TempBlob.HasValue() then
+            Error(NoContentErr);
+
+        TempBlob.CreateInStream(DocStream);
+        InsertAttachment(Rec, DocStream, RecRef, FileName, AllowDuplicateFileName);
+    end;
+
+    procedure SaveAttachmentFromStream(var Rec: Record "Imagenes Orden fijación"; DocStream: InStream; RecRef: RecordRef; FileName: Text; AllowDuplicateFileName: Boolean)
+    var
+        EmptyFileNameErr: Label 'Please choose a file to attach.';
+        NoContentErr: Label 'The selected file has no content. Please choose another file.';
+    begin
+
+        if FileName = '' then
+            Error(EmptyFileNameErr);
+
+        InsertAttachment(Rec, DocStream, RecRef, FileName, AllowDuplicateFileName);
+    end;
+
+    procedure SaveAttachmentFromStream(var Rec: Record "Imagenes Orden fijación"; DocStream: InStream; RecRef: RecordRef; FileName: Text)
+    begin
+        SaveAttachmentFromStream(Rec, DocStream, RecRef, FileName, true);
+    end;
+
+    //PurchaseHeader
+    procedure RenoveDocument(var Rec: Record "Purchase Header"): Code[20]
+    var
+        CopyPurchaseDocument: Report "Renove Purchase Document";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        if IsHandled then
+            exit;
+
+        CopyPurchaseDocument.SetPurchHeader(Rec);
+        CopyPurchaseDocument.RunModal();
+        exit(CopyPurchaseDocument.GetNo());
+    end;
+    //Resources
+    Procedure TrasladaOtrasEmpresas(var Rec: Record Resource)
+    Var
+        rRes: Record Resource;
+        Control: Codeunit ControlProcesos;
+        rEmp: Record Company;
+        rInf: Record "Company Information";
+    begin
+        //rEmp.SETRANGE(rEmp.InterEmpresas,TRUE);
+
+        rEmp.SETFILTER(rEmp.Name, '<>%1', COMPANYNAME);
+        rEmp.SetRange("Evaluation Company", false);
+        if rEmp.FINDFIRST THEN
+            REPEAT
+                if Control.Permiso_Empresas(rEmp.Name) then begin
+                    rInf.CHANGECOMPANY(rEmp.Name);
+                    if rInf.Get() then begin
+                        if rInf.InterEmpresas = true Then begin
+                            rRes.CHANGECOMPANY(rEmp.Name);
+                            if rRes.GET(Rec."No.") THEN rRes.DELETE;
+                            rRes := Rec;
+                            rRes.INSERT;
+                        End;
+                    end;
+                end;
+            UNTIL rEmp.NEXT = 0;
+    end;
+
+    Procedure BorraOtrasEmpresas(var Rec: Record Resource)
+    var
+        rRes: Record Resource;
+        Control: Codeunit ControlProcesos;
+        rEmp: Record Company;
+        rInf: Record "Company Information";
+    begin
+        //rEmp.SETRANGE(rEmp.InterEmpresas,TRUE);
+        rEmp.SETFILTER(rEmp.Name, '<>%1', COMPANYNAME);
+        rEmp.SetRange("Evaluation Company", false);
+
+        if rEmp.FINDFIRST THEN
+            REPEAT
+                if Control.Permiso_Empresas(rEmp.Name) then begin
+                    rInf.CHANGECOMPANY(rEmp.Name);
+                    if rInf.Get() then begin
+                        if rInf.InterEmpresas then begin
+                            if rRes.GET(Rec."No.") THEN rRes.DELETE;
+                            // rRes:=Rec;
+                            // rRes:=Rec;
+                        end;
+                    end;          // rRes.INSERT;
+                end;
+            UNTIL rEmp.NEXT = 0;
+    end;
+
+    procedure GetFileAsBase64(FileName: Text; APIServerURL: Text): Text
+    var
+        Client: HttpClient;
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        Content: HttpContent;
+        ResponseText: Text;
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+        Base64Content: Text;
+    begin
+        // Construir la URL completa
+        APIServerURL := APIServerURL + '/file?filepath=' + FileName;
+
+        // Configurar el método GET
+        RequestMessage.Method := 'GET';
+        RequestMessage.SetRequestUri(APIServerURL);
+
+        // Enviar la petición
+        if not Client.Send(RequestMessage, ResponseMessage) then
+            exit('');
+
+        // Verificar el código de respuesta
+        if not ResponseMessage.IsSuccessStatusCode() then
+            exit('');
+
+        // Leer el contenido de la respuesta
+        ResponseMessage.Content().ReadAs(ResponseText);
+
+        // Parsear el JSON
+        if not JsonObject.ReadFrom(ResponseText) then
+            exit('');
+
+        // Extraer el campo base64
+        if not JsonObject.Get('base64', JsonToken) then
+            exit('');
+
+        JsonToken.WriteTo(Base64Content);
+        // Remover las comillas del JSON
+        Base64Content := DelChr(Base64Content, '<>', '"');
+
+        exit(Base64Content);
+    end;
+
+
 }
 

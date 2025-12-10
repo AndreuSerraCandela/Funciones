@@ -884,18 +884,19 @@ codeunit 50007 "Procedures Standard"
         AccountingPeriod: Record 50;
         AccountingPeriodFY: Record 50;
         Steps: Integer;
-        Type: Option " ","Period","Fiscal year","Fiscal Halfyear","Fiscal Quarter";
+        Type: Enum "Period Type";
         CurrentPeriodNo: Integer;
-        RangeFromType: Option Int,CP,LP;
-        RangeToType: Option Int,CP,LP;
+        RangeFromType: Enum "Period Formula Range";
+        RangeToType: Enum "Period Formula Range";
         RangeFromInt: Integer;
         RangeToInt: Integer;
+        PeriodParse: Codeunit "Period Formula Parser";
+        LanguageId: Integer;
     BEGIN
         if Formula = '' THEN
             EXIT;
 
-        ColumnLayout.ParsePeriodFormula(
-          Formula, Steps, Type, RangeFromType, RangeToType, RangeFromInt, RangeToInt);
+        PeriodParse.ParsePeriodFormula(Formula, Steps, Type, RangeFromType, RangeToType, RangeFromInt, RangeToInt, LanguageId);
 
         // Find current period
         AccountingPeriod.SETFILTER("Starting Date", '<=%1', Date);
@@ -968,7 +969,7 @@ codeunit 50007 "Procedures Standard"
         END;
     END;
 
-    LOCAL PROCEDURE AccPeriodStartOrEnd(AccountingPeriod: Record 50; CurrentPeriodNo: Integer; RangeType: Option Int,CP,LP; RangeInt: Integer; EndDate: Boolean; VAR Date: Date);
+    LOCAL PROCEDURE AccPeriodStartOrEnd(AccountingPeriod: Record 50; CurrentPeriodNo: Integer; RangeType: Enum "Period Formula Range"; RangeInt: Integer; EndDate: Boolean; VAR Date: Date);
     BEGIN
         CASE RangeType OF
             RangeType::CP:

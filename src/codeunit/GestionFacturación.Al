@@ -3075,7 +3075,9 @@ codeunit 50001 "Gestion Facturación"
         SalesInvHeader: Record 112;
         SalesLine: Record 37;
         PrepmtInvBuffer: Record 461 TEMPORARY;
+#pragma warning disable AL0432
         TempVATAmountLine: Record 290 TEMPORARY;
+#pragma warning restore AL0432
         //TempDocDim: Record 357 TEMPORARY;
         TempDimBuf: Record 360 TEMPORARY;
         PrepmtInvLine: Record "Prepayment Inv. Line Buffer";
@@ -3555,7 +3557,9 @@ codeunit 50001 "Gestion Facturación"
         PrepmtTotalAmount: Decimal;
         PrepmtVATAmount: Decimal;
         PrepmtVATAmountText: Text[30];
+#pragma warning disable AL0432
         TempVATAmountLine4: Record 290;
+#pragma warning restore AL0432
         wTotFra1: Decimal;
         rPropuestas: Record "Facturas Propuestas";
     BEGIN

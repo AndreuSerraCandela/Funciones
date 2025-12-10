@@ -44,20 +44,20 @@ codeunit 50003 ControldeEventos
                 Texto := V.GetStatusDocumentTxt(SalesInvoice."B2r ID", SalesInvoice."No.", true);
             until SalesInvoice.Next() = 0;
         Commit();
-        SalesInvoice.SetFilter("B2R id", '<>%1', '');
-        SalesInvoice.SetRange("B2R FACe ID", '<>%1', '');
-        SalesInvoice.SetRange("B2R FACe ID 2", '');
-        if SalesInvoice.FindSet() then
-            repeat
-                SalesInvoice."B2R FACE ID 2" := SalesInvoice."B2R FACE ID";
-                SalesInvoice.Modify();
-            until SalesInvoice.Next() = 0;
-        SalesInvoice.SetRange("B2R FACE ID");
-        if SalesInvoice.FindFirst() then
-            repeat
-                Texto := V.GetStatusDocumentTxt(SalesInvoice."B2r ID", SalesInvoice."No.", true);
-            until SalesInvoice.Next() = 0;
-        Commit();
+        // SalesInvoice.SetFilter("B2R id", '<>%1', '');
+        // SalesInvoice.SetRange("B2R FACe ID", '<>%1', '');
+        // SalesInvoice.SetRange("B2R FACe ID 2", '');
+        // if SalesInvoice.FindSet() then
+        //     repeat
+        //         SalesInvoice."B2R FACE ID 2" := SalesInvoice."B2R FACE ID";
+        //         SalesInvoice.Modify();
+        //     until SalesInvoice.Next() = 0;
+        // SalesInvoice.SetRange("B2R FACE ID");
+        // if SalesInvoice.FindFirst() then
+        //     repeat
+        //         Texto := V.GetStatusDocumentTxt(SalesInvoice."B2r ID", SalesInvoice."No.", true);
+        //     until SalesInvoice.Next() = 0;
+        // Commit();
 
     end;
     #region EventSubscriber
@@ -178,6 +178,7 @@ codeunit 50003 ControldeEventos
                     DocumentEntry."Table ID" := Database::"Sales Header";
                     DocumentEntry."Document Type" := DocumentEntry."Document Type"::Order;
                     DocumentEntry."Table Name" := CopyStr('Contratos', 1, MaxStrLen(DocumentEntry."Table Name"));
+                    DocumentEntry."Document No." := Contratos."No.";
                     DocumentEntry."No. of Records" := 1;
                     DocumentEntry.Insert();
                     If Jobs.Get(Contratos."Nº Proyecto") then begin
@@ -186,6 +187,7 @@ codeunit 50003 ControldeEventos
                         DocumentEntry."Table ID" := Database::Job;
                         DocumentEntry."Document Type" := DocumentEntry."Document Type"::" ";
                         DocumentEntry."Table Name" := CopyStr(Jobs.TableCaption, 1, MaxStrLen(DocumentEntry."Table Name"));
+                        DocumentEntry."Document No." := Contratos."Nº Proyecto";
                         DocumentEntry."No. of Records" := 1;
                         DocumentEntry.Insert();
                     end;
@@ -199,67 +201,38 @@ codeunit 50003 ControldeEventos
         end;
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnBeforeNavigateShowRecords', '', false, false)]
-    local procedure OnBeforeNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; var TempDocumentEntry: Record "Document Entry" temporary; var IsHandled: Boolean; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; var SOSalesHeader: Record "Sales Header"; var SISalesHeader: Record "Sales Header"; var SCMSalesHeader: Record "Sales Header"; var SROSalesHeader: Record "Sales Header"; var GLEntry: Record "G/L Entry"; var VATEntry: Record "VAT Entry"; var VendLedgEntry: Record "Vendor Ledger Entry"; var WarrantyLedgerEntry: Record "Warranty Ledger Entry"; var NewSourceRecVar: Variant; var SalesShipmentHeader: Record "Sales Shipment Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var ReturnShipmentHeader: Record "Return Shipment Header"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry")
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnBeforeShowRecords', '', false, false)]
+    //local procedure OnBeforeNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; var TempDocumentEntry: Record "Document Entry" temporary; var IsHandled: Boolean; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; var SOSalesHeader: Record "Sales Header"; var SISalesHeader: Record "Sales Header"; var SCMSalesHeader: Record "Sales Header"; var SROSalesHeader: Record "Sales Header"; var GLEntry: Record "G/L Entry"; var VATEntry: Record "VAT Entry"; var VendLedgEntry: Record "Vendor Ledger Entry"; var WarrantyLedgerEntry: Record "Warranty Ledger Entry"; var NewSourceRecVar: Variant; var SalesShipmentHeader: Record "Sales Shipment Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var ReturnShipmentHeader: Record "Return Shipment Header"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry")
+    local procedure OnBeforeShowRecords(var TempDocumentEntry: Record "Document Entry" temporary; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean; ContactNo: Code[250]; ExtDocNo: Code[250]; var IsHandled: Boolean);
     var
         Contratos: Record "Sales Header";
-        RecRef: RecordRef;
         Jobs: Record Job;
+
     begin
-        If (TableID = Database::Job) or (TableID = Database::"Sales Header") then begin
-            if NewSourceRecVar.IsRecord then begin
-                RecRef.GetTable(NewSourceRecVar);
-                If (RecRef.Number = Database::"Sales Invoice Header") or (RecRef.Number = Database::"Sales Cr.Memo Header") or
-                (RecRef.Number = Database::"Sales Shipment Header") then begin
-                    Contratos.SetRange("No.", RecRef.Field(50030).Value);
-                    if Contratos.FindFirst() then begin
-                        If TableID = Database::Job Then begin
-                            If Jobs.Get(Contratos."Nº Proyecto") then begin
-                                Jobs.SetRange("No.", Contratos."Nº Proyecto");
-                                Page.RunModal(0, Jobs);
-                                IsHandled := true;
-                            end;
-                        end else begin
-                            If Contratos."No. Series" <> 'CONTRATO' THEN EXIT;
-                            IsHandled := true;
-                            Page.RunModal(Page::"Lista Contratos Venta", Contratos);
-                        end;
-                    end;
-                end;
-                If (RecRef.Number = Database::"Purch. Inv. Header") or (RecRef.Number = Database::"Purch. Cr. Memo Hdr.") then begin
-                    Contratos.SetRange("No.", RecRef.Field(51043).Value);
-                    if Contratos.FindFirst() then begin
-                        If TableID = Database::Job Then begin
-                            If Jobs.Get(Contratos."Nº Proyecto") then begin
-                                Jobs.SetRange("No.", Contratos."Nº Proyecto");
-                                IsHandled := true;
-                                Page.RunModal(0, Jobs);
-                            end;
-                        end else begin
-                            If Contratos."No. Series" <> 'CONTRATO' THEN EXIT;
-                            IsHandled := true;
-                            Page.RunModal(Page::"Lista Contratos Venta", Contratos);
-                        end;
-                    end;
-                end;
-                If (RecRef.Number = Database::"Purch. Rcpt. Header") then begin
-                    Contratos.SetRange("Nº Proyecto", RecRef.Field(50075).Value);
-                    if Contratos.FindFirst() then begin
-                        If TableID = Database::Job Then begin
-                            If Jobs.Get(Contratos."Nº Proyecto") then begin
-                                Jobs.SetRange("No.", Contratos."Nº Proyecto");
-                                IsHandled := true;
-                                Page.RunModal(0, Jobs);
-                            end;
-                        end else begin
-                            If Contratos."No. Series" <> 'CONTRATO' THEN EXIT;
-                            IsHandled := true;
-                            Page.RunModal(Page::"Lista Contratos Venta", Contratos);
-                        end;
-                    end;
+        If (TempDocumentEntry."Table ID" = Database::Job) or (TempDocumentEntry."Table ID" = Database::"Sales Header") then begin
+
+
+
+
+            If TempDocumentEntry."Table ID" = Database::Job Then begin
+
+                Jobs.SetRange("No.", TempDocumentEntry."Document No.");
+                Page.RunModal(0, Jobs);
+                IsHandled := true;
+
+            end else begin
+                Contratos.SetRange("No.", TempDocumentEntry."Document No.");
+                if Contratos.FindFirst() then begin
+
+                    If Contratos."No. Series" <> 'CONTRATO' THEN EXIT;
+                    IsHandled := true;
+                    Page.RunModal(Page::"Lista Contratos Venta", Contratos);
                 end;
             end;
         end;
+
+
+
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnBeforeFindRecordsSetSources', '', false, false)]

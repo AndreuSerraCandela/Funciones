@@ -1206,10 +1206,12 @@ codeunit 50015 ControldeEventosCodeunits
     //             TempSalesLine.Insert;
     //         UNTIL SelesDesgl.NEXT = 0;
     // end;
+#pragma warning disable AL0432
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesLines', '', false, false)]
     local procedure OnBeforePostSalesLines(var SalesHeader: Record "Sales Header"; var TempSalesLineGlobal: Record "Sales Line" temporary; var TempVATAmountLine: Record "VAT Amount Line" temporary)
     begin
+#pragma warning restore AL0432
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"] Then
             ContabAlb.Desglosar(SalesHeader);
         // OnAfterCopyToTempLines(TempSalesLineGlobal, SalesHeader);
@@ -1857,8 +1859,9 @@ codeunit 50015 ControldeEventosCodeunits
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 55, 'OnAfterPreparePurchase', '', false, false)]
-    local procedure OnAfterPreparePurchase(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", OnAfterPrepareInvoicePostingBuffer, '', false, false)]
+    local procedure OnAfterPrepareInvoicePostingBuffer(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+
     var
         GlSetup: Record "General Ledger Setup";
         PurchaseHeader: Record "Purchase Header";

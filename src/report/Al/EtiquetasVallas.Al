@@ -188,6 +188,7 @@ Report 50039 "Etiqueta orden fijacion Vallas"
         Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
+        Control: Codeunit "ControlProcesos";
     BEGIN
         mOrden[j, 1] := STRSUBSTNO('%1', rOrden."Nº Proyecto");
         mOrden[j, 2] := STRSUBSTNO('%1', rOrden."Fecha fijación");
@@ -232,10 +233,16 @@ Report 50039 "Etiqueta orden fijacion Vallas"
                 InputFile.CreateInStream(Ins);
                 //Resource.CalcFields(Image);
                 "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
+            end else begin
+                Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:5045');
+                TempBlob.CreateOutStream(OutStr);
+                Base64Convert.FromBase64(base64, OutStr);
+                TempBlob.CreateInStream(InS);
+                "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
             end;
             If Not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Imagen") Then Resource2.init;
             If Resource2.Url <> '' Then begin
-                Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                Base64 := Control.ToBase64StringOcr(Resource2.Url);
                 TempBlob.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(base64, OutStr);
                 TempBlob.CreateInStream(InStr);
@@ -243,7 +250,7 @@ Report 50039 "Etiqueta orden fijacion Vallas"
             end;
             If Not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Qr") Then Resource2.init;
             If Resource2.Url <> '' Then begin
-                Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                Base64 := Control.ToBase64StringOcr(Resource2.Url);
                 TempBlob.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(base64, OutStr);
                 TempBlob.CreateInStream(InStr);
@@ -267,10 +274,18 @@ Report 50039 "Etiqueta orden fijacion Vallas"
                 InputFile.CreateInStream(Ins);
                 //Resource.CalcFields(Image);
                 "Det_Orden_fijacion"."Image Resource2".ImportStream(ins, 'Image');
+            end else begin
+                Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:5045');
+                if Base64 <> '' then begin
+                    TempBlob.CreateOutStream(OutStr);
+                    Base64Convert.FromBase64(base64, OutStr);
+                    TempBlob.CreateInStream(InS);
+                    "Det_Orden_fijacion"."Image Resource2".ImportStream(ins, 'Image');
+                end;
             end;
             If not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Imagen") Then Resource2.init;
             If Resource2.Url <> '' Then begin
-                Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                Base64 := Control.ToBase64StringOcr(Resource2.Url);
                 TempBlob.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(base64, OutStr);
                 TempBlob.CreateInStream(InStr);
@@ -278,7 +293,7 @@ Report 50039 "Etiqueta orden fijacion Vallas"
             end;
             If not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Qr") Then Resource2.init;
             If Resource2.Url <> '' Then begin
-                Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                Base64 := Control.ToBase64StringOcr(Resource2.Url);
                 TempBlob.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(base64, OutStr);
                 TempBlob.CreateInStream(InStr);

@@ -659,9 +659,10 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 trigger OnAction()
                 Var
                     rDet: Record 1003;
+                    Control: Codeunit "ControlProcesos";
                 BEGIN
                     CurrPage.JobTaskLines2.Page.GETRECORD(rDet);
-                    rDet.Produccion;
+                    Control.Produccion(rDet);
                 END;
             }
             action("Crear Linea Producción")
@@ -679,6 +680,7 @@ pageextension 80111 "JobKuara" extends "Job Card"
                     T: Code[20];
                     rDet: Record 1003;
                     rLin: Record 1003 temporary;
+                    Control: Codeunit "ControlProcesos";
                 begin
                     Linea.SetRange("Job No.", Rec."No.");
                     T := '10';
@@ -718,9 +720,9 @@ pageextension 80111 "JobKuara" extends "Job Card"
                     Commit();
                     Asis.Lineas(rlin);
                     if rLin.Count = 0 then
-                        Linea.ProduccionNueva(Prod.Empresa, prod."Nº Proyecto")
+                        Control.ProduccionNueva(Linea, Prod.Empresa, prod."Nº Proyecto")
                     else
-                        Linea.ProduccionNuevaxLinea(Prod.Empresa, rLin);
+                        Control.ProduccionNuevaxLinea(Linea, Prod.Empresa, rLin);
 
 
 

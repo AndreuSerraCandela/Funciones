@@ -733,7 +733,9 @@ pageextension 80131 PosrtedSalesInvioce extends "Posted Sales Invoices"
         TotalPurchLine: Record 39;
         TotalPurchLineLCY: Record 39;
         Vend: Record Vendor;
-        TempVATAmountLine: Record 290 TEMPORARY;
+#pragma warning disable AL0432
+        TempVATAmountLine: Record "VAT Amount Line" TEMPORARY;
+#pragma warning restore AL0432
         PurchSetup: Record "Purchases & Payables Setup";
         PurchPost: Codeunit 90;
         TotalAmount1: Decimal;

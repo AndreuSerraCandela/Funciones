@@ -620,11 +620,8 @@ Codeunit 50014 ContabAlb
                             if (lResource."Empresa Origen" <> COMPANYNAME) AND (lResource."Empresa Origen" <> '') THEN BEGIN
                                 lSalesInvoiceLineTMP."No." := lResource."Nº En Empresa origen";
                                 lSalesInvoiceLineTMP."Empresa Origen" := lResource."Empresa Origen";
-                                lJob.CHANGECOMPANY(lResource."Empresa Origen");
-                                lJob.SETRANGE(lJob."Empresa Origen", COMPANYNAME);
-                                lJob.SETRANGE("Proyecto en empresa Origen", lSalesInvLineTMPo."Job No.");
-                                If lJob.FINDFIRST Then
-                                    lSalesInvoiceLineTMP."Proyecto Origen" := lJob."No.";
+                                recuperaproyecto(lJob, lSalesInvLineTMPo."Job No.", lResource);
+                                lSalesInvoiceLineTMP."Proyecto Origen" := lJob."No.";
                                 lResource.CHANGECOMPANY(lResource."Empresa Origen");
                                 ltCompany := lResource."Empresa Origen";
                                 if NOT lResource.GET(lSalesInvoiceLineTMP."No.") THEN lResource.INIT;
@@ -634,7 +631,8 @@ Codeunit 50014 ContabAlb
                                 lSalesInvoiceLineTMP."Shortcut Dimension 4 Code" := lResource."Global Dimension 4 Code";
                                 lSalesInvoiceLineTMP."Shortcut Dimension 5 Code" := lResource."Global Dimension 5 Code";
 
-                            END;
+                            END else
+                                ProyectoEmpresa(lJob, lSalesInvLineTMPo."Job No.", pSalesHeader."Nº Proyecto");
                         END;
                     END;
                     lSalesInvoiceLineTMP.Recurso := lSalesInvoiceLineTMP."No.";
@@ -1059,13 +1057,8 @@ Codeunit 50014 ContabAlb
                             And (lPurchInvLineTMPo."Job No." <> '') THEN BEGIN
                                 lPurchInvLineTMP."No." := lResource."Nº En Empresa origen";
                                 lPurchInvLineTMP."Empresa Origen" := lResource."Empresa Origen";
-                                lJob.CHANGECOMPANY(lResource."Empresa Origen");
-                                lJob.SETRANGE(lJob."Empresa Origen", COMPANYNAME);
-                                lJob.SETRANGE("Proyecto en empresa Origen", lPurchInvLineTMPo."Job No.");
-                                If lJob.FINDFIRST THEN
-                                    lPurchInvLineTMP."Proyecto Origen" := lJob."No."
-                                ELSE
-                                    lPurchInvLineTMP."Proyecto Origen" := '';
+                                recuperaproyecto(lJob, lPurchInvLineTMPo."Job No.", lResource);
+                                lPurchInvLineTMP."Proyecto Origen" := lJob."No.";
                                 lResource.CHANGECOMPANY(lResource."Empresa Origen");
                                 ltCompany := lResource."Empresa Origen";
                                 if NOT lResource.GET(lPurchInvLineTMP."No.") THEN lResource.INIT;
@@ -1075,7 +1068,8 @@ Codeunit 50014 ContabAlb
                                 lPurchInvLineTMP."Shortcut Dimension 4 Code" := lResource."Global Dimension 4 Code";
                                 lPurchInvLineTMP."Shortcut Dimension 5 Code" := lResource."Global Dimension 5 Code";
 
-                            END;
+                            END else
+                                ProyectoEmpresa(lJob, lPurchInvLineTMPo."Job No.", pPurchaseHeader."Nº Proyecto");
                         END;
                     END;
                     lPurchInvLineTMP.Recurso := lPurchInvLineTMP."No.";
@@ -1441,13 +1435,8 @@ Codeunit 50014 ContabAlb
                             if (lResource."Empresa Origen" <> COMPANYNAME) AND (lResource."Empresa Origen" <> '') THEN BEGIN
                                 lSalesInvLineTMP."No." := lResource."Nº En Empresa origen";
                                 lSalesInvLineTMP."Empresa Origen" := lResource."Empresa Origen";
-                                lJob.CHANGECOMPANY(lResource."Empresa Origen");
-                                lJob.SETRANGE(lJob."Empresa Origen", COMPANYNAME);
-                                lJob.SETRANGE("Proyecto en empresa Origen", lSalesInvLineTMPo."Job No.");
-                                If lJob.FINDFIRST THEN
-                                    lSalesInvLineTMP."Proyecto Origen" := lJob."No."
-                                ELSE
-                                    lSalesInvLineTMP."Proyecto Origen" := '';
+                                recuperaproyecto(lJob, lSalesInvLineTMPo."Job No.", lResource);
+                                lSalesInvLineTMP."Proyecto Origen" := lJob."No.";
                                 lResource.CHANGECOMPANY(lResource."Empresa Origen");
                                 ltCompany := lResource."Empresa Origen";
                                 if NOT lResource.GET(lSalesInvLineTMP."No.") THEN lResource.INIT;
@@ -1457,7 +1446,8 @@ Codeunit 50014 ContabAlb
                                 lSalesInvLineTMP."Shortcut Dimension 4 Code" := lResource."Global Dimension 4 Code";
                                 lSalesInvLineTMP."Shortcut Dimension 5 Code" := lResource."Global Dimension 5 Code";
 
-                            END;
+                            END else
+                                ProyectoEmpresa(lJob, lSalesInvLineTMPo."Job No.", pSalesHeader."Nº Proyecto");
                         END;
                     END;
                     lSalesInvLineTMP.Recurso := lSalesInvLineTMP."No.";
@@ -6648,16 +6638,13 @@ Codeunit 50014 ContabAlb
                             if (lResource."Empresa Origen" <> COMPANYNAME) AND (lResource."Empresa Origen" <> '') THEN BEGIN
                                 lPurchRcptLineTMP."No." := lResource."Nº En Empresa origen";
                                 lPurchRcptLineTMP."Empresa Origen" := lResource."Empresa Origen";
-                                lJob.CHANGECOMPANY(lResource."Empresa Origen");
-                                lJob.SETRANGE(lJob."Empresa Origen", COMPANYNAME);
-                                lJob.SETRANGE("Proyecto en empresa Origen", lPurchRcptLineOrg."Job No.");
+                                recuperaproyecto(lJob, lPurchRcptLineOrg."Job No.", lResource);
+                                lPurchRcptLineTMP."Proyecto Origen" := lJob."No.";
 
                                 lResource.CHANGECOMPANY(lResource."Empresa Origen");
                                 if Not lResource.GET(lPurchRcptLineTMP."No.") Then begin
                                     lResource.Init();
                                 end;
-                                if lJob.FINDFIRST THEN
-                                    lPurchRcptLineTMP."Proyecto Origen" := lJob."No.";
                                 lDefDim.ChangeCompany(lResource."Empresa Origen");
                                 lDefDim.SetRange("Table ID", Database::Resource);
                                 lDefDim.SetRange("No.", lResource."No.");
@@ -6680,7 +6667,8 @@ Codeunit 50014 ContabAlb
                                 // lPurchRcptLineTMP."Shortcut Dimension 3 Code" := lResource."Global Dimension 3 Code";
                                 // lPurchRcptLineTMP."Shortcut Dimension 4 Code" := lResource."Global Dimension 4 Code";
                                 // lPurchRcptLineTMP."Shortcut Dimension 5 Code" := lResource."Global Dimension 5 Code";
-                            END;
+                            END else
+                                ProyectoEmpresa(lJob, lPurchRcptLineOrg."Job No.", pPurchaseRcptHdr."Nº Proyecto");
                         END;
                     END;
                     lPurchRcptLineTMP.Recurso := lPurchRcptLineTMP."No.";
@@ -7432,21 +7420,19 @@ Codeunit 50014 ContabAlb
                             if (lResource."Empresa Origen" <> COMPANYNAME) AND (lResource."Empresa Origen" <> '') THEN BEGIN
                                 lPurchRcptLineTMP."No." := lResource."Nº En Empresa origen";
                                 lPurchRcptLineTMP."Empresa Origen" := lResource."Empresa Origen";
-                                lJob.CHANGECOMPANY(lResource."Empresa Origen");
-                                lJob.SETRANGE(lJob."Empresa Origen", COMPANYNAME);
-                                lJob.SETRANGE("Proyecto en empresa Origen", lPurchRcptLineOrg."Job No.");
+                                recuperaproyecto(lJob, lPurchRcptLineOrg."Job No.", lResource);
+                                lPurchRcptLineTMP."Proyecto Origen" := lJob."No.";
 
                                 lResource.CHANGECOMPANY(lResource."Empresa Origen");
                                 ltCompany := lResource."Empresa Origen";
                                 lResource.GET(lPurchRcptLineTMP."No.");
-                                if lJob.FINDFIRST THEN
-                                    lPurchRcptLineTMP."Proyecto Origen" := lJob."No.";
                                 lPurchRcptLineTMP."Shortcut Dimension 1 Code" := lResource."Global Dimension 1 Code";
                                 lPurchRcptLineTMP."Shortcut Dimension 2 Code" := lResource."Global Dimension 2 Code";
                                 lPurchRcptLineTMP."Shortcut Dimension 3 Code" := lResource."Global Dimension 3 Code";
                                 lPurchRcptLineTMP."Shortcut Dimension 4 Code" := lResource."Global Dimension 4 Code";
                                 lPurchRcptLineTMP."Shortcut Dimension 5 Code" := lResource."Global Dimension 5 Code";
-                            END;
+                            END else
+                                ProyectoEmpresa(lJob, lPurchRcptLineTMP."Job No.", pPurchaseRcptHdr."Nº Proyecto");
                         END;
                     END;
                     lPurchRcptLineTMP.Recurso := lPurchRcptLineTMP."No.";
@@ -9314,5 +9300,30 @@ Codeunit 50014 ContabAlb
             Until lSalesInvoiceLineTMP2.NEXT = 0;
 
     end;
+
+    procedure recuperaproyecto(var lJob: Record Job; JobNo: Code[20]; lResource: Record Resource)
+    begin
+        If JobNo <> '' Then Begin
+            if (lResource."Empresa Origen" <> COMPANYNAME) THEN BEGIN
+                lJob.CHANGECOMPANY(lResource."Empresa Origen");
+                If not lJob.Get(JobNo) Then begin
+                    ljob.SetRange("Empresa Origen", CompanyName);
+                    lJob.Setrange("Proyecto en empresa Origen", JobNo);
+                    If not lJob.FindSet() THEN Error('No existe el proyecto %1 en la empresa %2 revise las asignaciones de producción', JobNo, lResource."Empresa Origen");
+                end;
+            END else
+                If not lJob.GET(JobNo) THEN Error('No existe el proyecto %1 en la empresa %2 revise las asignaciones de producción', JobNo, lResource."Empresa Origen");
+        end;
+    end;
+
+    procedure ProyectoEmpresa(var lJob: Record Job; JobNo: Code[20]; JobCabNo: Code[20])
+    begin
+        lJob.CHANGECOMPANY(COMPANYNAME);
+        If "JobNo" <> '' Then
+            If not lJob.GET(JobNo) THEN
+                If not lJob.GET(JobCabNo) THEN
+                    Error('No existe el proyecto %1 en la empresa %2 revise las asignaciones de producción', JobCabNo, Companyname);
+    end;
+
 
 }

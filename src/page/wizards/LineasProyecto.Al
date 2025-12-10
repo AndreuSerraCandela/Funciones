@@ -137,6 +137,7 @@ page 7001160 "Wizard Lineas Proyectos"
                         T: Code[20];
                         Job: Record Job;
                         JobTak: Record "Job Task";
+                        Control: Codeunit "ControlProcesos";
                     begin
                         if Produccion then begin
                             if not Job.Get(Rec."Job No.") then begin
@@ -189,7 +190,7 @@ page 7001160 "Wizard Lineas Proyectos"
                             Linea."Fecha Final" := Job."Ending Date";
                             Linea.Insert();
                             Commit();
-                            Linea.ProduccionNueva(Prod.Empresa, prod."Nº Proyecto");
+                            Control.ProduccionNueva(Linea, Prod.Empresa, prod."Nº Proyecto");
                         end else begin
                             Resource.SetRange("Tipo Recurso", TipoRecurso);
                             Resource.SetRange("Recurso Agrupado", Agrupado);

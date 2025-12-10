@@ -835,6 +835,12 @@ pageextension 80133 GlEntries extends "General Ledger Entries"
             rGlRf.SetTable(rGl);
             rActRf.SetTable(rAct);
             r36Rf.SetTable(r36);
+            rVen.ChangeCompany(EmpresaTXT);
+            rCli.ChangeCompany(EmpresaTXT);
+            rBan.ChangeCompany(EmpresaTXT);
+            rGl.ChangeCompany(EmpresaTXT);
+            rAct.ChangeCompany(EmpresaTXT);
+            r36.ChangeCompany(EmpresaTXT);
         end;
         if Tipo = 'NOM' Then begin
             if Rec."Source Type" = Rec."Source Type"::Vendor THEN

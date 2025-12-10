@@ -1198,7 +1198,9 @@ Report 50007 "Presupuesto proyecto para cli"
 
                 trigger OnPreDataItem()
                 begin
+#pragma warning disable AL0432 // TODO: - Eliminar Copias
                     NoOfLoops := ABS(NoOfCopies) + Cust."Invoice Copies" + 1;
+#pragma warning restore AL0432 // TODO: - Eliminar Copias
                     if NoOfLoops <= 0 THEN
                         NoOfLoops := 1;
                     CopyText := '';
@@ -1644,7 +1646,9 @@ Report 50007 "Presupuesto proyecto para cli"
         SalesSetup: Record 311;
         SalesShipmentBuffer: Record 7190 temporary;
         Cust: Record Customer;
-        VATAmountLine: Record 290 temporary;
+#pragma warning disable AL0432
+        VATAmountLine: Record "VAT Amount Line" temporary;
+#pragma warning restore AL0432
         DimSetEntry1: Record 480;
         DimSetEntry2: Record 480;
         RespCenter: Record 5714;

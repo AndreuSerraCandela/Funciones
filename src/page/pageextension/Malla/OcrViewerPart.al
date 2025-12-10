@@ -23,10 +23,11 @@ pageextension 75018 OcrViewerPart extends "OCR Viewer Part"
         OutStr: OutStream;
         InStr: InStream;
         TempBlob: Codeunit "Temp Blob";
+        Control: Codeunit "ControlProcesos";
     begin
         Url := Rec.Url;
         if Url = '' Then exit;
-        Base64 := Rec.ToBase64StringOcr(Url);
+        Base64 := Control.ToBase64StringOcr(Url);
         TempBlob.CreateOutStream(OutStr);
         Base64Convert.FromBase64(base64, OutStr);
         TempBlob.CreateInStream(InStr);

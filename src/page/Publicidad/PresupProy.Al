@@ -398,6 +398,7 @@ page 50050 "MLL-Presupuesto proyecto compr"
         rOrden: Record "Cab. orden publicidad";
         rProyecto: Record 167;
         rProv: Record Vendor;
+        ControlProcesos: Codeunit "ControlProcesos";
     BEGIN
         // $002
         Rec.TESTFIELD("Compra a-Nº proveedor");
@@ -436,7 +437,7 @@ page 50050 "MLL-Presupuesto proyecto compr"
             Rec.TESTFIELD("No.");
             rOrden.VALIDATE(Concepto, Rec."No.");
             rOrden.MODIFY(TRUE);
-            rOrden.ActualizarLineas(TRUE);
+            ControlProcesos.ActualizarLineas(rOrden, TRUE);
             COMMIT;
         END;
 

@@ -180,6 +180,7 @@ Report 50041 "Etiqueta fijacion Soportes"
         Contrato: record "Sales Header";
         SalesPersonCode: Record "Salesperson/Purchaser";
         Job: Record "Job";
+        Control: Codeunit "ControlProcesos";
     BEGIN
 
         Contrato.setrange("Document Type", Contrato."Document Type"::"Order");
@@ -263,10 +264,18 @@ Report 50041 "Etiqueta fijacion Soportes"
                 InputFile.CreateInStream(Ins);
                 //Resource.CalcFields(Image);
                 "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
+            end else begin
+                Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:5045');
+                if Base64 <> '' then begin
+                    TempBlob.CreateOutStream(OutStr);
+                    Base64Convert.FromBase64(base64, OutStr);
+                    TempBlob.CreateInStream(InS);
+                    "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
+                end;
             end;
             If Not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Imagen") Then Resource2.init;
             If Resource2.Url <> '' Then begin
-                Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                Base64 := Control.ToBase64StringOcr(Resource2.Url);
                 TempBlob.CreateOutStream(OutStr);
                 Base64Convert.FromBase64(base64, OutStr);
                 TempBlob.CreateInStream(InStr);
@@ -281,7 +290,7 @@ Report 50041 "Etiqueta fijacion Soportes"
                     Clear(InStr);
                     Clear(TempBlob);
                     Clear(Base64Convert);
-                    Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                    Base64 := Control.ToBase64StringOcr(Resource2.Url);
                     TempBlob.CreateOutStream(OutStr);
                     Base64Convert.FromBase64(base64, OutStr);
                     TempBlob.CreateInStream(InStr);
@@ -305,7 +314,7 @@ Report 50041 "Etiqueta fijacion Soportes"
                     Clear(InStr);
                     Clear(TempBlob);
                     Clear(Base64Convert);
-                    Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                    Base64 := Control.ToBase64StringOcr(Resource2.Url);
                     TempBlob.CreateOutStream(OutStr);
                     Base64Convert.FromBase64(base64, OutStr);
                     TempBlob.CreateInStream(InStr);

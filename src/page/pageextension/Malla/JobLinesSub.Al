@@ -95,6 +95,7 @@ pageextension 75006 JobLinesSub extends "JobLinesSub"
                     Tipo: Code[20];
                     Res: Record Resource;
                     rProd: Record "Recursos de Producción";
+                    Control: Codeunit "ControlProcesos";
                 begin
                     CurrPage.SetSelectionFilter(JobPlanningLine);
                     JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
@@ -124,7 +125,7 @@ pageextension 75006 JobLinesSub extends "JobLinesSub"
 
                         end;
                         commit;
-                        Rec.CrearLineaProduccion(rProd.Material, True, JobPlanningLine);
+                        Control.CrearLineaProduccion(JobPlanningLine, rProd.Material, True, JobPlanningLine);
                     end;
 
                 end;
@@ -285,6 +286,7 @@ pageextension 75006 JobLinesSub extends "JobLinesSub"
         rProyecto: Record 167;
         rProv: Record Vendor;
         rLinCont: Record 37;
+        ControlProcesos: Codeunit "ControlProcesos";
     BEGIN
         // $002
         Rec.TESTFIELD("Compra a-Nº proveedor");
@@ -323,7 +325,7 @@ pageextension 75006 JobLinesSub extends "JobLinesSub"
             Rec.TESTFIELD("No.");
             rOrden.VALIDATE(Concepto, Rec."No.");
             rOrden.MODIFY(TRUE);
-            rOrden.ActualizarLineas(TRUE);
+            ControlProcesos.ActualizarLineas(rOrden, TRUE);
             COMMIT;
         END;
 

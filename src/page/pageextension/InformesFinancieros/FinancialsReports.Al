@@ -7,6 +7,7 @@ pageextension 80119 Esquema2 extends "Financial Reports"
     {
         modify(Name)
         {
+            Visible = false;
             ApplicationArea = Basic, Suite;
             ToolTip = 'Specifies the name of the financial report.';
             trigger OnDrillDown()
@@ -16,6 +17,21 @@ pageextension 80119 Esquema2 extends "Financial Reports"
                 AccSchedOverview.SetAccSchedName(Rec.Name);
                 AccSchedOverview.Run();
             end;
+        }
+        addafter(Name)
+        {
+            field("Nombre"; Rec."Name")
+            {
+                ApplicationArea = Basic, Suite;
+                ToolTip = 'Specifies the name of the financial report.';
+                trigger OnAssistEdit()
+                var
+                    AccSchedOverview: Page Panorama;
+                begin
+                    AccSchedOverview.SetAccSchedName(Rec.Name);
+                    AccSchedOverview.Run();
+                end;
+            }
         }
     }
     actions
