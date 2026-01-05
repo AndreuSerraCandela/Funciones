@@ -42,7 +42,7 @@ codeunit 50016 ControldeEventosTables
     #region Tabla15
     #endregion Tabla15
     #region Tabla17
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterModifyEvent, '', false, false)]
     LOCAL PROCEDURE Tabla17_OnModify(VAR Rec: Record "G/L Entry"; VAR xRec: Record "G/L Entry"; RunTrigger: Boolean)
     VAR
         r21: Record 21;
@@ -78,7 +78,7 @@ codeunit 50016 ControldeEventosTables
 
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterDeleteEvent, '', false, false)]
     LOCAL PROCEDURE Tabla17_OnDelete(VAR Rec: Record "G/L Entry"; RunTrigger: Boolean)
     VAR
         r21: Record 21;
@@ -287,7 +287,7 @@ codeunit 50016 ControldeEventosTables
     #endregion Tabla18
     #region Tabla36
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterDeleteEvent, '', false, false)]
     PROCEDURE Tabla36_OnDelete(VAR Rec: Record "Sales Header"; RunTrigger: Boolean)
     VAR
         rLinContrato: Record 37;
@@ -1291,7 +1291,7 @@ codeunit 50016 ControldeEventosTables
     /// </summary>
     /// <param name="Rec">VAR Record "Sales Line".</param>
     /// <param name="RunTrigger">Boolean.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterDeleteEvent, '', false, false)]
     procedure BorrarLineas(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
         JobPlLine: Record "Job Planning Line";
@@ -1315,7 +1315,8 @@ codeunit 50016 ControldeEventosTables
             if Res."Producción" then Tipo."Crea Reservas" := false;
             if Res."Recurso Agrupado" then Tipo."Crea Reservas" := false;
             if Tipo."Crea Reservas" Then exit;
-            if JobPlLine.Get(Rec."Job No.", Rec."Job Task No.", Rec."No linea proyecto") Then Error('No puede eliminar esta línea, porque está en un proyecto');
+            if RunTrigger then
+                if JobPlLine.Get(Rec."Job No.", Rec."Job Task No.", Rec."No linea proyecto") Then Error('No puede eliminar esta línea, porque está en un proyecto');
         end;
     end;
     /// <summary>
@@ -1324,7 +1325,7 @@ codeunit 50016 ControldeEventosTables
     /// <param name="Rec">VAR Record "Sales Line".</param>
     /// <param name="xRec">VAR Record "Sales Line".</param>
     /// <param name="RunTrigger">Boolean.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterModifyEvent, '', false, false)]
     procedure ModificarLineas(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; RunTrigger: Boolean)
     var
 
@@ -2108,8 +2109,8 @@ codeunit 50016 ControldeEventosTables
 
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterDeleteEvent', '', false, false)]
-    Local PROCEDURE Table167_OnAfterDelete(VAR Rec: Record Job)
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterDeleteEvent, '', false, false)]
+    Local PROCEDURE Table167_OnAfterDelete(VAR Rec: Record Job; RunTrigger: Boolean)
     var
         rReserva: Record Reserva;
         rTextoAmpli: Record "Texto Presupuesto";
@@ -2122,7 +2123,7 @@ codeunit 50016 ControldeEventosTables
             rReserva.SETCURRENTKEY("Nº Proyecto", "Fecha inicio");
             rReserva.SETRANGE("Nº Proyecto", Rec."No.");
             if rReserva.FIND('-') THEN
-                ERROR('No se puede eliminar este proyecto ya que tiene reservas activas');
+                If RunTrigger then ERROR('No se puede eliminar este proyecto ya que tiene reservas activas');
         END;
 
         // MNC
@@ -2785,8 +2786,8 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla1003
     #region Tabla5080
-    [EventSubscriber(ObjectType::Table, Database::"To-do", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnAfterDeleteEvent(var Rec: Record "To-do")
+    [EventSubscriber(ObjectType::Table, Database::"To-do", OnAfterDeleteEvent, '', false, false)]
+    local procedure OnAfterDeleteEvent(var Rec: Record "To-do"; RunTrigger: Boolean)
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -2847,7 +2848,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", OnAfterModifyEvent, '', false, false)]
     local procedure DimensionValue_OnAfterModify(var Rec: Record "Dimension Value"; var xRec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2867,7 +2868,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", OnAfterDeleteEvent, '', false, false)]
     local procedure DimensionValue_OnAfterDelete(var Rec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2906,7 +2907,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension", OnAfterModifyEvent, '', false, false)]
     local procedure Dimension_OnAfterModify(var Rec: Record "Dimension"; var xRec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2926,7 +2927,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension", OnAfterDeleteEvent, '', false, false)]
     local procedure Dimension_OnAfterDelete(var Rec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2945,11 +2946,12 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla348
     #region Tabla120
-    [EventSubscriber(ObjectType::Table, Database::"Purch. Rcpt. Header", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure PurchRcptHeader_OnAfterDelete(var Rec: Record "Purch. Rcpt. Header")
+    [EventSubscriber(ObjectType::Table, Database::"Purch. Rcpt. Header", OnAfterDeleteEvent, '', false, false)]
+    local procedure PurchRcptHeader_OnAfterDelete(var Rec: Record "Purch. Rcpt. Header"; RunTrigger: Boolean)
     begin
-        if Rec.Contabilizado then
-            Procesos.BORRCAALB();
+        if RunTrigger then
+            if Rec.Contabilizado then
+                Procesos.BORRCAALB();
     end;
     #endregion Tabla120
     #region Tabla481
@@ -2962,7 +2964,7 @@ codeunit 50016 ControldeEventosTables
         Procesos.Inserta(RecFef, CompanyName);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", OnAfterModifyEvent, '', false, false)]
     local procedure DimensionValueCombination_OnAfterModify(var Rec: Record "Dimension Value Combination"; var xRec: Record "Dimension Value Combination")
     var
         RecFef: RecordRef;
@@ -3116,7 +3118,7 @@ codeunit 50016 ControldeEventosTables
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
-    local procedure JobPlanningLine_OnAfterInsert(var Rec: Record "Job Planning Line")
+    local procedure JobPlanningLine_OnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         rSelf: Record "Job Planning Line";
         Job: Record Job;
@@ -3128,10 +3130,11 @@ codeunit 50016 ControldeEventosTables
         If Rec.IsTemporary() Then Exit;
         EsJulia := UserId in ['GRUPOMALLA\JULIÀ.SASTRE', 'JULIÀ.SASTRE'];
         // $001 -
-        Job.TESTFIELD("Cód. vendedor");
+        if RunTrigger then
+            Job.TESTFIELD("Cód. vendedor");
         if Job.Status = Job.Status::Open THEN
             If not EsJulia then
-                MESSAGE(Text50001);
+                If RunTrigger then MESSAGE(Text50001);
         Rec."Planning Date" := Job."Starting Date";
         Rec."Fecha Final" := Job."Ending Date";
         //Mirar_Estado;
@@ -3153,19 +3156,20 @@ codeunit 50016 ControldeEventosTables
         //   Produccion;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterModifyEvent', '', false, false)]
-    local procedure JobPlanningLine_OnAfterModify(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterModifyEvent, '', false, false)]
+    local procedure JobPlanningLine_OnAfterModify(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; RunTrigger: Boolean)
     begin
         if xRec."No." <> Rec."No." THEN BEGIN
             //  VALIDATE("Unit Price", 0);
-            Rec.BorrarecursosRelacionados(Rec."Line No.", Rec."Job No.");
+            if RunTrigger then
+                Rec.BorrarecursosRelacionados(Rec."Line No.", Rec."Job No.");
         END;
         //if BuscarecursosRelacionados("Line No.", "Job No.", "No.") = FALSE THEN
         //  Produccion; TODO Revisar
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure JobPlanningLine_OnAfterDelete(var Rec: Record "Job Planning Line")
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterDeleteEvent, '', false, false)]
+    local procedure JobPlanningLine_OnAfterDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         rSelf: Record "Job Planning Line";
         rOrden: Record "Cab. orden publicidad";
@@ -3173,6 +3177,7 @@ codeunit 50016 ControldeEventosTables
         Text50003: Label 'No se puede eliminar esta linea, ya que tiene una orden de publicidad Validada.';
     begin
         //TESTFIELD(Transferred,FALSE);
+        if not RunTrigger then exit;
 
         Rec.BorrarecursosRelacionados(Rec."Line No.", Rec."Job No.");
         // MNC 211098
@@ -3209,21 +3214,23 @@ codeunit 50016 ControldeEventosTables
     #endregion Tabla1003
     #region Tabla289
     [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterInsertEvent', '', false, false)]
-    local procedure PaymentMethod_OnAfterInsert(var Rec: Record "Payment Method")
+    local procedure PaymentMethod_OnAfterInsert(var Rec: Record "Payment Method"; RunTrigger: Boolean)
     var
         RecFef: RecordRef;
     begin
+        If Rec.IsTemporary() Then Exit;
         RecFef.GetTable(Rec);
         If not Procesos.CompruebaPermisos(UserSecurityId, 'FORMAPAGO', CompanyName) then
             Error('No tienes permisos para insertar formas de pago');
         Procesos.Inserta(RecFef, CompanyName);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterModifyEvent', '', false, false)]
-    local procedure PaymentMethod_OnAfterModify(var Rec: Record "Payment Method"; var xRec: Record "Payment Method")
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", OnAfterModifyEvent, '', false, false)]
+    local procedure PaymentMethod_OnAfterModify(var Rec: Record "Payment Method"; var xRec: Record "Payment Method"; RunTrigger: Boolean)
     var
         RecFef: RecordRef;
     begin
+        if Rec.IsTemporary() Then Exit;
         RecFef.GetTable(Rec);
         If not Procesos.CompruebaPermisos(UserSecurityId, 'FORMAPAGO', CompanyName) then
             Error('No tienes permisos para modificar formas de pago');
@@ -3292,8 +3299,8 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla7001114
     #region TablaLinOrdenPublicidad
-    [EventSubscriber(ObjectType::Table, Database::"Lin. orden publicidad", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure LinOrdenPublicidad_OnAfterDelete(var Rec: Record "Lin. orden publicidad")
+    [EventSubscriber(ObjectType::Table, Database::"Lin. orden publicidad", OnAfterDeleteEvent, '', false, false)]
+    local procedure LinOrdenPublicidad_OnAfterDelete(var Rec: Record "Lin. orden publicidad"; RunTrigger: Boolean)
     var
         cMedios: Codeunit "Gestion Medios";
         rOrden: Record "Cab. orden publicidad";
@@ -3302,6 +3309,7 @@ codeunit 50016 ControldeEventosTables
         wFechaFin: Date;
 
     begin
+        if not RunTrigger then exit;
         if Rec."Dia conjunto" <> 0D THEN begin
             rLinOrden.RESET;
             rLinOrden.SETRANGE("Tipo orden", Rec."Tipo orden");

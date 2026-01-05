@@ -1030,6 +1030,7 @@ page 7001154 Rentings
         Cab.SetRange("Código Del Prestamo", Rec."Cabecera Prestamo2");
         if Cab.FindFirst() Then begin
             Pres.Empresa(Rec.Empresa);
+            Pres.CambiarEmpresa(Rec.Empresa);
             Pres.SetRecord(Cab);
             Pres.SetTableView(Cab);
             Pres.RunModal();

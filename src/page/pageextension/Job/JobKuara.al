@@ -541,7 +541,7 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 Image = Purchase;
                 //PushAction=RunObject;
                 Caption = '&Pedidos Compra';
-                RunObject = Page 53;
+                RunObject = Page "Purchase List";
                 //RunPageView=SORTING("Nº Proyecto");
                 RunPageLink = "Nº Proyecto" = FIELD("No.");
             }

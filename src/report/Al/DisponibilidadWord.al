@@ -85,23 +85,23 @@ report 50038 DisponibilidadWord
                 FromSalesPrice.SETRANGE("Source Type", FromSalesPrice."Source Type"::"Customer Price Group");
                 FromSalesPrice.SETRANGE("Source No.", Resource."Customer Price Group");
                 if Not FromSalesPrice.FINDLAST THEN FromSalesPrice.Init();
-                if File.Exists(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg') Then Begin
-                    InputFile.Open(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg');
-                    InputFile.CreateInStream(Ins);
-                    //Resource.CalcFields(Image);
+                // if File.Exists(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg') Then Begin
+                //     InputFile.Open(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg');
+                //     InputFile.CreateInStream(Ins);
+                //     //Resource.CalcFields(Image);
+                //     Resource.Image.ImportStream(ins, 'Image');
+                // end else begin
+                Base64 := ControlProcesos.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg', 'http://192.168.10.226:8089');
+                If Base64 <> '' Then begin
+                    TempBlob.CreateOutStream(OutStr);
+                    Base64Convert.FromBase64(base64, OutStr);
+                    TempBlob.CreateInStream(InS);
                     Resource.Image.ImportStream(ins, 'Image');
-                end else begin
-                    Base64 := ControlProcesos.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg', 'http://192.168.10.226:5045');
-                    If Base64 <> '' Then begin
-                        TempBlob.CreateOutStream(OutStr);
-                        Base64Convert.FromBase64(base64, OutStr);
-                        TempBlob.CreateInStream(InS);
-                        Resource.Image.ImportStream(ins, 'Image');
 
-                        TempBlob.CreateInStream(InS);
-                        Resource.Image.ImportStream(ins, 'Image');
-                    end;
+                    TempBlob.CreateInStream(InS);
+                    Resource.Image.ImportStream(ins, 'Image');
                 end;
+                //end;
                 if Not Cat.Get(Resource."Customer Price Group") Then Cat.Init;
                 Categ := Cat.Description;
                 if Resource."Alquiler Anual" = 0 Then Resource."Alquiler Anual" := FromSalesPrice."Unit Price";

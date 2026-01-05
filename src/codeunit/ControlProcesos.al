@@ -3407,7 +3407,7 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
     /// </summary>
     /// <param name="Id">Integer.</param>
     /// <returns>Return value of type Text.</returns>
-    procedure DeleteId(Id: Integer): Text
+    procedure DeleteId(Id: Integer; FileName: Text): Text
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         JsonObj: JsonObject;
@@ -3416,7 +3416,11 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
         RequestType: Option Get,patch,put,post,delete;
         base64Token: JsonToken;
         base64: Text;
+        FileMgt: Codeunit "File Management";
     begin
+        //Di fileextension es jpg, png, bmp, tif no borrar el archivo
+        if FileMgt.GetExtension(FileName) in ['jpg', 'png', 'bmp', 'tif'] then
+            exit('');
         GeneralLedgerSetup.Get();
         Json := RestApiC.RestApiImagenes('https://base64-api.deploy.malla.es/' + 'delete/' + Format(Id), RequestType::delete, '');
         //Clear(JsonObj);

@@ -3043,7 +3043,8 @@ report 50011 "Gestión SII"
             Pais := '';
             Customer."Country/Region Code" := '';
 
-        END;
+        END else
+            Pais := Customer."Country/Region Code";
         if Pais = '' Then Pais := 'ES';
         if Pais = 'EN' THEN Pais := 'GB';
         // if (Customer."Cliente Directo") AND (Pais = 'ES') THEN Pais := '';

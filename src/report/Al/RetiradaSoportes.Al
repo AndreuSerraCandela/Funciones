@@ -248,7 +248,7 @@ Report 50042 "Retirada fijacion Soportes"
                     //Resource.CalcFields(Image);
                     "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
                 end else begin
-                    Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:5045');
+                    Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:8089');
                     if Base64 <> '' Then Begin
                         TempBlob.CreateOutStream(OutStr);
                         Base64Convert.FromBase64(base64, OutStr);

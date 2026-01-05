@@ -199,6 +199,8 @@ codeunit 50012 Albaranes
         lGlEntry: Record "G/L Entry";
         lReverSalEntry: Record "Reversal Entry";
         lcCalculo: Record "Calculo Albaranes";
+        AsientoDesde: Integer;
+        AsientoHasta: Integer;
     BEGIN
         lPurchRcptline.SETRANGE(lPurchRcptline."Document No.", pRec."No.");
         lPurchRcptline.SETFILTER(lPurchRcptline."No.", '%1', '');
@@ -215,8 +217,22 @@ codeunit 50012 Albaranes
             lGlEntry.SETRANGE("Document Type", lGlEntry."Document Type"::Receipt);
             lGlEntry.FINDLAST;
             liHasta := lGlEntry."Entry No.";
+            AsientoHasta := lGlEntry."Transaction No.";
+
             lGlEntry.FindFirst();
             liDesde := lGlEntry."Entry No.";
+            AsientoDesde := lGlEntry."Transaction No.";
+            If AsientoDesde <> AsientoHasta Then begin
+                Message('Hay Varios asientos para este albaran, Elija uno para descontabilizar');
+                If Page.RunModal(0, lGlEntry) = Action::LookupOK Then begin
+                    lGlEntry.SetRange("Transaction No.", lGlEntry."Transaction No.");
+                    lGlEntry.FindFirst();
+                    liDesde := lGlEntry."Entry No.";
+                    lGlEntry.FindLast();
+                    liHasta := lGlEntry."Entry No.";
+
+                end;
+            end;
             lReverSalEntry.ReverseAlbaran(lGlEntry."Transaction No.", liDesde, liHasta);
             pRec.Contabilizado := FALSE;
             pRec.MODIFY;
@@ -767,7 +783,7 @@ codeunit 50012 Albaranes
         CLEAR(lcContabAlb);
         lGlEntry.SETCURRENTKEY(lGlEntry."Transaction No.");
         lGlEntry.SETRANGE("Document No.", pRec."No.");
-        lGlEntry.SETRANGE("Document Type", lGlEntry."Document Type"::Bill);
+        //lGlEntry.SETRANGE("Document Type", lGlEntry."Document Type"::Bill);
         lGlEntry.FINDLAST;
         lDHasta := lGlEntry."Posting Date";
         liAsiento := lGlEntry."Transaction No.";

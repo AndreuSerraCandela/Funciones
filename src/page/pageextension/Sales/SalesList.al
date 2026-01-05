@@ -663,7 +663,7 @@ pageextension 80159 SalesInvoicList extends "Sales Invoice List"
     {
         addfirst(Control1)
         {
-            field("Document Type"; "DocumentType") { Caption = 'Tipo Documento'; ApplicationArea = All; }
+            field("Tipo Documento"; "DocumentType") { Caption = 'Tipo Documento'; ApplicationArea = All; }
         }
         modify("Sell-to Customer Name")
         {

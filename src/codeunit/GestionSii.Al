@@ -208,10 +208,10 @@ codeunit 7001102 GestionSii
         //-SII
         GLSetup.GET;
         if GLSetup."Activar SII" THEN BEGIN
-            if SalesHeader."Tipo factura SII" = '' THEN
-                SalesHeader."Tipo factura SII" := 'F1';
+            //if SalesHeader."Tipo factura SII" = '' THEN
+            SalesHeader."Tipo factura SII" := 'F1';
             if (SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo") OR (SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order") THEN
-                SalesHeader."Tipo factura SII" := '4';
+                SalesHeader."Tipo Factura Rectificativa" := 'I';
             if SalesHeader."Descripción operación" = '' THEN
                 SalesHeader."Descripción operación" := SalesHeader."Posting Description";
         END;
