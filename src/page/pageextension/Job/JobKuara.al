@@ -19,12 +19,7 @@ pageextension 80111 "JobKuara" extends "Job Card"
         // }
         addafter("Bill-to Name")
         {
-#if not CLEAN27
-            field("Bill-to Name 2"; Rec."Bill-to Name 2")
-            {
-                ApplicationArea = All;
-            }
-#endif
+
         }
         addafter(Description)
         {
@@ -296,6 +291,19 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 trigger OnAction()
                 Begin
                     CurrPage.JobTaskLines2.Page.LlamarPlazos;
+                END;
+            }
+            action("Añadir a Planificacion")
+            {
+                Image = Add;
+                ApplicationArea = All;
+                Caption = 'Añadir a Planificacion';
+                trigger OnAction()
+                var
+                    Soportes: Page "Soportes proyecto";
+                Begin
+                    Soportes.SetRecord(Rec);
+                    Soportes.RUNMODAL;
                 END;
             }
             action("Informes Recursos")

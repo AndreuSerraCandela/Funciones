@@ -686,3 +686,42 @@ page 7001142 "Comer - Control contab. ptes"
     // END.
 
 }
+page 50119 "Soportes proyecto"
+{
+    //Version List=MLL1.00;
+    PageType = Card;
+    SourceTable = 167;
+    layout
+    {
+        area(Content)
+        {
+            field("No."; Rec."No.")
+            {
+                Caption = 'Proyecto';
+                ApplicationArea = All;
+                Editable = false;
+            }
+
+            field("Fecha Fijación"; Rec."Fecha Fijación")
+            {
+                trigger OnValidate()
+                begin
+                    Rec.Fijar := True;
+                    Rec.Modify();
+                end;
+            }
+            field("Tipo Soporte"; Rec."Tipo soporte")
+            {
+
+            }
+            field("No. soportes"; Rec."No. soportes")
+            {
+                Caption = 'Nº soportes';
+            }
+
+        }
+    }
+
+
+
+}

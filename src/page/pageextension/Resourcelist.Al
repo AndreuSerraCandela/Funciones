@@ -1414,6 +1414,7 @@ pageextension 80206 ResourceList Extends "Resource List"
         if Rec."Recurso Agrupado" then Color := 'Unfavorable';
         ListaEspera.SetRange("Nº Recurso", Rec."No.");
         ListaEspera.SetRange(Motivo, ListaEspera.Motivo::"Lista de espera");
+        ListaEspera.SetRange(Orden, -99, 98);
         if ListaEspera.FindSet then Color := 'StandardAccent';
 
     End;
