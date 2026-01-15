@@ -306,6 +306,30 @@ pageextension 80111 "JobKuara" extends "Job Card"
                     Soportes.RUNMODAL;
                 END;
             }
+            action("Crear Reportaje Fotográfico")
+            {
+                ApplicationArea = All;
+                Image = Camera;
+                Caption = 'Crear Reportaje Fotográfico';
+                trigger OnAction()
+                var
+                Begin
+                    //si la url de llamada a busines central es interna http://192.168.10.226:8088/proyecto-publico, si no https://proyectos.malla.es
+
+                    Hyperlink('https://proyectos.malla.es//proyecto-publico/' + Rec."No." + '/' + CompanyName);
+                end;
+            }
+            action("Enviar enlace")
+            {
+                ApplicationArea = All;
+                Image = Camera;
+                Caption = 'Enviar enlace Reportaje Fotográfico';
+                trigger OnAction()
+                var
+                Begin
+                    EnviaCorreo(Rec);
+                end;
+            }
             action("Informes Recursos")
             {
                 Caption = 'Disponibilidad Recursos';
@@ -1246,6 +1270,77 @@ pageextension 80111 "JobKuara" extends "Job Card"
             EXIT(rCliente."Invoice Disc. Code");
         EXIT('');
     END;
+
+    local procedure EnviaCorreo(var Job: Record Job)
+    var
+        Mail: Codeunit Mail;
+        Salesperson2: Record "Salesperson/Purchaser";
+        Body: Text;
+        BigText: Text;
+        REmail: Record "Email Item" temporary;
+        emilesc: Enum "Email Scenario";
+        rInf: Record "Company Information";
+        Funciones: Codeunit "Funciones Correo PDF";
+        r17: Record "G/L Entry";
+        Base64: Text;
+    begin
+        Salesperson2.Get(Job."Cód. vendedor");
+        rInf.Get();
+        BigText := ('Estimad@ ' + Salesperson2.Name + ':');
+
+        //(FORMAT(cr,0,'<CHAR>') + FORMAT(lf,0,'<CHAR>')
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<br> </br>';
+        //BigText:=('<br> </br>';
+        BigText := BigText + ('En el Siguiente enlace, puede  crear el reportage fotográfico del proyecto nº ' + Job."No.");
+        BigText := BigText + (' de la empresa ' + rInf.Name + ' del cliente ' + Job."Sell-to Customer Name");
+        BigText := BigText + (' https://proyectos.malla.es/proyecto-publico/' + Job."No." + '/' + CompanyName);
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + ('Aprovechamos la ocasión para enviarte un cordial saludo');
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + ('Atentamente');
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + ('Dpto. Medios');
+        BigText := BigText + '<br> </br>';
+
+        BigText := BigText + (rInf.Name);
+        //"Plaintext Formatted":=TRUE;
+        // SendMsg.AppendBody(BigText);
+        // CLEAR(BigText);
+        Funciones.CargaPie(Base64);
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<img src="data:image/png;base64,' + base64 + '" />';//"emailFoot.png" />';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<font face="Franklin Gothic Book" sice=2 color=#A6A6A6>';
+        BigText := BigText + ('<b>SI NO DESEA RECIBIR MAS INFORMACION, CONTESTE ESTE E-MAIL INDICANDOLO EXPRESAMENTE</b>');
+        BigText := BigText + '</font>';
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + '<font face="Franklin Gothic Book" size=1 color=#A6A6A6>';
+        BigText := BigText + ('En cumplimiento de lo establecido en el REGLAMENTO (UE) 2016/679, de 27 de abril de 2016, con plenos efectos desde el 25 de mayo de 2018, le recordamos que sus datos personales son');
+        BigText := BigText + ('objeto de tratamiento por parte de MALLA S.A. Le informamos también que tiene la posibilidad de ejercer los derechos de acceso, rectificación, supresión, oposición, limitación del');
+        BigText := BigText + (' tratamiento y portabilidad de sus datos, mediante comunicación escrita a la dirección de correo electrónico <a href="mailto:lopd@malla.es" rel="noreferrer" target="_blank" heap-ignore="true"><span style="color:blue">lopd@malla.es</span></a>, o bien, a nuestra dirección postal (' + rInf.Name + ')');
+        BigText := BigText + (rInf.Address + '. ' + rInf."Post Code" + '. ' + rInf.City + '. España');
+        BigText := BigText + '<br> </br>';
+        BigText := BigText + ('Este correo y sus archivos asociados son privados y confidenciales y va dirigido exclusivamente a su destinatario. Si recibe este correo sin ser el destinatario del mismo, le rogamos proceda');
+        BigText := BigText + (' a su eliminación y lo ponga en conocimiento del emisor. La difusión por cualquier medio del contenido de este correo podría ser sancionada conforme a lo previsto en las leyes españolas.');
+        BigText := BigText + ('No se autoriza la utilización con fines comerciales o para su incorporación a ficheros automatizados de las direcciones del emisor o del destinatario');
+        REmail.Subject := 'Reportaje fotrográfico proyecto ' + Job."No.";
+
+        REmail."Send to" := Salesperson2."E-Mail";
+        REmail."Send BCC" := 'andreuserra@malla.es';
+        REmail.SetBodyText(BigText);
+        REmail."From Name" := 'Dpto. Medios';
+        // if REmail."From Address" <> '' Then
+        //     REmail."Send BCC" := REmail."From Address" else
+        //     REmail."Send BCC" := BCC();
+        if REmail.Send(true, emilesc::Default) then begin
+
+        end;
+    end;
 
     //   $001 Actualizo líneas si se modifica tipo, soporte de, o fija/papel en cabecera.
     //   $002 FCL-25/05/10. Incluyo proyecto origen y modifico la llamada a ver proyectos asociados
