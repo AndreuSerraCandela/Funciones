@@ -444,7 +444,7 @@ Report 50007 "Presupuesto proyecto para cli"
                             AutoFormatExpression = GetCurrencyCode;
                             AutoFormatType = 1;
                         }
-                        column(Description_SalesInvLine; Description)
+                        column(Description_SalesInvLine; Description(Description, "No.", "Type"))
                         {
                         }
                         column(No_SalesInvoiceLine; "No.")
@@ -1568,6 +1568,7 @@ Report 50007 "Presupuesto proyecto para cli"
                     // }
                     field(Logotipo; Logotipo) { ApplicationArea = All; }
                     field("Imprimir Solo Totales"; wToTal2) { ApplicationArea = All; }
+                    field("Imprimir Nº Recurso"; ImprimirNRecurso) { ApplicationArea = All; }
                     field("Imprimir fecha emisión doc."; FecEmis) { ApplicationArea = All; }
                     field("Recursos agrupados por tarea"; AgrRec) { ApplicationArea = All; }
                     field("Totales por tarea"; TotTarea) { ApplicationArea = All; }
@@ -1811,6 +1812,7 @@ Report 50007 "Presupuesto proyecto para cli"
         aImportes: ARRAY[29] OF Decimal;
         IClausulbuses: Boolean;
         IClausulInter: Boolean;
+        ImprimirNRecurso: Boolean;
 
 
     /// <summary>
@@ -2083,6 +2085,20 @@ Report 50007 "Presupuesto proyecto para cli"
     begin
         If cs = 0 Then Exit(1);
         exit(Cs);
+    end;
+
+    procedure Description(Description: Text; No: Code[20]; Type: enum "Job Planning Line Type"): Text
+    var
+        Resource: Record Resource;
+    begin
+        if ImprimirNRecurso = false then exit(Description);
+        if Type = Type::Resource then begin
+            if Resource.Get(No) then begin
+                if not Resource."Recurso Agrupado" then exit(No + ' ' + Description);
+            end;
+        end;
+
+        exit(Description);
     end;
 
 }

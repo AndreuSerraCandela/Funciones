@@ -1411,8 +1411,8 @@ codeunit 50002 "Gestion Proyecto"
                             rLinCompra.VALIDATE("Buy-from Vendor No.", rCabCompr."Buy-from Vendor No.");
                             rLinCompra.VALIDATE(Type, SalesLineFacOrTmp.Type);
                             rLinCompra.VALIDATE("No.", SalesLineFacOrTmp."No.");
-                            If rLinCompra.Type=rLinCompra.Type::Resource then 
-                            rLinCompra.TestField("No.");
+                            If rLinCompra.Type = rLinCompra.Type::Resource then
+                                rLinCompra.TestField("No.");
                             rLinCompra.VALIDATE(Description, SalesLineFacOrTmp.Description);
                             rLinCompra.VALIDATE(Quantity, SalesLineFacOrTmp.Quantity);
                             // mig a 5.0     SalesLineFacOrTemp.CALCFIELDS(Quantity);
@@ -1608,14 +1608,16 @@ codeunit 50002 "Gestion Proyecto"
 
         if SalesLineFac.FINDfirst THEN
             REPEAT
+                if rLinCompra.get(rCabCompr."Document Type", rCabCompr."No.", SalesLineFac."Line No.") then
+                    rLinCompra.Delete();
+
                 rLinCompra.Init();
                 rLinCompra."Document Type" := rCabCompr."Document Type";
                 rLinCompra."Document No." := rCabCompr."No.";
-                ult += 10000;
-                rLinCompra."Line No." := SalesLineFac."Line No.";
+                ult += SalesLineFac."Line No.";
+                rLinCompra."Line No." := Ult;
 
                 rLinCompra."Empresa Venta" := CompanyName;
-                rLinCompra.INSERT;
                 rLinCompra."Buy-from Vendor No." := rCabCompr."Buy-from Vendor No.";
                 rLinCompra."Pay-to Vendor No." := rCabCompr."Buy-from Vendor No.";
                 rLinCompra.VALIDATE(Type, SalesLineFac.Type);
@@ -1679,6 +1681,8 @@ codeunit 50002 "Gestion Proyecto"
         rLinCompra.FindFirst();
         repeat
             rLinCompraDef.ChangeCompany(rIcPartner."Inbox Details");
+            if rLinCompraDef.get(rLinCompra."Document Type", rLinCompra."Document No.", rLinCompra."Line No.") then
+                rLinCompraDef.Delete();
             rLinCompraDef := rLinCompra;
             rLinCompraDef."No." := rLinCompra."Vendor Item No.";
             rLinCompraDef."Vendor Item No." := '';

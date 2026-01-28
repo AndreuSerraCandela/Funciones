@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo del documento -->
+  <path d="M112 32h240l96 96v352H112V32z" fill="#e8e8e8" stroke="#2c2c2c" stroke-width="24" stroke-linejoin="round"/>
+  
+  <!-- Esquina doblada -->
+  <path d="M352 32l96 96h-96V32z" fill="#a0a0a0" stroke="#2c2c2c" stroke-width="24" stroke-linejoin="round"/>
+  
+  <!-- Engranaje Superior Grande (8 dientes) -->
+  <g transform="translate(200, 200)">
+    <!-- Cuerpo principal del engranaje -->
+    <circle cx="0" cy="0" r="50" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="20"/>
+    
+    <!-- Dientes del engranaje (8 dientes) -->
+    <g>
+      <!-- Diente 1 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(0)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(0)"/>
+      
+      <!-- Diente 2 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(45)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(45)"/>
+      
+      <!-- Diente 3 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(90)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(90)"/>
+      
+      <!-- Diente 4 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(135)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(135)"/>
+      
+      <!-- Diente 5 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(180)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(180)"/>
+      
+      <!-- Diente 6 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(225)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(225)"/>
+      
+      <!-- Diente 7 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(270)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(270)"/>
+      
+      <!-- Diente 8 -->
+      <rect x="-12" y="-85" width="24" height="40" rx="6" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(315)"/>
+      <rect x="-6" y="-80" width="12" height="25" rx="3" fill="#d0d8e8" transform="rotate(315)"/>
+    </g>
+    
+    <!-- Circulo central con borde azul y punto negro -->
+    <circle cx="0" cy="0" r="20" fill="#ececec" stroke="#d0d8e8" stroke-width="8"/>
+    <circle cx="0" cy="0" r="6" fill="#2c2c2c"/>
+  </g>
+
+  <!-- Engranaje Inferior Peque�o (8 dientes, superpuesto) -->
+  <g transform="translate(320, 340)">
+    <!-- Cuerpo principal del engranaje -->
+    <circle cx="0" cy="0" r="40" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="20"/>
+    
+    <!-- Dientes del engranaje (8 dientes) -->
+    <g>
+      <!-- Diente 1 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(22.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(22.5)"/>
+      
+      <!-- Diente 2 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(67.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(67.5)"/>
+      
+      <!-- Diente 3 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(112.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(112.5)"/>
+      
+      <!-- Diente 4 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(157.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(157.5)"/>
+      
+      <!-- Diente 5 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(202.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(202.5)"/>
+      
+      <!-- Diente 6 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(247.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(247.5)"/>
+      
+      <!-- Diente 7 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(292.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(292.5)"/>
+      
+      <!-- Diente 8 -->
+      <rect x="-10" y="-70" width="20" height="35" rx="5" fill="#2c2c2c" stroke="#2c2c2c" stroke-width="18" transform="rotate(337.5)"/>
+      <rect x="-5" y="-65" width="10" height="20" rx="2" fill="#d0d8e8" transform="rotate(337.5)"/>
+    </g>
+    
+    <!-- C�rculo central con borde azul y punto negro -->
+    <circle cx="0" cy="0" r="16" fill="#ececec" stroke="#d0d8e8" stroke-width="8"/>
+    <circle cx="0" cy="0" r="5" fill="#2c2c2c"/>
+  </g>
+</svg>
