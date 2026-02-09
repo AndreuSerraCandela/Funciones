@@ -1,4 +1,4 @@
-page 7001122 "Lista docs. vta. relacionados"
+﻿page 50054 "Lista docs. vta. relacionados"
 {
     //Version List=MLL1.00;
     Editable = false;

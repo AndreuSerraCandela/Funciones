@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Codeunit ControldeEventos (ID 50003).
 /// </summary>
 codeunit 50016 ControldeEventosTables
@@ -300,12 +300,12 @@ codeunit 50016 ControldeEventosTables
         if Rec."Factura Compra" <> '' Then begin
 
             if RunTrigger Then
-                Error('Hay una factura de compra asociada en una empresa del grupo');
+                Error('Hay una factura/abono de compra asociada en una empresa del grupo');
             Fac.ChangeCompany(Rec."Empresa Origen Alb");
-            if Not Fac.Get(Fac."Document Type"::Invoice, Rec."Factura Compra") then exit;
-            if Fac."Vendor Invoice No." = '' Then Begin
+            if Not Fac.Get(Rec."Document Type", Rec."Factura Compra") then exit;
+            if (Fac."Vendor Invoice No." = '') and (Fac."Vendor Cr. Memo No." = '') Then Begin
                 lin.ChangeCompany(Rec."Empresa Origen Alb");
-                Lin.SetRange("Document Type", Lin."Document Type"::Invoice);
+                Lin.SetRange("Document Type", Rec."Document Type");
                 Lin.SetRange("Document No.", Fac."No.");
                 Lin.DeleteAll();
                 Fac.Delete();
@@ -321,9 +321,9 @@ codeunit 50016 ControldeEventosTables
                 rVenInter.SETRANGE(rVenInter."No.", SalesLine."Doc. Itercompany Venta");
                 rLinVerEntry.ChangeCompany(SalesLine."Empresa Venta");
                 if rVenInter.FindFirst() Then Begin
-                    if Fac.Get(Fac."Document Type"::Invoice, Rec."Factura Compra") Then Begin
+                    if Fac.Get(Rec."Document Type", Rec."Factura Compra") Then Begin
                         lin.ChangeCompany(Rec."Empresa Origen Alb");
-                        Lin.SetRange("Document Type", Lin."Document Type"::Invoice);
+                        Lin.SetRange("Document Type", Rec."Document Type");
                         Lin.SetRange("Document No.", Fac."No.");
                         Lin.DeleteAll();
                         Fac.Delete();
@@ -670,7 +670,7 @@ codeunit 50016 ControldeEventosTables
     PROCEDURE Tabla36_EstadoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
-        Ventana: Page 50009;
+        Ventana: Page "Dialogo fecha anulación";
         FecFin: Date;
         rProy: Record 167;
         rRes: Record Reserva;
@@ -948,7 +948,7 @@ codeunit 50016 ControldeEventosTables
     LOCAL PROCEDURE Tabla36_EstadoContratoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
-        Ventana: Page 50009;
+        Ventana: Page "Dialogo fecha anulación";
         FecFin: Date;
         rProy: Record 167;
         rRes: Record Reserva;
@@ -1993,16 +1993,14 @@ codeunit 50016 ControldeEventosTables
             9:
                 begin
                     if AnalysisView."Dimension 5 Totaling" <> '' then
-                        Result := '1,6,' + AnalysisView."Dimension 5 Totaling";
-
-                    Result := Text006;
+                        Result := '1,6,' + AnalysisView."Dimension 5 Totaling" + Text010 else
+                        Result := Text006;
                 end;
             10:
                 begin
                     if AnalysisView."Dimension 5 Totaling" <> '' then
-                        Result := '1,5,' + AnalysisView."Dimension 5 Totaling" + Text010;
-
-                    Result := Text011;
+                        Result := '1,5,' + AnalysisView."Dimension 5 Totaling" + Text010 else
+                        Result := Text011;
                 end;
 
         end;

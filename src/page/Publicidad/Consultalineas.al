@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Consulta líneas proyectoNO SE (ID 50020).
 /// </summary>
-page 50020 "Consulta líneas proyectoNO SE"
+page 50005 "Consulta líneas proyectoNO SE"
 {
     PageType = List;
     UsageCategory = Lists;

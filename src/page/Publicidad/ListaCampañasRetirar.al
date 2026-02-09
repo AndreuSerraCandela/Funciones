@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Campañas a retirar (ID 50118).
 /// </summary>
-page 50118 "Campañas a retirar"
+page 50047 "Campañas a retirar"
 {
     ApplicationArea = All;
     Caption = 'Campañas a retirar';

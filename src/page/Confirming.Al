@@ -3,7 +3,7 @@
 /// <summary>
 /// Page Efectos conf. en rem. cerr (2) (ID 50067).
 /// </summary>
-page 50067 "Efectos conf. en rem. cerr (2)"
+page 50034 "Efectos conf. en rem. cerr (2)"
 {
 
     Permissions = TableData 7000003 = m;
@@ -143,7 +143,7 @@ page 50067 "Efectos conf. en rem. cerr (2)"
 
 }
 
-page 50068 "Efectos confirming (2)"
+page 50035 "Efectos confirming (2)"
 {
     Permissions = TableData 7000002 = m;
 
@@ -224,7 +224,7 @@ page 50068 "Efectos confirming (2)"
 
 }
 
-page 50069 "Configuración confirming (2)"
+page 50036 "Configuración confirming (2)"
 {
 
     SourceTable = "General Ledger Setup";

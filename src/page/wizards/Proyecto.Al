@@ -1,7 +1,7 @@
-/// <summary>
+﻿/// <summary>
 /// Page Laerit File Management Setup Wizard (ID 90103).
 /// </summary>
-page 7001112 "Wizard Proyectos"
+page 50051 "Wizard Proyectos"
 {
     Caption = 'Wizard Proyectos';
     PageType = NavigatePage;

@@ -1,7 +1,7 @@
 /// <summary>
 /// Page ChartofCashFlowAccounts (ID 50041).
 /// </summary>
-page 50041 "ChartofCashFlowAccounts"
+page 50014 "ChartofCashFlowAccounts"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Plan de Cuentas CashFlow';

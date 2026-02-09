@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Orden de Publicidad (ID 50024).
 /// </summary>
-page 50024 "Orden de Publicidad"
+page 50008 "Orden de Publicidad"
 {
     PageType = Card;
     SourceTable = "Cab. orden publicidad";

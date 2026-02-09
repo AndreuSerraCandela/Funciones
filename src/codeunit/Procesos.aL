@@ -4321,6 +4321,8 @@ codeunit 50007 "Procedures Standard"
 
     local procedure GetImplementation(var NoSeriesLine: Record "No. Series Line"): Interface "No. Series - Single"
     begin
+        if NoSeriesLine.Implementation = NoSeriesLine.Implementation::Sequence THEN
+            error('No se puede usar la implementación de secuencia para la facturación interna');
         exit(NoSeriesLine.Implementation);
     end;
 

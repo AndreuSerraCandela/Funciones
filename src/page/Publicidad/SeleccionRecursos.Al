@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Nombre Comercial (ID 7001158).
+﻿/// <summary>
+/// Page Nombre Comercial (ID 50102).
 /// </summary>
-page 7001161 "Seleccionar Recursos"
+page 50068 "Seleccionar Recursos"
 {
     ApplicationArea = All;
     Caption = 'Seleccion Recursos';

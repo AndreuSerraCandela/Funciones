@@ -1,4 +1,4 @@
-page 7001118 "Cambio fechas proyecto"
+﻿page 50053 "Cambio fechas proyecto"
 {
     //Version List=MLL1.00;
     PageType = Card;
@@ -89,7 +89,7 @@ page 7001118 "Cambio fechas proyecto"
     END;
 
 }
-page 7001131 "Fijación Proyectos"
+page 50056 "Fijación Proyectos"
 {
     //Version List=;
     //area(Content){ Repeater(Detalle){ID=1;
@@ -270,7 +270,7 @@ page 7001131 "Fijación Proyectos"
         cProyecto: Codeunit "Gestion Proyecto";
 }
 
-page 7001116 "Proyectos de Fijacion"
+page 50052 "Proyectos de Fijacion"
 {
     //Version List=;
     //area(Content){ Repeater(Detalle){ID=1;
@@ -295,7 +295,7 @@ page 7001116 "Proyectos de Fijacion"
         }
     }
 }
-page 7001126 "Lista contratos con totales"
+page 50055 "Lista contratos con totales"
 {
     //Version List=NAVW13.70,MLL1.00;
     PageType = List;
@@ -515,7 +515,7 @@ page 7001126 "Lista contratos con totales"
     END;
 
 }
-page 7001142 "Comer - Control contab. ptes"
+page 50058 "Comer - Control contab. ptes"
 {
     //Version List=FH3.70,ES;
     SaveValues = true;
@@ -686,7 +686,7 @@ page 7001142 "Comer - Control contab. ptes"
     // END.
 
 }
-page 50119 "Soportes proyecto"
+page 50048 "Soportes proyecto"
 {
     //Version List=MLL1.00;
     PageType = Card;

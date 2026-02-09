@@ -41,6 +41,10 @@ pageextension 80119 Esquema2 extends "Financial Reports"
             Visible = false;
 
         }
+        modify(ViewFinancialReport)
+        {
+            Visible = false;
+        }
         addafter(Overview)
         {
             action(Panorama)

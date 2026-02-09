@@ -1,4 +1,4 @@
-page 50089 "Particion Reserva"
+page 50044 "Particion Reserva"
 {
     PageType = Card;
     SourceTable = Reserva;

@@ -68,6 +68,14 @@ pageextension 80188 AccScheduleOverview Extends "Acc. Schedule Overview"
         {
             Visible = false;
         }
+        addafter("Row No.")
+        {
+            field(Indentation; Rec.Indentation)
+            {
+                ApplicationArea = All;
+            }
+        }
+
 
         // fixed(Empresas)
         // {

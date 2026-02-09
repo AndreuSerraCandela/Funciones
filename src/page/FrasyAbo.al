@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Fra y abonos ptes. (ID 50052).
 /// </summary>
-page 50052 "Fra y abonos ptes."
+page 50020 "Fra y abonos ptes."
 {
     SourceTable = "Vendor Ledger Entry";
     PageType = List;

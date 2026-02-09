@@ -1668,7 +1668,7 @@ codeunit 50002 "Gestion Proyecto"
                 rLinCompra.Description := SalesLineFac.Description;
                 if rLinCompra."No." = '' Then
                     rLinCompra.Quantity := 0;
-                rLinCompra.MODIFY;
+                rLinCompra.insert;
                 SalesLineFac."Doc Intercompany Compra" := rCabCompr."No.";
                 SalesLineFac.Modify();
             UNTIL SalesLineFac.NEXT = 0;

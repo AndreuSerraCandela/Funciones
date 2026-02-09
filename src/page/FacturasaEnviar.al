@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Facturas a enviar (ID 50012).
+﻿/// <summary>
+/// Page Facturas a enviar (ID 50003).
 /// </summary>
-page 50012 "Facturas a enviar"
+page 50003 "Facturas a enviar"
 {
 
     Permissions = TableData 17 = rimd,

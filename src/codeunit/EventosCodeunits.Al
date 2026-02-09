@@ -911,6 +911,10 @@ codeunit 50015 ControldeEventosCodeunits
         rContrato: Record "Sales Header";
         rLinDetFra: Record "Sales Comment Line";
         rLinDetFraDef: Record "Sales Comment Line";
+        Fac: Record "Purchase Header";
+        PurchLine: Record "Purchase Line";
+        Inf: Record "Company Information";
+        SalesLine: Record "Sales Line";
     begin
 
         //-SII
@@ -919,6 +923,37 @@ codeunit 50015 ControldeEventosCodeunits
             SalesCrMemoHeader."Clave registro SII expedidas" := VATBusPostGrp."Clave registro SII expedidas";
         END;
         SalesCrMemoHeader."Pte Contabilicación" := true;
+        if SalesHeader."Factura Compra" <> '' Then begin
+            Fac.ChangeCompany(Salesheader."Empresa Origen Alb");
+            Fac.Get(Fac."Document Type"::"Credit Memo", SalesHeader."Factura Compra");
+            Fac."Vendor Cr. Memo No." := SalesCrMemoHeader."No.";
+            Fac."Posting Date" := SalesCrMemoHeader."Posting Date";
+            Fac."Document Date" := SalesCrMemoHeader."Document Date";
+            Fac."VAT Reporting Date" := SalesCrMemoHeader."VAT Reporting Date";
+            if Fac."Empresa Factura" = '' Then
+                Fac."Empresa Factura" := SalesHeader."Empresa Origen Alb";
+            Fac.ContabilizaInter := true;
+            Fac.Modify();
+            //CompruebaLineasCompra
+            PurchLine.ChangeCompany(Salesheader."Empresa Origen Alb");
+            PurchLine.SetRange("Document No.", SalesHeader."Factura Compra");
+            PurchLine.SetRange("Document Type", PurchLine."Document Type"::"Credit Memo");
+            PurchLine.SetRange(Type, PurchLine.Type::Resource);
+            PurchLine.SetFilter("No.", '<>%1', '');
+            PurchLine.SetFilter(Quantity, '<>%1', 0);
+            if PurchLine.FindFirst() then begin
+                Inf.Get();
+                repeat
+                    SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                    SalesLine.SetRange("Document No.", SalesHeader."No.");
+                    SalesLine.SetRange("Line No.", PurchLine."Line No.");
+                    if SalesLine.FindFirst() then begin
+                        PurchLine."No." := INF."Clave Recursos" + SalesLine."No.";
+                        PurchLine.Modify();
+                    end;
+                until PurchLine.Next() = 0;
+            end;
+        end;
         //Lineas de factura de impresión
         rLinDetFra.SETRANGE("Document Type", rLinDetFra."Document Type"::"Detalle Abono");
         rLinDetFra.SETRANGE("No.", SalesHeader."No.");

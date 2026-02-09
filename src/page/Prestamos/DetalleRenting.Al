@@ -1,8 +1,8 @@
-
+﻿
 /// <summary>
-/// Page Detalle Renting (ID 7001153).
+/// Page Detalle Renting (ID 50097).
 /// </summary>
-page 7001153 "Detalle Renting"
+page 50064 "Detalle Renting"
 {
     PageType = ListPart;
     SourceTable = "Detalle Prestamo";

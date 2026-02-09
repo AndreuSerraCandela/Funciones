@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Plazos recursos Matrix (ID 50023).
 /// </summary>
-page 50023 "Plazos recursos Matrix"
+page 50007 "Plazos recursos Matrix"
 {
     PageType = ListPart;
     SourceTable = Resource;

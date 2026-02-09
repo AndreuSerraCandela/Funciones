@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Panorama (ID 50035).
 /// </summary>
-page 50035 "Panorama"
+page 50010 "Panorama"
 {
     Caption = 'Panorama';
     DataCaptionExpression = CurrentSchedName + ' - ' + CurrentColumnName;

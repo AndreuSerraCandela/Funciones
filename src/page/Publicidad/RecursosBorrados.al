@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Resource List 2 (ID 50016).
 /// </summary>
-page 50016 "Resource List 2"
+page 50004 "Resource List 2"
 {
     AdditionalSearchTerms = 'capacity,job,project';
     ApplicationArea = All;

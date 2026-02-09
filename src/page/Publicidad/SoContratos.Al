@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Page Contratos Activities (ID 50000).
 /// </summary>
 Page 50000 "Contratos Activities"
@@ -493,7 +493,7 @@ Page 50000 "Contratos Activities"
 /// <summary>
 /// Page Contratos Activities (ID 7001298).
 /// </summary>
-Page 7001157 "Systemas Activities"
+Page 50066 "Systemas Activities"
 {
     PageType = CardPart;
     Caption = 'Sistemas';

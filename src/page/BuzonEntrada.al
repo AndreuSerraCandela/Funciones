@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Buzón Entrada (ID 7001168).
+﻿/// <summary>
+/// Page Buzón Entrada (ID 50112).
 /// </summary>
-page 7001168 "Buzón Entrada"
+page 50069 "Buzón Entrada"
 {
     SourceTable = Company;
     Caption = 'Buzón Entrada Facturas';

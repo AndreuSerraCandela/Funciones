@@ -1,4 +1,4 @@
-page 50032 "Saldo Interempresas det"
+page 50009 "Saldo Interempresas det"
 {
     PageType = List;
     UsageCategory = Lists;
@@ -1725,7 +1725,7 @@ page 50032 "Saldo Interempresas det"
     END;
 
 }
-// page 7001176 "Matix Prestamos"
+// page 50071 "Matix Prestamos"
 // {
 //     PageType = List;
 //     UsageCategory = Lists;
@@ -3319,7 +3319,7 @@ page 50032 "Saldo Interempresas det"
 //     END;
 
 // }
-page 50036 "Comprobación Clientes/Prov In"
+page 50011 "Comprobación Clientes/Prov In"
 {
     PageType = Card;
     UsageCategory = Tasks;

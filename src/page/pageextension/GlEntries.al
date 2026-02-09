@@ -512,6 +512,7 @@ pageextension 80133 GlEntries extends "General Ledger Entries"
                                         end;
                                     until lin.Next() = 0;
                             Until GlEntries.Next() = 0;
+                        if albt.count > 1 Then Error('Hay más de un albarán asociado a la entrada');
                         ControlProcesos.CambiAlbaran(GlEntries, Albt);
                     end;
                 }

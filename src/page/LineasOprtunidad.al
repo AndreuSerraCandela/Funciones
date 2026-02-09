@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Lineas Oprtunidad (ID 50004).
+﻿/// <summary>
+/// Page Lineas Oprtunidad (ID 50002).
 /// </summary>
-page 50004 "Lineas Oprtunidad"
+page 50002 "Lineas Oprtunidad"
 {
 
     Caption = 'Lineas Oprtunidad';

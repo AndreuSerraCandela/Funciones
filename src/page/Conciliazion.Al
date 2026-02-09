@@ -1,7 +1,7 @@
-/// <summary>
+﻿/// <summary>
 /// Page Ficha conciliacion cuentas (ID 7001192).
 /// </summary>
-page 7001146 "Ficha conciliacion cuentas"
+page 50059 "Ficha conciliacion cuentas"
 {
     //Version List=FH3.70;
     PageType = List;
@@ -775,7 +775,7 @@ page 7001146 "Ficha conciliacion cuentas"
     //     END.
     //   }
 }
-page 7001147 "Ficha Conciliaciones cuenta"
+page 50060 "Ficha Conciliaciones cuenta"
 {
     //Version List=FH3.70,FINTIS,COC,ES;
     PageType = Card;
@@ -826,7 +826,7 @@ page 7001147 "Ficha Conciliaciones cuenta"
     VAR
         Text100: Label '%1 a las %2';
 }
-page 7001148 "Tabla conciliacion cuenta"
+page 50061 "Tabla conciliacion cuenta"
 {
     //Version List=FH3.70,FINTIS,COC,ES;
     InsertAllowed = false;
@@ -849,7 +849,7 @@ page 7001148 "Tabla conciliacion cuenta"
     }
 
 }
-page 7001149 "Subf. Conciliacion cuenta"
+page 50062 "Subf. Conciliacion cuenta"
 {
     //Version List=FH3.70,FINTIS,COC,ES;
     Editable = false;
@@ -871,7 +871,7 @@ page 7001149 "Subf. Conciliacion cuenta"
         }
     }
 }
-page 7001152 "Movs. Conciliacion cuenta"
+page 50063 "Movs. Conciliacion cuenta"
 {
     //Version List=FH3.70,FINTIS,COC,ES;
     Editable = false;
