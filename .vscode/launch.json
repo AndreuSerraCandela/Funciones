@@ -16,8 +16,28 @@
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
-            "port": 8049,
-            "debugServer": 8049
+            "port": 7049,
+            "debugServer": 7049
+        },
+        
+        {
+            "type": "al",
+            "request": "launch",           
+            "name": "server",
+            "server": "http://192.168.10.226:8080/POWERBI",
+            "serverInstance": "POWERBI",
+            "authentication": "UserPassword",
+            "tenant": "default",
+            "environmentType": "OnPrem",
+            "schemaUpdateMode": "Synchronize",
+            "startupCompany": "Ibiza publicidad, S.A.",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "port": 49049,
+            "debugServer": 49049
         }
+
     ]
 }
