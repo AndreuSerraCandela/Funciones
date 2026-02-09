@@ -1,7 +1,7 @@
-/// <summary>
+﻿/// <summary>
 /// Page Generar pagares (ID 50054).
 /// </summary>
-page 50054 "Generar pagares"
+page 50022 "Generar pagares"
 {
     //Version List=FH3.70,FINTIS,PAG,ES;
     PageType = StandardDialog;
@@ -18,7 +18,7 @@ page 50054 "Generar pagares"
 
                 TableRelation = "Bank Account";
             }
-            //    { 1103350004;Label  ;440  ;990  ;3300 ;440  ;
+            //    { 1103350002;Label  ;440  ;990  ;3300 ;440  ;
             group("Agrupar por")
             {
 
@@ -116,7 +116,7 @@ page 50054 "Generar pagares"
     //   }
 }
 
-page 50055 "Primer pagare"
+page 50023 "Primer pagare"
 {
     //Version List=FH3.70,FINTIS,PAG,ES;
     PageType = StandardDialog;
@@ -161,7 +161,7 @@ page 50055 "Primer pagare"
     //     END.
     //   }
 }
-page 50056 "Relación Dimensiones"
+page 50024 "Relación Dimensiones"
 {
 
     PageType = List;
@@ -313,7 +313,7 @@ page 50056 "Relación Dimensiones"
     //   }
 }
 
-page 50057 "Relacion pagos"
+page 50025 "Relacion pagos"
 {
 
     //Version List=PAG;
@@ -476,7 +476,7 @@ page 50057 "Relacion pagos"
     //   }
 }
 
-page 50058 "Subform relacion pagos docs"
+page 50026 "Subform relacion pagos docs"
 {
 
     PageType = ListPart;
@@ -603,7 +603,7 @@ page 50058 "Subform relacion pagos docs"
     // }
 }
 
-page 50059 "Subform relacion pagos vtos"
+page 50027 "Subform relacion pagos vtos"
 {
 
     //Version List=PAG;
@@ -742,7 +742,7 @@ page 50059 "Subform relacion pagos vtos"
     // }
 }
 
-page 50060 "Lista relaciones pagos"
+page 50028 "Lista relaciones pagos"
 {
 
     //Version List=PAG;
@@ -766,7 +766,7 @@ page 50060 "Lista relaciones pagos"
     }
 }
 
-page 50061 "Borrador pagare"
+page 50029 "Borrador pagare"
 {
     PageType = Card;
     Caption = 'Borrador pagaré';
@@ -890,7 +890,7 @@ page 50061 "Borrador pagare"
 
 }
 
-page 50062 "Subform borrador pagare"
+page 50030 "Subform borrador pagare"
 {
     PageType = ListPart;
     Editable = false;
@@ -917,7 +917,7 @@ page 50062 "Subform borrador pagare"
     }
 }
 
-page 50063 "Lista pagares"
+page 50031 "Lista pagares"
 {
     PageType = List;
     UsageCategory = Lists;
@@ -978,7 +978,7 @@ page 50063 "Lista pagares"
 
 }
 
-page 50064 "Hist. pagare"
+page 50032 "Hist. pagare"
 {
     PageType = Card;
     Caption = 'Histórico pagarés';
@@ -1090,7 +1090,7 @@ page 50064 "Hist. pagare"
 
 }
 
-page 50065 "Subform hist. pagare"
+page 50033 "Subform hist. pagare"
 {
     PageType = ListPart;
     Editable = false;

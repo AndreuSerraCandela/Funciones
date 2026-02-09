@@ -65,6 +65,12 @@ report 50038 DisponibilidadWord
                 FromSalesPrice: Record "Price List Line";
                 StartingDate: date;
                 Tipo: Record "Tipo Recurso";
+                ControlProcesos: Codeunit ControlProcesos;
+                TempBlob: Codeunit "Temp Blob";
+                OutStr: OutStream;
+                InStr: InStream;
+                Base64Convert: Codeunit "Base64 Convert";
+                base64: Text;
 
             begin
                 rSetup.Get;
@@ -79,12 +85,23 @@ report 50038 DisponibilidadWord
                 FromSalesPrice.SETRANGE("Source Type", FromSalesPrice."Source Type"::"Customer Price Group");
                 FromSalesPrice.SETRANGE("Source No.", Resource."Customer Price Group");
                 if Not FromSalesPrice.FINDLAST THEN FromSalesPrice.Init();
-                if File.Exists(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg') Then Begin
-                    InputFile.Open(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg');
-                    InputFile.CreateInStream(Ins);
-                    //Resource.CalcFields(Image);
+                // if File.Exists(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg') Then Begin
+                //     InputFile.Open(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg');
+                //     InputFile.CreateInStream(Ins);
+                //     //Resource.CalcFields(Image);
+                //     Resource.Image.ImportStream(ins, 'Image');
+                // end else begin
+                Base64 := ControlProcesos.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource."No." + '.jpg', 'http://192.168.10.226:8089');
+                If Base64 <> '' Then begin
+                    TempBlob.CreateOutStream(OutStr);
+                    Base64Convert.FromBase64(base64, OutStr);
+                    TempBlob.CreateInStream(InS);
+                    Resource.Image.ImportStream(ins, 'Image');
+
+                    TempBlob.CreateInStream(InS);
                     Resource.Image.ImportStream(ins, 'Image');
                 end;
+                //end;
                 if Not Cat.Get(Resource."Customer Price Group") Then Cat.Init;
                 Categ := Cat.Description;
                 if Resource."Alquiler Anual" = 0 Then Resource."Alquiler Anual" := FromSalesPrice."Unit Price";
@@ -101,6 +118,16 @@ report 50038 DisponibilidadWord
                 If Resource."Tipo Recurso" = 'MINI OPI' Then Mes := '/Mes';
                 If Resource."Tipo Recurso" = 'OPI SMAP' Then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'LED' then Mes := '/Mes';
+                if Resource."Tipo Recurso" = 'OPIDIGITAL' then Mes := '/Mes';
+                if Resource."Tipo Recurso" = 'OPI DIGIT.' then Mes := '/Mes';
+                //Indicador
+                if Resource."Tipo Recurso" = 'INDICADOR' then Mes := '/Mes';
+                if Resource."Tipo Recurso" = 'IND.CALLE' then Mes := '/Mes';
+                //Peatonales
+                if Resource."Tipo Recurso" = 'VPEATON' then Mes := '/Mes';
+                //Reloj
+                if Resource."Tipo Recurso" = 'RELOJ' then Mes := '/Mes';
+                //Digitales
                 if Resource."Tipo Recurso" = 'OPIDIGITAL' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'OPI DIGIT.' then Mes := '/Mes';
                 // 'ASCENSORES' | 'ASCENSOR'
@@ -169,16 +196,16 @@ report 50038 DisponibilidadWord
                     field("Tipo Informe"; Rec."Tipo Informe") { ApplicationArea = All; }
                     field("¿Con precios?"; Rec."Precios") { ApplicationArea = All; }
                     field("¿Con prohibiciones?"; Rec."Prohibiciones") { ApplicationArea = All; }
-                    field("¿Agencia o Local?"; Rec."Tipo Cliente")
-                    {
-                        ApplicationArea = All;
-                        trigger OnValidate()
-                        begin
-                            if Rec."Tipo Cliente" = Rec."Tipo Cliente"::Agencia then
-                                DtoAgencia := '**Descuento de agencia e IVA no incluidos' else
-                                DtoAgencia := '';
-                        end;
-                    }
+                    // field("¿Agencia o Local?"; Rec."Tipo Cliente")
+                    // {
+                    //     ApplicationArea = All;
+                    //     trigger OnValidate()
+                    //     begin
+                    //         if Rec."Tipo Cliente" = Rec."Tipo Cliente"::Agencia then
+                    //             DtoAgencia := '**Descuento de agencia e IVA no incluidos' else
+                    //             DtoAgencia := '';
+                    //     end;
+                    // }
                     field("Con que precios"; Rec."Tipo Precios") { ApplicationArea = All; }
                     field("Con Que calidad"; Rec."Calidad") { ApplicationArea = All; }
                     field("Texto Temporada"; Temporada) { ApplicationArea = All; }

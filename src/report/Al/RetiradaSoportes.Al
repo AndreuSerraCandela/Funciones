@@ -161,6 +161,7 @@ Report 50042 "Retirada fijacion Soportes"
         gTask: Codeunit DropBox;
         VallasFijadas: Record "Imagenes Orden fijación";
         InStream: Instream;
+        Control: Codeunit "ControlProcesos";
     BEGIN
         if rOrden."Empresa" <> '' then
             Contrato.ChangeCompany(rOrden."Empresa")
@@ -237,7 +238,7 @@ Report 50042 "Retirada fijacion Soportes"
             VallasFijadas.SetRange("Nº Orden", rOrden."Nº Orden");
             If VallasFijadas.Findlast() Then begin
                 TempBlob.CreateOutStream(OutStr);
-                Base64Convert.FromBase64(VallasFijadas.ToBase64StringOcr(VallasFijadas.Url), OutStr);
+                Base64Convert.FromBase64(Control.ToBase64StringOcr(VallasFijadas.Url), OutStr);
                 TempBlob.CreateInStream(InStr);
                 "Det_Orden_fijacion".Image.ImportStream(InStr, VallasFijadas.Nombre);
             end else begin
@@ -246,10 +247,18 @@ Report 50042 "Retirada fijacion Soportes"
                     InputFile.CreateInStream(Ins);
                     //Resource.CalcFields(Image);
                     "Det_Orden_fijacion"."Image Resource".ImportStream(ins, 'Image');
+                end else begin
+                    Base64 := Control.GetFileAsBase64(Copystr(Tipo."Ruta imagenes", 6) + '\' + Resource1."No." + '.jpg', 'http://192.168.10.226:8089');
+                    if Base64 <> '' Then Begin
+                        TempBlob.CreateOutStream(OutStr);
+                        Base64Convert.FromBase64(base64, OutStr);
+                        TempBlob.CreateInStream(InS);
+                        "Det_Orden_fijacion"."Image Resource2".ImportStream(ins, 'Image');
+                    end;
                 end;
                 If Not Resource2.GET(rOrden."Nº Orden", rOrden."Nº Imagen") Then Resource2.init;
                 If Resource2.Url <> '' Then begin
-                    Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                    Base64 := Control.ToBase64StringOcr(Resource2.Url);
                     TempBlob.CreateOutStream(OutStr);
                     Base64Convert.FromBase64(base64, OutStr);
                     TempBlob.CreateInStream(InStr);
@@ -265,7 +274,7 @@ Report 50042 "Retirada fijacion Soportes"
                     Clear(InStr);
                     Clear(TempBlob);
                     Clear(Base64Convert);
-                    Base64 := Resource2.ToBase64StringOcr(Resource2.Url);
+                    Base64 := Control.ToBase64StringOcr(Resource2.Url);
                     TempBlob.CreateOutStream(OutStr);
                     Base64Convert.FromBase64(base64, OutStr);
                     TempBlob.CreateInStream(InStr);

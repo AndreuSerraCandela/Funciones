@@ -23,61 +23,46 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
             column(DebugCabCount; DebugCabCount) { }
             column(DebugMessage; 'Registros encontrados en CabFijacion') { }
 
-            dataitem("CampanasRetirar"; "Orden fijación")
+            dataitem("CampanasRetirar"; "Campañas a retirar")
             {
                 UseTemporary = true;
 
 
-                column(CampanaNombre; "Nombre Comercial") { }
-                column(TirarCampana; Format("Guardar o Tirar")) { }
-                column(ObservacionesCampana; AlgunosSigen(CampanasRetirar."Nº Orden")) { }
-                column(FechaRetirada; "Fecha Retirada") { }
-                column(TirarCampanaFlag; "Guardar o Tirar" = "Guardar o Tirar"::"Tirar") { }
+                column(CampanaNombre; CampanasRetirar."Campaña") { }
+                column(TirarCampana; Format(CampanasRetirar."Tirar")) { }
+                column(ObservacionesCampana; CampanasRetirar."Observaciones") { }
+                column(FechaRetirada; "Fecha") { }
+                column(TirarCampanaFlag; Tirar = true) { }
                 // Debug campos
                 column(DebugCampanasCount; DebugCampanasCount) { }
                 column(DebugCampanasMsg; 'Campañas encontradas') { }
 
                 trigger OnPreDataItem()
                 var
-                    Orden_fijacion: Record "Orden fijación";
-                    Job: Record Job;
-                    CabOrdenFijacion: Record "Cab Orden fijación";
+                    CampañasRetirar: Record "Campañas a retirar";
                 begin
-                    Orden_fijacion.setrange("Fecha fijación", FechaDesde, FechaHasta);
-                    Orden_fijacion.SetFilter("Fecha Retirada", '<>%1', 0D);
-                    if Orden_fijacion.FindSet() then
+                    CampañasRetirar.SetRange("Fecha", FechaDesde, FechaHasta);
+                    DebugCampanasCount := CampañasRetirar.Count;
+                    If CampañasRetirar.FindSet() then
                         repeat
-                            CampanasRetirar.SetRange("Nº Orden", Orden_fijacion."Nº Orden");
-                            if not CampanasRetirar.FindSet() then begin
-                                CampanasRetirar := Orden_fijacion;
-                                if not CabOrdenFijacion.Get(Orden_fijacion."Nº Orden") then
-                                    CabOrdenFijacion.Init();
-                                if CampanasRetirar."Nombre Comercial" = '' then
-                                    CampanasRetirar."Nombre Comercial" := CabOrdenFijacion."Nombre Comercial";
-                                if CampanasRetirar."Nombre Comercial" = '' then
-                                    if Job.Get(Orden_fijacion."Nº Proyecto") then
-                                        CampanasRetirar."Nombre Comercial" := Job."Sell-to Customer Name";
-
-                                CampanasRetirar.Insert();
-                            end;
-
-                        until Orden_fijacion.Next() = 0;
+                            CampanasRetirar := CampañasRetirar;
+                            If CampanasRetirar.Insert() then;
+                        until CampañasRetirar.Next() = 0;
                 end;
             }
 
-            dataitem("Orden_fijacion"; "Cab Orden fijación")
+            dataitem("Orden_fijacion"; Job)
             {
-                DataItemTableView = SORTING("Fecha fijación");
 
-                column(Nombre; NombreCliente) { }
+                column(Nombre; "Sell-to Customer Name") { }
                 column(FechaFijacion; Format("Fecha fijación", 0, '<Day,2>/<Month,2>/<Year>')) { }
-                column(NumOpis; "No. Opis") { }
-                column(Descripcion; Descripcion) { }
-                column(NProyecto; "Nº Proyecto") { }
+                column(NumOpis; "No. soportes") { }
+                column(Descripcion; Description) { }
+                column(NProyecto; "No.") { }
                 column(NombreComercial; "Nombre Comercial") { }
-                column(RetirarCampana; Retirar(Orden_fijacion."Nº Orden")) { }
-                column(Observaciones; Observaciones(Orden_fijacion."Nº Orden")) { }
-                column(GuardarOTirar; GuardarTirar(Orden_fijacion."Nº Orden")) { }
+                column(RetirarCampana; false) { }
+                column(Observaciones; Descripcion) { }
+                column(GuardarOTirar; 'TIRAR') { }
                 // Debug campos
                 column(DebugOrdenCount; DebugOrdenCount) { }
                 column(DebugOrdenMsg; 'Órdenes procesadas') { }
@@ -89,19 +74,7 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
                     Orden_fijacion: Record "Orden fijación";
 
                 begin
-                    if "Nombre Comercial" = '' then
-                        If Job.Get("Nº Proyecto") then
-                            "NombreCliente" := JOB."Sell-to Customer Name";
-                    Orden_fijacion.SetRange("Nº Orden", "Nº Orden");
-                    if "No. Opis" = 0 then
-                        "No. Opis" := Orden_fijacion.Count;
-                    Descripcion := Fijar;
 
-                    if "No. Opis" = 0 then begin
-                        //Message('Skip registro por No. Opis = 0. Orden: %1', "Nº Orden");
-                        // Comentamos temporalmente el skip para debugging
-                        // CurrReport.Skip();
-                    end;
 
 
                     DebugOrdenCount += 1;
@@ -109,8 +82,9 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
 
                 trigger OnPreDataItem()
                 begin
+                    SetRange(Fijar, true);
                     SetRange("Fecha fijación", FechaDesde, FechaHasta);
-                    SetRange("Tipo soporte", "Tipo soporte"::"OPI");
+                    SetRange("Tipo soporte", "Tipo soporte"::Opis);
                     DebugOrdenCount := 0;
                     //Message('Iniciando procesamiento de Orden_fijacion. Total registros disponibles: %1', Count);
                 end;
@@ -118,15 +92,14 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
 
             trigger OnPreDataItem()
             var
-                Orden_fijacion: Record "Orden fijación";
-                CabOrdenFijacion: Record "Cab Orden fijación";
+                CabOrdenFijacion: Record Job;
             begin
+                CabOrdenFijacion.SetRange(Fijar, true);
                 CabOrdenFijacion.SetRange("Fecha fijación", FechaDesde, FechaHasta);
-                CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::"OPI");
+                CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::Opis);
                 if CabOrdenFijacion.FindSet() then
                     repeat
-                        Orden_fijacion.SetRange("Nº Orden", CabOrdenFijacion."Nº Orden");
-                        TotalOpis += Orden_fijacion.Count;
+                        TotalOpis += CabOrdenFijacion."No. Soportes";
                     until CabOrdenFijacion.Next() = 0;
 
                 // Contar registros para debugging
@@ -151,6 +124,12 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
             {
                 group(Opciones)
                 {
+                    field(TipoSoporte; TipoSoporte)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Tipo de soporte';
+
+                    }
                     field(FechaDesde; FechaDesde)
                     {
                         ApplicationArea = All;
@@ -158,16 +137,16 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
 
                         trigger OnValidate()
                         var
-                            CabOrdenFijacion: Record "Cab Orden fijación";
+                            CabOrdenFijacion: Record Job;
                         begin
                             ActualizarNumeroSemana();
+                            CabOrdenFijacion.SetRange(Fijar, true);
                             FechaHasta := CalcDate('<CW>', FechaDesde);
                             CabOrdenFijacion.SetRange("Fecha fijación", FechaDesde, FechaHasta);
-                            CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::"OPI");
+                            CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::"OPIs");
                             if CabOrdenFijacion.FindSet() then
                                 repeat
-                                    Orden_fijacion.SetRange("Nº Orden", CabOrdenFijacion."Nº Orden");
-                                    TotalOpis += Orden_fijacion.Count;
+                                    TotalOpis += CabOrdenFijacion."No. soportes";
                                 until CabOrdenFijacion.Next() = 0;
                         end;
                     }
@@ -177,15 +156,15 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
                         Caption = 'Fecha hasta';
                         trigger OnValidate()
                         var
-                            CabOrdenFijacion: Record "Cab Orden fijación";
+                            CabOrdenFijacion: Record Job;
                         begin
                             TotalOpis := 0;
+                            CabOrdenFijacion.SetRange(Fijar, true);
                             CabOrdenFijacion.SetRange("Fecha fijación", FechaDesde, FechaHasta);
-                            CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::"OPI");
+                            CabOrdenFijacion.SetRange("Tipo soporte", CabOrdenFijacion."Tipo soporte"::"OPIs");
                             if CabOrdenFijacion.FindSet() then
                                 repeat
-                                    Orden_fijacion.SetRange("Nº Orden", CabOrdenFijacion."Nº Orden");
-                                    TotalOpis += Orden_fijacion.Count;
+                                    TotalOpis += CabOrdenFijacion."No. soportes";
                                 until CabOrdenFijacion.Next() = 0;
                         end;
                     }
@@ -228,33 +207,11 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
         end;
     end;
 
-    local procedure AlgunosSigen(NoOrden_fijacion: Integer): Text
-    var
-        Orden_fijacion: Record "Orden fijación";
-    begin
-        //Si en la orden de ficjacion, queda alguna linea que no este marcada para retirar o que ya se haya retirado devuelve 'Algunos siguen.'
-        Orden_fijacion.SetRange("Nº Orden", NoOrden_fijacion);
-        if Orden_fijacion.FindSet() then
-            repeat
-                if (Orden_fijacion.Retirada = false) and (Orden_fijacion.Retirar = false) then
-                    exit('Algunos siguen.');
-            until Orden_fijacion.Next() = 0;
-    end;
 
-    local procedure Retirar(NOrden: Integer): Boolean
-    begin
-        Exit(false);
-    end;
 
-    local procedure Observaciones(NOrden: Integer): Text
-    var
-        Orden_fijacion: Record "Orden fijación";
-    begin
-        Orden_fijacion.SetRange("Nº Orden", NOrden);
-        if Orden_fijacion.FindSet() then
-            exit(Orden_fijacion."Observaciones");
-        Exit('');
-    end;
+
+
+
 
     local procedure GuardarTirar(NOrden: Integer): Text
     begin
@@ -272,4 +229,5 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
         DebugCabCount: Integer;
         DebugCampanasCount: Integer;
         DebugOrdenCount: Integer;
+        TipoSoporte: Option "Opis","Vallas","Vallas Peantones","Indicadores";
 }

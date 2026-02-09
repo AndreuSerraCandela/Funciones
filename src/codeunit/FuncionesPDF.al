@@ -80,6 +80,7 @@ codeunit 7001111 "Funciones Correo PDF"
         Url: Text;
         DocAttch: Record "Imagenes Orden fijación";
         Id: Integer;
+        Control: Codeunit "ControlProcesos";
     BEGIN
 
         rCnfVta.GET;
@@ -306,7 +307,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         RecRef.Close();
                         //TempEmailItem.AddAttachment(AttachmentStream, Abono."No." + '.pdf');
                         If Base64 <> '' then
-                            Url := DocAttch.FormBase64ToUrl(Base64, TxtArchivo + '.pdf', Id);
+                            Url := Control.FormBase64ToUrl(Base64, TxtArchivo + '.pdf', Id);
                         Clear(AttachmentStream);
                         ficheros."Fecha Caducidad" := CalcDate('PM+2M', Today);
                         ficheros.Id_Url := Id;
@@ -1004,6 +1005,7 @@ codeunit 7001111 "Funciones Correo PDF"
         Url: Text;
         DocAttch: Record "Imagenes Orden fijación";
         Id: Integer;
+        Control: Codeunit "ControlProcesos";
     BEGIN
         if EmailF.FINDFIRST THEN BEGIN
             TxtArchivo := EmailF.Name;
@@ -1071,7 +1073,7 @@ codeunit 7001111 "Funciones Correo PDF"
                                 ficheros.Fichero.CreateInStream(AttachmentStream);
                                 Base64 := Base64Convert.ToBase64(AttachmentStream);
                                 If Base64 <> '' then
-                                    Url := DocAttch.FormBase64ToUrl(Base64, EmailF.Name + '.pdf', Id);
+                                    Url := Control.FormBase64ToUrl(Base64, EmailF.Name + '.pdf', Id);
                                 Clear(AttachmentStream);
                                 ficheros."Fecha Caducidad" := CalcDate('PM+2M', Today);
                                 ficheros.Id_Url := Id;
@@ -1386,6 +1388,7 @@ codeunit 7001111 "Funciones Correo PDF"
         Url: Text;
         DocAttch: Record "Imagenes Orden fijación";
         Id: Integer;
+        Control: Codeunit "ControlProcesos";
     BEGIN
         if EmailF.FINDFIRST THEN BEGIN
             TxtArchivo := EmailF.Name;
@@ -1441,7 +1444,7 @@ codeunit 7001111 "Funciones Correo PDF"
                                 ficheros.Fichero.CreateInStream(AttachmentStream);
                                 Base64 := Base64Convert.ToBase64(AttachmentStream);
                                 If Base64 <> '' then
-                                    Url := DocAttch.FormBase64ToUrl(Base64, EmailF.Name + '.pdf', Id);
+                                    Url := Control.FormBase64ToUrl(Base64, EmailF.Name + '.pdf', Id);
                                 Clear(AttachmentStream);
                                 ficheros."Fecha Caducidad" := CalcDate('PM+2M', Today);
                                 ficheros.Id_Url := Id;

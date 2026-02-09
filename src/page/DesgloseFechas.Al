@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Detalle fechas (ID 50049).
 /// </summary>
-page 50049 "Detalle fechas"
+page 50017 "Detalle fechas"
 {
     SourceTable = "Detalle Fechas x Usuario";
     PageType = List;

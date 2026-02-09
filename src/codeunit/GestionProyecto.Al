@@ -820,44 +820,31 @@ codeunit 50002 "Gestion Proyecto"
         JobTask: Record 1001;
         rJobt: Record Job temporary;
         rRes: Record "Resource";
-        rEmp: Record 2000000006;
-#if CLEAN24
-#pragma warning disable AL0432
-        cMan: Codeunit NoSeriesManagement;
-#pragma warning restore AL0432
-#else
+        rEmp: Record Company;
         CMan: Codeunit "No. Series";
-#endif
-        JobSetup: Record 315;
+        JobSetup: Record "Jobs Setup";
         rCli: Record "Customer";
-        rSo: Record 413;
         lSalesHeaderOtraEmpresa: Record "Sales Header";
         lSalesLineOtraEmpresa: Record "Sales Line";
         rCabCompr: Record "Purchase Header";
         rLinCompra: Record "Purchase Line";
         SalesLineFacOrTMP: Record "Sales Line" temporary;
         SalesLineFacOr: Record "Sales Line";
-        ConfVtas: Record 311;
-        rComentVenta: Record 44;
-#if CLEAN24
-#pragma warning disable AL0432
-        GestNoSer: Codeunit NoSeriesManagement;
-#pragma warning restore AL0432
-#else
+        ConfVtas: Record "Sales & Receivables Setup";
+        rComentVenta: Record "Sales Comment Line";
         GestNoSer: Codeunit "No. Series";
-#endif
         rClient: Record "Customer";
-        rComentProy: Record 97;
+        rComentProy: Record "Comment Line";
         ult: Integer;
         rRecurs: Record "Resource";
-        rGCP: Record 251;
-        rGCN: Record 250;
-        rCGC: Record 252;
-        rFamilia: Record 152;
+        rGCP: Record "Gen. Product Posting Group";
+        rGCN: Record "Gen. Business Posting Group";
+        rCGC: Record "General Posting Setup";
+        rFamilia: Record "Resource Group";
         lTexto: Record "Texto Presupuesto";
-        r352: Record 352;
+        lDefDim: Record "Default Dimension";
         //r357: Record 357;
-        r325: Record 325;
+        VatPostingSetup: Record "Vat Posting Setup";
         Currency: Record "Currency";
         rInf: Record "Company Information";
         Vendor: Record Vendor;
@@ -867,7 +854,7 @@ codeunit 50002 "Gestion Proyecto"
         LinContratoOtraEmpresa: Record "Sales Line";
         Ic: Record "IC Setup";
         ConfCompra: Record "Purchases & Payables Setup";
-        rComentCompra: Record 43;
+        rComentCompra: Record "Purch. Comment Line";
     BEGIN
         rClient.GET(Factura."Bill-to Customer No.");
         If rClient."IC Partner Code" <> '' THEN BEGIN
@@ -1044,7 +1031,8 @@ codeunit 50002 "Gestion Proyecto"
                 Ic.Get();
                 ContratoOtraEmpresa.CHANGECOMPANY(rJobt."Bill-to Contact");
                 ContratoOtraEmpresa.SetRange("Nº Proyecto", JobOtraEmpresa."No.");
-                ContratoOtraEmpresa.FindFirst();
+                If Not ContratoOtraEmpresa.FindFirst() Then
+                    Error('No se ha encontrado el contrato para el proyecto %1 en la empresa %2', JobOtraEmpresa."No.", rJobt."Bill-to Contact");
                 ContratoOtraEmpresa.Estado := ContratoOtraEmpresa.Estado::Firmado;
                 ContratoOtraEmpresa."Fecha Estado" := WorkDate();
                 ContratoOtraEmpresa."Facturacion Iniciada" := TRUE;
@@ -1186,7 +1174,7 @@ codeunit 50002 "Gestion Proyecto"
 
                 ult := 10000;
                 //rJobPlanigLine.CHANGECOMPANY(rJobt."Bill-to Contact");
-                r352.CHANGECOMPANY(rJobt."Bill-to Contact");
+                lDefDim.CHANGECOMPANY(rJobt."Bill-to Contact");
                 //r357.CHANGECOMPANY(rJobt."Bill-to Contact");
 
                 //rJobPlanigLine.SETRANGE(rJobPlanigLine."Job No.", JobOtraEmpresa."No.");
@@ -1224,39 +1212,39 @@ codeunit 50002 "Gestion Proyecto"
                                 lSalesLineOtraEmpresa."Gen. Prod. Posting Group" := rRecurs."Gen. Prod. Posting Group";
                                 lSalesLineOtraEmpresa."VAT Prod. Posting Group" := rRecurs."VAT Prod. Posting Group";
                                 lSalesLineOtraEmpresa."Unit of Measure Code" := rRecurs."Base Unit of Measure";
-                                r352.SETRANGE(r352."Table ID", 156);
-                                r352.SETRANGE(r352."No.", SalesLineFacOrTmp."No.");
-                                if r352.FINDFIRST THEN
+                                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                                lDefDim.SETRANGE(lDefDim."No.", SalesLineFacOrTmp."No.");
+                                if lDefDim.FINDFIRST THEN
                                     REPEAT
-                                        case r352."Dimension Code" of
+                                        case lDefDim."Dimension Code" of
                                             'DEPARTAMENTO':
-                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                                             'PROGRAMA':
-                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                                             'PRINCIPAL':
-                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                                             'SOPORTE':
-                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                                             'ZONA':
-                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                                lSalesLineOtraEmpresa.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                                         end;
                                     /* r357."Table ID" := 37;
                                     r357."Document Type" := r357."Document Type"::Order;
                                     r357."Document No." := rCab."No.";
                                     r357."Line No." := rLin."Line No.";
-                                    r357."Dimension Code" := r352."Dimension Code";
-                                    r357."Dimension Value Code" := r352."Dimension Value Code";
+                                    r357."Dimension Code" := lDefDim."Dimension Code";
+                                    r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                                     r357.INSERT; */
-                                    UNTIL r352.NEXT = 0;
+                                    UNTIL lDefDim.NEXT = 0;
                                 if (rRecurs."Enunciado Cto. Venta" <> '') THEN
                                     lSalesLineOtraEmpresa.Description := rRecurs."Enunciado Cto. Venta";
                                 lSalesLineOtraEmpresa."Gen. Bus. Posting Group" := lSalesHeaderOtraEmpresa."Gen. Bus. Posting Group";
                                 lSalesLineOtraEmpresa."Gen. Prod. Posting Group" := rRecurs."Gen. Prod. Posting Group";
                                 lSalesLineOtraEmpresa."VAT Bus. Posting Group" := rClient."VAT Bus. Posting Group";
                                 lSalesLineOtraEmpresa."VAT Prod. Posting Group" := rRecurs."VAT Prod. Posting Group";
-                                r325.CHANGECOMPANY(rJobt."Bill-to Contact");
-                                if r325.GET(lSalesLineOtraEmpresa."VAT Bus. Posting Group", lSalesLineOtraEmpresa."VAT Prod. Posting Group") THEN
-                                    lSalesLineOtraEmpresa."VAT %" := r325."VAT %";
+                                VatPostingSetup.CHANGECOMPANY(rJobt."Bill-to Contact");
+                                if VatPostingSetup.GET(lSalesLineOtraEmpresa."VAT Bus. Posting Group", lSalesLineOtraEmpresa."VAT Prod. Posting Group") THEN
+                                    lSalesLineOtraEmpresa."VAT %" := VatPostingSetup."VAT %";
                                 lSalesLineOtraEmpresa."Dto. Tarifa" := JobPlanningLineT."Dto. Tarifa";
                                 lSalesLineOtraEmpresa."% Dto. Venta 1" := JobPlanningLineT."% Dto. Venta 1";
 
@@ -1423,6 +1411,8 @@ codeunit 50002 "Gestion Proyecto"
                             rLinCompra.VALIDATE("Buy-from Vendor No.", rCabCompr."Buy-from Vendor No.");
                             rLinCompra.VALIDATE(Type, SalesLineFacOrTmp.Type);
                             rLinCompra.VALIDATE("No.", SalesLineFacOrTmp."No.");
+                            If rLinCompra.Type = rLinCompra.Type::Resource then
+                                rLinCompra.TestField("No.");
                             rLinCompra.VALIDATE(Description, SalesLineFacOrTmp.Description);
                             rLinCompra.VALIDATE(Quantity, SalesLineFacOrTmp.Quantity);
                             // mig a 5.0     SalesLineFacOrTemp.CALCFIELDS(Quantity);
@@ -1618,14 +1608,16 @@ codeunit 50002 "Gestion Proyecto"
 
         if SalesLineFac.FINDfirst THEN
             REPEAT
+                if rLinCompra.get(rCabCompr."Document Type", rCabCompr."No.", SalesLineFac."Line No.") then
+                    rLinCompra.Delete();
+
                 rLinCompra.Init();
                 rLinCompra."Document Type" := rCabCompr."Document Type";
                 rLinCompra."Document No." := rCabCompr."No.";
-                ult += 10000;
-                rLinCompra."Line No." := SalesLineFac."Line No.";
+                ult += SalesLineFac."Line No.";
+                rLinCompra."Line No." := Ult;
 
                 rLinCompra."Empresa Venta" := CompanyName;
-                rLinCompra.INSERT;
                 rLinCompra."Buy-from Vendor No." := rCabCompr."Buy-from Vendor No.";
                 rLinCompra."Pay-to Vendor No." := rCabCompr."Buy-from Vendor No.";
                 rLinCompra.VALIDATE(Type, SalesLineFac.Type);
@@ -1676,7 +1668,7 @@ codeunit 50002 "Gestion Proyecto"
                 rLinCompra.Description := SalesLineFac.Description;
                 if rLinCompra."No." = '' Then
                     rLinCompra.Quantity := 0;
-                rLinCompra.MODIFY;
+                rLinCompra.insert;
                 SalesLineFac."Doc Intercompany Compra" := rCabCompr."No.";
                 SalesLineFac.Modify();
             UNTIL SalesLineFac.NEXT = 0;
@@ -1689,9 +1681,11 @@ codeunit 50002 "Gestion Proyecto"
         rLinCompra.FindFirst();
         repeat
             rLinCompraDef.ChangeCompany(rIcPartner."Inbox Details");
+            if rLinCompraDef.get(rLinCompra."Document Type", rLinCompra."Document No.", rLinCompra."Line No.") then
+                rLinCompraDef.Delete();
             rLinCompraDef := rLinCompra;
-            rLinCompraDef."Vendor Item No." := '';
             rLinCompraDef."No." := rLinCompra."Vendor Item No.";
+            rLinCompraDef."Vendor Item No." := '';
             rLinCompraDef.Insert;
         until rLinCompra.NEXT = 0;
     end;
@@ -1733,7 +1727,7 @@ codeunit 50002 "Gestion Proyecto"
         rCGC: Record 252;
         rFamilia: Record 152;
         lTexto: Record "Texto Presupuesto";
-        r352: Record 352;
+        lDefDim: Record 352;
         //r357: Record 357;
         r325: Record 325;
         Currency: Record "Currency";
@@ -1899,7 +1893,7 @@ codeunit 50002 "Gestion Proyecto"
 
                 ult := 10000;
                 rPresup.CHANGECOMPANY(rJobt."Bill-to Contact");
-                r352.CHANGECOMPANY(rJobt."Bill-to Contact");
+                lDefDim.CHANGECOMPANY(rJobt."Bill-to Contact");
                 //r357.CHANGECOMPANY(rJobt."Bill-to Contact");
                 rRecurs.CHANGECOMPANY(rJobt."Bill-to Contact");
                 rPresup.SETRANGE(rPresup."Job No.", rJob2."No.");
@@ -1929,30 +1923,30 @@ codeunit 50002 "Gestion Proyecto"
                             if (rPresup.Type = rPresup.Type::Resource) THEN BEGIN
                                 rRecurs.GET(rPresup."No.");
                                 rLin."Unit of Measure Code" := rRecurs."Base Unit of Measure";
-                                r352.SETRANGE(r352."Table ID", 156);
-                                r352.SETRANGE(r352."No.", rPresup."No.");
-                                if r352.FINDFIRST THEN
+                                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                                lDefDim.SETRANGE(lDefDim."No.", rPresup."No.");
+                                if lDefDim.FINDFIRST THEN
                                     REPEAT
-                                        case r352."Dimension Code" of
+                                        case lDefDim."Dimension Code" of
                                             'DEPARTAMENTO':
-                                                rLin.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                                             'PROGRAMA':
-                                                rLin.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                                             'PRINCIPAL':
-                                                rLin.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                                             'SOPORTE':
-                                                rLin.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                                             'ZONA':
-                                                rLin.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                                         end;
                                     /* r357."Table ID" := 37;
                                     r357."Document Type" := r357."Document Type"::Order;
                                     r357."Document No." := rCab."No.";
                                     r357."Line No." := rLin."Line No.";
-                                    r357."Dimension Code" := r352."Dimension Code";
-                                    r357."Dimension Value Code" := r352."Dimension Value Code";
+                                    r357."Dimension Code" := lDefDim."Dimension Code";
+                                    r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                                     r357.INSERT; */
-                                    UNTIL r352.NEXT = 0;
+                                    UNTIL lDefDim.NEXT = 0;
                                 if (rRecurs."Enunciado Cto. Venta" <> '') THEN
                                     rLin.Description := rRecurs."Enunciado Cto. Venta";
                                 rLin."Gen. Bus. Posting Group" := rCab."Gen. Bus. Posting Group";
@@ -2533,7 +2527,7 @@ codeunit 50002 "Gestion Proyecto"
         Vendor: Record Vendor;
         r39: Record "Purchase Line";
         Contrato: Code[20];
-        r352: Record 352;
+        lDefDim: Record 352;
         //r357: Record 357;
         r251: Record 251;
         Numero: Code[20];
@@ -2644,31 +2638,31 @@ codeunit 50002 "Gestion Proyecto"
                                 rLin2."No." := rResOrg."No.";
                                 rLin2."Unit of Measure" := rResOrg."Base Unit of Measure";
                                 rLin2.INSERT;
-                                r352.CHANGECOMPANY(r121t."Periodo de Pago");
-                                r352.SETRANGE(r352."Table ID", 156);
-                                r352.SETRANGE(r352."No.", rResOrg."No.");
-                                if r352.FINDFIRST THEN
+                                lDefDim.CHANGECOMPANY(r121t."Periodo de Pago");
+                                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                                lDefDim.SETRANGE(lDefDim."No.", rResOrg."No.");
+                                if lDefDim.FINDFIRST THEN
                                     REPEAT
-                                        case r352."Dimension Code" of
+                                        case lDefDim."Dimension Code" of
                                             'DEPARTAMENTO':
-                                                rLin.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                                             'PROGRAMA':
-                                                rLin.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                                             'PRINCIPAL':
-                                                rLin.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                                             'SOPORTE':
-                                                rLin.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                                             'ZONA':
-                                                rLin.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                                rLin.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                                         end;
                                     /*  r357."Table ID" := 37;
                                      r357."Document Type" := r357."Document Type"::Order;
                                      r357."Document No." := lSalesHeader."No.";
                                      r357."Line No." := rLin2."Line No.";
-                                     r357."Dimension Code" := r352."Dimension Code";
-                                     r357."Dimension Value Code" := r352."Dimension Value Code";
+                                     r357."Dimension Code" := lDefDim."Dimension Code";
+                                     r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                                      r357.INSERT; */
-                                    UNTIL r352.NEXT = 0;
+                                    UNTIL lDefDim.NEXT = 0;
                                 // if rResOrg.Irpf THEN BEGIN
                                 //     r251.CHANGECOMPANY(r121t."Periodo de Pago");
                                 //     r251.GET(rResOrg."Gen. Prod. Posting Group");
@@ -2751,31 +2745,31 @@ codeunit 50002 "Gestion Proyecto"
                 rLin2."No." := rResOrg."No.";
                 rLin2."Unit of Measure" := rResOrg."Base Unit of Measure";
                 rLin2.INSERT;
-                r352.CHANGECOMPANY(r121t."Periodo de Pago");
-                r352.SETRANGE(r352."Table ID", 156);
-                r352.SETRANGE(r352."No.", rResOrg."No.");
-                if r352.FINDFIRST THEN
+                lDefDim.CHANGECOMPANY(r121t."Periodo de Pago");
+                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                lDefDim.SETRANGE(lDefDim."No.", rResOrg."No.");
+                if lDefDim.FINDFIRST THEN
                     REPEAT
-                        case r352."Dimension Code" of
+                        case lDefDim."Dimension Code" of
                             'DEPARTAMENTO':
-                                rLin2.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                             'PROGRAMA':
-                                rLin2.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                             'PRINCIPAL':
-                                rLin2.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                             'SOPORTE':
-                                rLin2.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                             'ZONA':
-                                rLin2.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                         end;
                     /* r357."Table ID" := 37;
                     r357."Document Type" := r357."Document Type"::Invoice;
                     r357."Document No." := lSalesHeader."No.";
                     r357."Line No." := rLin2."Line No.";
-                    r357."Dimension Code" := r352."Dimension Code";
-                    r357."Dimension Value Code" := r352."Dimension Value Code";
+                    r357."Dimension Code" := lDefDim."Dimension Code";
+                    r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                     r357.INSERT; */
-                    UNTIL r352.NEXT = 0;
+                    UNTIL lDefDim.NEXT = 0;
                 // if rResOrg.Irpf THEN BEGIN
                 //     r251.CHANGECOMPANY(r121t."Periodo de Pago");
                 //     r251.GET(rResOrg."Gen. Prod. Posting Group");
@@ -3255,7 +3249,7 @@ codeunit 50002 "Gestion Proyecto"
         Vendor: Record Vendor;
         r39: Record "Purchase Line";
         Contrato: Code[20];
-        r352: Record 352;
+        lDefDim: Record 352;
         //r357: Record 357;
         r251: Record 251;
         Numero: Code[20];
@@ -3364,31 +3358,31 @@ codeunit 50002 "Gestion Proyecto"
                                 rLin2."No." := rResOrg."No.";
                                 rLin2."Unit of Measure" := rResOrg."Base Unit of Measure";
                                 rLin2.INSERT;
-                                r352.CHANGECOMPANY(r121t."Periodo de Pago");
-                                r352.SETRANGE(r352."Table ID", 156);
-                                r352.SETRANGE(r352."No.", rResOrg."No.");
-                                if r352.FINDFIRST THEN
+                                lDefDim.CHANGECOMPANY(r121t."Periodo de Pago");
+                                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                                lDefDim.SETRANGE(lDefDim."No.", rResOrg."No.");
+                                if lDefDim.FINDFIRST THEN
                                     REPEAT
-                                        case r352."Dimension Code" of
+                                        case lDefDim."Dimension Code" of
                                             'DEPARTAMENTO':
-                                                rLin2.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                                rLin2.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                                             'PROGRAMA':
-                                                rLin2.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                                rLin2.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                                             'PRINCIPAL':
-                                                rLin2.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                                rLin2.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                                             'SOPORTE':
-                                                rLin2.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                                rLin2.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                                             'ZONA':
-                                                rLin2.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                                rLin2.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                                         end;
                                     /*       r357."Table ID" := 37;
                                           r357."Document Type" := r357."Document Type"::Order;
                                           r357."Document No." := lSalesHeader."No.";
                                           r357."Line No." := rLin2."Line No.";
-                                          r357."Dimension Code" := r352."Dimension Code";
-                                          r357."Dimension Value Code" := r352."Dimension Value Code";
+                                          r357."Dimension Code" := lDefDim."Dimension Code";
+                                          r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                                           r357.INSERT; */
-                                    UNTIL r352.NEXT = 0;
+                                    UNTIL lDefDim.NEXT = 0;
                                 //     if rResOrg.Irpf THEN BEGIN
                                 //         r251.CHANGECOMPANY(r121t."Periodo de Pago");
                                 //         r251.GET(rResOrg."Gen. Prod. Posting Group");
@@ -3471,31 +3465,31 @@ codeunit 50002 "Gestion Proyecto"
                 rLin2."No." := rResOrg."No.";
                 rLin2."Unit of Measure" := rResOrg."Base Unit of Measure";
                 rLin2.INSERT;
-                r352.CHANGECOMPANY(r121t."Periodo de Pago");
-                r352.SETRANGE(r352."Table ID", 156);
-                r352.SETRANGE(r352."No.", rResOrg."No.");
-                if r352.FINDFIRST THEN
+                lDefDim.CHANGECOMPANY(r121t."Periodo de Pago");
+                lDefDim.SETRANGE(lDefDim."Table ID", 156);
+                lDefDim.SETRANGE(lDefDim."No.", rResOrg."No.");
+                if lDefDim.FINDFIRST THEN
                     REPEAT
-                        case r352."Dimension Code" of
+                        case lDefDim."Dimension Code" of
                             'DEPARTAMENTO':
-                                rLin2.Validate("Shortcut Dimension 1 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 1 Code", lDefDim."Dimension Value Code");
                             'PROGRAMA':
-                                rLin2.Validate("Shortcut Dimension 2 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 2 Code", lDefDim."Dimension Value Code");
                             'PRINCIPAL':
-                                rLin2.Validate("Shortcut Dimension 3 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 3 Code", lDefDim."Dimension Value Code");
                             'SOPORTE':
-                                rLin2.Validate("Shortcut Dimension 5 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 5 Code", lDefDim."Dimension Value Code");
                             'ZONA':
-                                rLin2.Validate("Shortcut Dimension 4 Code", r352."Dimension Value Code");
+                                rLin2.Validate("Shortcut Dimension 4 Code", lDefDim."Dimension Value Code");
                         end;
                     /* r357."Table ID" := 37;
                     r357."Document Type" := r357."Document Type"::Invoice;
                     r357."Document No." := lSalesHeader."No.";
                     r357."Line No." := rLin2."Line No.";
-                    r357."Dimension Code" := r352."Dimension Code";
-                    r357."Dimension Value Code" := r352."Dimension Value Code";
+                    r357."Dimension Code" := lDefDim."Dimension Code";
+                    r357."Dimension Value Code" := lDefDim."Dimension Value Code";
                     r357.INSERT; */
-                    UNTIL r352.NEXT = 0;
+                    UNTIL lDefDim.NEXT = 0;
                 // if rResOrg.Irpf THEN BEGIN
                 //     r251.CHANGECOMPANY(r121t."Periodo de Pago");
                 //     r251.GET(rResOrg."Gen. Prod. Posting Group");

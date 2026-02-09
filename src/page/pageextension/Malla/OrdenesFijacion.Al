@@ -68,6 +68,7 @@ pageextension 75009 OrdenesFijacion extends "Ficha Orden Fijacion"
                         else begin
                             Imagenes.Init();
                             Imagenes."Nº Orden" := Rec."Nº Orden";
+                            Imagenes."Nombre" := 'Imagen_' + Format(Rec."Nº Orden");
                             Imagenes."Nº Imagen" := 0;
                             If Imagenes.Insert() Then;
                             Commit();

@@ -129,7 +129,7 @@ codeunit 50001 "Gestion Facturación"
         finestra: Dialog;
         Text005: Label 'Se van a facturar todas las Ordenes de Publicidad entre %1 y %2, y se creará un borrador de factura con fecha %3. ¿Es correcto?';
         Text006: Label 'Ya se han creado los borradores de facturas de este contrato.';
-        fDatos: page 50010;
+        fDatos: page "Petición datos Facturación";
         Text007: Label 'Este contrato tiene lineas que no proceden de Ordenes de Publicidad.\La Facturación Por Fechas no contemplará esas lineas.';
         Text008: Label 'Este contrato ya ha sido empezado con la facturacion %1 y no puede ser cambiado.';
         Text009: Label 'Facturación %1 finalizada. Se ha creado el borrador de Factura Nº %2.';
@@ -3075,7 +3075,9 @@ codeunit 50001 "Gestion Facturación"
         SalesInvHeader: Record 112;
         SalesLine: Record 37;
         PrepmtInvBuffer: Record 461 TEMPORARY;
+#pragma warning disable AL0432
         TempVATAmountLine: Record 290 TEMPORARY;
+#pragma warning restore AL0432
         //TempDocDim: Record 357 TEMPORARY;
         TempDimBuf: Record 360 TEMPORARY;
         PrepmtInvLine: Record "Prepayment Inv. Line Buffer";
@@ -3555,7 +3557,9 @@ codeunit 50001 "Gestion Facturación"
         PrepmtTotalAmount: Decimal;
         PrepmtVATAmount: Decimal;
         PrepmtVATAmountText: Text[30];
+#pragma warning disable AL0432
         TempVATAmountLine4: Record 290;
+#pragma warning restore AL0432
         wTotFra1: Decimal;
         rPropuestas: Record "Facturas Propuestas";
     BEGIN

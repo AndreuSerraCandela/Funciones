@@ -1,5 +1,4 @@
-
-page 50071 "Grupo de empresas"
+page 50037 "Grupo de empresas"
 {
     PageType = List;
     UsageCategory = Lists;
@@ -34,7 +33,7 @@ page 50071 "Grupo de empresas"
 
 
 
-page 50073 "Lista grupos empresas"
+page 50038 "Lista grupos empresas"
 {
     SourceTable = "Grupo de empresas";
     PageType = List;
@@ -73,7 +72,7 @@ page 50073 "Lista grupos empresas"
     END;
 
 }
-page 50075 "Lista de códigos de agrupación"
+page 50040 "Lista de códigos de agrupación"
 {
     PageType = List;
     UsageCategory = Lists;

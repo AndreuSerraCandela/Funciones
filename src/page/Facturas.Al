@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Lista de facturas (ID 50037).
 /// </summary>
-page 50037 "Lista de facturas"
+page 50012 "Lista de facturas"
 {
     CardPageID = "Posted Sales Invoice";
     Editable = false;
@@ -939,7 +939,9 @@ page 50037 "Lista de facturas"
         TotalPurchLine: Record 39;
         TotalPurchLineLCY: Record 39;
         Vend: Record Vendor;
-        TempVATAmountLine: Record 290 TEMPORARY;
+#pragma warning disable AL0432
+        TempVATAmountLine: Record "VAT Amount Line" TEMPORARY;
+#pragma warning restore AL0432
         PurchSetup: Record "Purchases & Payables Setup";
         PurchPost: Codeunit 90;
         TotalAmount1: Decimal;
@@ -1078,7 +1080,7 @@ page 50037 "Lista de facturas"
     END;
 
 }
-page 50038 "Lista de Abonos"
+page 50013 "Lista de Abonos"
 {
     CardPageID = "Posted Sales Credit Memo";
     Editable = false;
@@ -1835,7 +1837,9 @@ page 50038 "Lista de Abonos"
         TotalPurchLine: Record 39;
         TotalPurchLineLCY: Record 39;
         Vend: Record Vendor;
-        TempVATAmountLine: Record 290 TEMPORARY;
+#pragma warning disable AL0432
+        TempVATAmountLine: Record "VAT Amount Line" TEMPORARY;
+#pragma warning restore AL0432
         PurchSetup: Record "Purchases & Payables Setup";
         PurchPost: Codeunit 90;
         TotalAmount1: Decimal;

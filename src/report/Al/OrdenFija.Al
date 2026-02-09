@@ -37,14 +37,12 @@ Report 50032 "Crear orden fijación"
                 TempBlob: Codeunit "Temp Blob";
                 DocAttach: Record "Document Attachment";
                 Images: Record "Imagenes Orden fijación";
-                Images2: Record "Imagenes Orden fijación";
                 Instream: Instream;
                 Base64: Text;
                 Base64Convert: Codeunit "Base64 Convert";
                 Url: Text;
                 Id: Integer;
-
-
+                Control: Codeunit "ControlProcesos";
             BEGIN
 
                 // If Primero then begin
@@ -165,13 +163,14 @@ Report 50032 "Crear orden fijación"
                         // if Images2.FindFirst() then
                         //     Images.Url := Images2.Url
                         // else
-                        Images.Url := Images.FormBase64ToUrl(Base64, Images.Nombre, Images.Id);
+                        Images.Url := Control.FormBase64ToUrl(Base64, Images.Nombre, Images.Id);
                         rRecurs.qr := Images.Url;
                     END else
-                        Images.Url := Images.FormBase64ToUrl(Base64, Images.Nombre, Images.Id);
+                        Images.Url := Control.FormBase64ToUrl(Base64, Images.Nombre, Images.Id);
 
 
                 end;
+                If Images.Nombre = '' Then Images.Nombre := 'Imagen_' + Format(Images."Nº Orden") + '.png';
                 Images.INSERT;
                 cuentaReservas := cuentaReservas + 1;
                 rDet.INSERT;

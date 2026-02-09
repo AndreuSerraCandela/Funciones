@@ -287,7 +287,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VatPostStp: Record 325;
         VATBusPostGrp: Record 323;
@@ -677,8 +679,9 @@ report 50011 "Gestión SII"
         //+EXP01
         //+001
     end;
-
-    local procedure WriteNewIMPDOC(var Fichero: OutStream; var VATAmountLines: Record 290 temporary; ImporteEnNegativo: Boolean; var TempVatPostStp: Record 325 temporary; Sale: Boolean; TipoFactura: Text; CurrCode: Code[10])
+#pragma warning disable AL0432
+    local procedure WriteNewIMPDOC(var Fichero: OutStream; var VATAmountLines: Record "VAT Amount Line" temporary; ImporteEnNegativo: Boolean; var TempVatPostStp: Record 325 temporary; Sale: Boolean; TipoFactura: Text; CurrCode: Code[10])
+#pragma warning restore AL0432
     var
         VATPostingSetup: Record 325;
         importe_art_otros: Decimal;
@@ -898,7 +901,9 @@ report 50011 "Gestión SII"
 
     end;
 
-    local procedure WriteNewRECDOC(var Fichero: OutStream; var VATAmountLines: Record 290 temporary; TipoFacturaRectificativa: Code[3]; CurrCode: Code[10])
+#pragma warning disable AL0432
+    local procedure WriteNewRECDOC(var Fichero: OutStream; var VATAmountLines: Record "VAT Amount Line" Temporary; TipoFacturaRectificativa: Code[3]; CurrCode: Code[10])
+#pragma warning restore AL0432
     var
         VATBase: Decimal;
         LineAmt: Decimal;
@@ -928,7 +933,9 @@ report 50011 "Gestión SII"
                             + ChangeCommaForDot(FORMAT(LineAmt, 0, DevolverFormato(CurrCode))));
     end;
 
-    local procedure CalcVATAmtLines(DocType: Option "Factura venta","Factura compra","Abono venta","Abono compra","Factura servicio","Abono servicio"; DocNo: Code[20]; var VATAmountLines: Record 290 temporary; var TempVatPostStp: Record 325 temporary)
+#pragma warning disable AL0432
+    local procedure CalcVATAmtLines(DocType: Option "Factura venta","Factura compra","Abono venta","Abono compra","Factura servicio","Abono servicio"; DocNo: Code[20]; var VATAmountLines: Record "VAT Amount Line" Temporary; var TempVatPostStp: Record 325 temporary)
+#pragma warning restore AL0432
     var
         SalesInvoiceLine: Record 113;
         SalesInvoiceHeader: Record 112;
@@ -1246,7 +1253,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VATBusPostGrp: Record 323;
         CuotaDeducible: Decimal;
@@ -1652,7 +1661,9 @@ report 50011 "Gestión SII"
         END;
     end;
 
-    local procedure CalcCuotaDeducible(var VATAmountLines: Record 290 temporary): Decimal
+#pragma warning disable AL0432
+    local procedure CalcCuotaDeducible(var VATAmountLines: Record "VAT Amount Line" Temporary): Decimal
+#pragma warning restore AL0432
     var
         CuotaDeducible: Decimal;
         VatSet: Record 325;
@@ -1980,7 +1991,9 @@ report 50011 "Gestión SII"
         NifReceptor: Code[20];
         TipoFactura: Text;
         TempVATPostingSetup: Record 325 temporary;
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TipoIDEmisor: Code[3];
         IDEmisor: Code[20];
         PaisEmisor: Code[10];
@@ -2322,7 +2335,9 @@ report 50011 "Gestión SII"
 
     end;
 
-    local procedure CalcVatLinesGenJnlLine(DocNo: Code[20]; PostingDate: Date; DocType: Enum "Document Type Kuara"; var TempVATAmountLines: Record 290 temporary; var TempVATPostingSetup: Record 325 temporary)
+#pragma warning disable AL0432
+    local procedure CalcVatLinesGenJnlLine(DocNo: Code[20]; PostingDate: Date; DocType: Enum "Document Type Kuara"; var TempVATAmountLines: Record "VAT Amount Line" Temporary; var TempVATPostingSetup: Record 325 temporary)
+#pragma warning restore AL0432
     var
         VATEntry: Record 254;
         VATPostingSetup: Record 325;
@@ -2548,6 +2563,8 @@ report 50011 "Gestión SII"
         Ficheros."Nombre fichero" := RutaFichero;
         Ficheros.Procesado := false;
         Ficheros.Proceso := 'SII';
+        Ficheros."Fecha Caducidad" := CalcDate('PM+2M', WorkDate());
+        Ficheros.Id_Url := 0;
         Ficheros.Insert(True);
         Ficheros.CalcFields(Fichero);
         Ficheros.Fichero.CreateOutStream(Fichero);
@@ -2766,7 +2783,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VATBusPostGrp: Record 323;
         IVACaja: Boolean;
@@ -3024,7 +3043,8 @@ report 50011 "Gestión SII"
             Pais := '';
             Customer."Country/Region Code" := '';
 
-        END;
+        END else
+            Pais := Customer."Country/Region Code";
         if Pais = '' Then Pais := 'ES';
         if Pais = 'EN' THEN Pais := 'GB';
         // if (Customer."Cliente Directo") AND (Pais = 'ES') THEN Pais := '';
@@ -3373,7 +3393,9 @@ report 50011 "Gestión SII"
         VATBusPostGrp: Record 323;
         AmountInclVat: Decimal;
         Amount: Decimal;
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         WriteHeader: Boolean;
         Negativo: Boolean;
@@ -3833,7 +3855,9 @@ report 50011 "Gestión SII"
 
     end;
 
-    local procedure CalcAmts(var TempVatAmtLine: Record 290 temporary; var AmtInclVAT: Decimal; var Amt: Decimal)
+#pragma warning disable AL0432
+    local procedure CalcAmts(var TempVatAmtLine: Record "VAT Amount Line" Temporary; var AmtInclVAT: Decimal; var Amt: Decimal)
+#pragma warning restore AL0432
     begin
         TempVatAmtLine.RESET;
         if TempVatAmtLine.FINDSET THEN
@@ -4191,7 +4215,9 @@ report 50011 "Gestión SII"
         EXIT(EVALUATE(Number, TipoFacSII));
     end;
 
-    local procedure CalcVatAmounts(var TempVatAmtAux: Record 290 temporary; var VatAmt: Decimal; var Vatbase: Decimal)
+#pragma warning disable AL0432
+    local procedure CalcVatAmounts(var TempVatAmtAux: Record "VAT Amount Line" Temporary; var VatAmt: Decimal; var Vatbase: Decimal)
+#pragma warning restore AL0432
     begin
         TempVatAmtAux.RESET;
         if TempVatAmtAux.FINDSET THEN
@@ -4201,7 +4227,9 @@ report 50011 "Gestión SII"
             UNTIL TempVatAmtAux.NEXT = 0;
     end;
 
-    local procedure CalcVatGenJnlLine(GenJournalLine: Record "Gen. Journal Line"; VATBusCode: Code[20]; VATProdCode: Code[20]; var TempVATAmountLines: Record 290 temporary; var TempVATPostingSetup: Record 325 temporary)
+#pragma warning disable AL0432
+    local procedure CalcVatGenJnlLine(GenJournalLine: Record "Gen. Journal Line"; VATBusCode: Code[20]; VATProdCode: Code[20]; var TempVATAmountLines: Record "VAT Amount Line" Temporary; var TempVATPostingSetup: Record 325 temporary)
+#pragma warning restore AL0432
     var
         VATPostingSetup: Record 325;
         tipofac: Code[3];
@@ -4258,7 +4286,9 @@ report 50011 "Gestión SII"
         Regenerar := TRUE;
     end;
 
-    local procedure CalcBaseACoste(var VATAmountLines: Record 290 temporary): Decimal
+#pragma warning disable AL0432
+    local procedure CalcBaseACoste(var VATAmountLines: Record "VAT Amount Line" Temporary): Decimal
+#pragma warning restore AL0432
     var
         decBaseACoste: Decimal;
     begin
@@ -4320,8 +4350,9 @@ report 50011 "Gestión SII"
                 EXIT(PurchInvHeader."Posting Date");
         EXIT(TODAY);
     end;
-
-    local procedure ApplyCurrencyFactor(var VATAmountLines: Record 290 temporary; CurrencyFactor: Decimal)
+#pragma warning disable AL0432
+    local procedure ApplyCurrencyFactor(var VATAmountLines: Record "VAT Amount Line" Temporary; CurrencyFactor: Decimal)
+#pragma warning restore AL0432
     begin
         //-SII1
         if CurrencyFactor = 0 THEN
@@ -4337,9 +4368,13 @@ report 50011 "Gestión SII"
         //+SII1
     end;
 
-    local procedure AgruparVatAmtLines(var recPrmTempVATAmtLines: Record 290 temporary)
+#pragma warning disable AL0432
+    local procedure AgruparVatAmtLines(var recPrmTempVATAmtLines: Record "VAT Amount Line" Temporary)
+#pragma warning restore AL0432
     var
-        recTempVATAmtDef: Record 290 temporary;
+#pragma warning disable AL0432
+        recTempVATAmtDef: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
     begin
         //-SII10
         //PRORRATA 2
@@ -4805,7 +4840,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VATBusPostGrp: Record 323;
         CuotaDeducible: Decimal;
@@ -5047,7 +5084,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VatPostStp: Record 325;
         VATBusPostGrp: Record 323;
@@ -5278,7 +5317,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VATBusPostGrp: Record 323;
         CuotaDeducible: Decimal;
@@ -5518,7 +5559,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VatPostStp: Record 325;
         VATBusPostGrp: Record 323;
@@ -5756,7 +5799,9 @@ report 50011 "Gestión SII"
         Mes: Text;
         Dia: Text;
         NifReceptor: Code[20];
-        TempVATAmountLines: Record 290 temporary;
+#pragma warning disable AL0432
+        TempVATAmountLines: Record "VAT Amount Line" Temporary;
+#pragma warning restore AL0432
         TempVatPostStp: Record 325 temporary;
         VatPostStp: Record 325;
         VATBusPostGrp: Record 323;

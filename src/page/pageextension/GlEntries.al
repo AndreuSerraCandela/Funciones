@@ -512,6 +512,7 @@ pageextension 80133 GlEntries extends "General Ledger Entries"
                                         end;
                                     until lin.Next() = 0;
                             Until GlEntries.Next() = 0;
+                        if albt.count > 1 Then Error('Hay más de un albarán asociado a la entrada');
                         ControlProcesos.CambiAlbaran(GlEntries, Albt);
                     end;
                 }
@@ -835,6 +836,12 @@ pageextension 80133 GlEntries extends "General Ledger Entries"
             rGlRf.SetTable(rGl);
             rActRf.SetTable(rAct);
             r36Rf.SetTable(r36);
+            rVen.ChangeCompany(EmpresaTXT);
+            rCli.ChangeCompany(EmpresaTXT);
+            rBan.ChangeCompany(EmpresaTXT);
+            rGl.ChangeCompany(EmpresaTXT);
+            rAct.ChangeCompany(EmpresaTXT);
+            r36.ChangeCompany(EmpresaTXT);
         end;
         if Tipo = 'NOM' Then begin
             if Rec."Source Type" = Rec."Source Type"::Vendor THEN

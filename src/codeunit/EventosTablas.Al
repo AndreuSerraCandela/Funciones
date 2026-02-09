@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Codeunit ControldeEventos (ID 50003).
 /// </summary>
 codeunit 50016 ControldeEventosTables
@@ -42,7 +42,7 @@ codeunit 50016 ControldeEventosTables
     #region Tabla15
     #endregion Tabla15
     #region Tabla17
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterModifyEvent, '', false, false)]
     LOCAL PROCEDURE Tabla17_OnModify(VAR Rec: Record "G/L Entry"; VAR xRec: Record "G/L Entry"; RunTrigger: Boolean)
     VAR
         r21: Record 21;
@@ -78,7 +78,7 @@ codeunit 50016 ControldeEventosTables
 
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterDeleteEvent, '', false, false)]
     LOCAL PROCEDURE Tabla17_OnDelete(VAR Rec: Record "G/L Entry"; RunTrigger: Boolean)
     VAR
         r21: Record 21;
@@ -287,7 +287,7 @@ codeunit 50016 ControldeEventosTables
     #endregion Tabla18
     #region Tabla36
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterDeleteEvent, '', false, false)]
     PROCEDURE Tabla36_OnDelete(VAR Rec: Record "Sales Header"; RunTrigger: Boolean)
     VAR
         rLinContrato: Record 37;
@@ -300,12 +300,12 @@ codeunit 50016 ControldeEventosTables
         if Rec."Factura Compra" <> '' Then begin
 
             if RunTrigger Then
-                Error('Hay una factura de compra asociada en una empresa del grupo');
+                Error('Hay una factura/abono de compra asociada en una empresa del grupo');
             Fac.ChangeCompany(Rec."Empresa Origen Alb");
-            if Not Fac.Get(Fac."Document Type"::Invoice, Rec."Factura Compra") then exit;
-            if Fac."Vendor Invoice No." = '' Then Begin
+            if Not Fac.Get(Rec."Document Type", Rec."Factura Compra") then exit;
+            if (Fac."Vendor Invoice No." = '') and (Fac."Vendor Cr. Memo No." = '') Then Begin
                 lin.ChangeCompany(Rec."Empresa Origen Alb");
-                Lin.SetRange("Document Type", Lin."Document Type"::Invoice);
+                Lin.SetRange("Document Type", Rec."Document Type");
                 Lin.SetRange("Document No.", Fac."No.");
                 Lin.DeleteAll();
                 Fac.Delete();
@@ -321,9 +321,9 @@ codeunit 50016 ControldeEventosTables
                 rVenInter.SETRANGE(rVenInter."No.", SalesLine."Doc. Itercompany Venta");
                 rLinVerEntry.ChangeCompany(SalesLine."Empresa Venta");
                 if rVenInter.FindFirst() Then Begin
-                    if Fac.Get(Fac."Document Type"::Invoice, Rec."Factura Compra") Then Begin
+                    if Fac.Get(Rec."Document Type", Rec."Factura Compra") Then Begin
                         lin.ChangeCompany(Rec."Empresa Origen Alb");
-                        Lin.SetRange("Document Type", Lin."Document Type"::Invoice);
+                        Lin.SetRange("Document Type", Rec."Document Type");
                         Lin.SetRange("Document No.", Fac."No.");
                         Lin.DeleteAll();
                         Fac.Delete();
@@ -670,7 +670,7 @@ codeunit 50016 ControldeEventosTables
     PROCEDURE Tabla36_EstadoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
-        Ventana: Page 50009;
+        Ventana: Page "Dialogo fecha anulación";
         FecFin: Date;
         rProy: Record 167;
         rRes: Record Reserva;
@@ -948,7 +948,7 @@ codeunit 50016 ControldeEventosTables
     LOCAL PROCEDURE Tabla36_EstadoContratoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
-        Ventana: Page 50009;
+        Ventana: Page "Dialogo fecha anulación";
         FecFin: Date;
         rProy: Record 167;
         rRes: Record Reserva;
@@ -1291,7 +1291,7 @@ codeunit 50016 ControldeEventosTables
     /// </summary>
     /// <param name="Rec">VAR Record "Sales Line".</param>
     /// <param name="RunTrigger">Boolean.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterDeleteEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterDeleteEvent, '', false, false)]
     procedure BorrarLineas(var Rec: Record "Sales Line"; RunTrigger: Boolean)
     var
         JobPlLine: Record "Job Planning Line";
@@ -1315,7 +1315,8 @@ codeunit 50016 ControldeEventosTables
             if Res."Producción" then Tipo."Crea Reservas" := false;
             if Res."Recurso Agrupado" then Tipo."Crea Reservas" := false;
             if Tipo."Crea Reservas" Then exit;
-            if JobPlLine.Get(Rec."Job No.", Rec."Job Task No.", Rec."No linea proyecto") Then Error('No puede eliminar esta línea, porque está en un proyecto');
+            if RunTrigger then
+                if JobPlLine.Get(Rec."Job No.", Rec."Job Task No.", Rec."No linea proyecto") Then Error('No puede eliminar esta línea, porque está en un proyecto');
         end;
     end;
     /// <summary>
@@ -1324,7 +1325,7 @@ codeunit 50016 ControldeEventosTables
     /// <param name="Rec">VAR Record "Sales Line".</param>
     /// <param name="xRec">VAR Record "Sales Line".</param>
     /// <param name="RunTrigger">Boolean.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterModifyEvent, '', false, false)]
     procedure ModificarLineas(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; RunTrigger: Boolean)
     var
 
@@ -1992,16 +1993,14 @@ codeunit 50016 ControldeEventosTables
             9:
                 begin
                     if AnalysisView."Dimension 5 Totaling" <> '' then
-                        Result := '1,6,' + AnalysisView."Dimension 5 Totaling";
-
-                    Result := Text006;
+                        Result := '1,6,' + AnalysisView."Dimension 5 Totaling" + Text010 else
+                        Result := Text006;
                 end;
             10:
                 begin
                     if AnalysisView."Dimension 5 Totaling" <> '' then
-                        Result := '1,5,' + AnalysisView."Dimension 5 Totaling" + Text010;
-
-                    Result := Text011;
+                        Result := '1,5,' + AnalysisView."Dimension 5 Totaling" + Text010 else
+                        Result := Text011;
                 end;
 
         end;
@@ -2108,8 +2107,8 @@ codeunit 50016 ControldeEventosTables
 
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterDeleteEvent', '', false, false)]
-    Local PROCEDURE Table167_OnAfterDelete(VAR Rec: Record Job)
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterDeleteEvent, '', false, false)]
+    Local PROCEDURE Table167_OnAfterDelete(VAR Rec: Record Job; RunTrigger: Boolean)
     var
         rReserva: Record Reserva;
         rTextoAmpli: Record "Texto Presupuesto";
@@ -2122,7 +2121,7 @@ codeunit 50016 ControldeEventosTables
             rReserva.SETCURRENTKEY("Nº Proyecto", "Fecha inicio");
             rReserva.SETRANGE("Nº Proyecto", Rec."No.");
             if rReserva.FIND('-') THEN
-                ERROR('No se puede eliminar este proyecto ya que tiene reservas activas');
+                If RunTrigger then ERROR('No se puede eliminar este proyecto ya que tiene reservas activas');
         END;
 
         // MNC
@@ -2785,8 +2784,8 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla1003
     #region Tabla5080
-    [EventSubscriber(ObjectType::Table, Database::"To-do", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnAfterDeleteEvent(var Rec: Record "To-do")
+    [EventSubscriber(ObjectType::Table, Database::"To-do", OnAfterDeleteEvent, '', false, false)]
+    local procedure OnAfterDeleteEvent(var Rec: Record "To-do"; RunTrigger: Boolean)
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -2828,55 +2827,58 @@ codeunit 50016 ControldeEventosTables
     #endregion TableNombres
     #region Tabla349
     [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterInsertEvent', '', false, false)]
-    local procedure DimensionValue_OnAfterInsert(var Rec: Record "Dimension Value")
+    local procedure DimensionValue_OnAfterInsert(var Rec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension Value";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete();
+                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete(false);
                         DimVal := Rec;
-                        if DimVal.Insert Then;
+                        DimVal.Insert(false);
                     end;
                 Until Company.Next() = 0;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterModifyEvent', '', false, false)]
-    local procedure DimensionValue_OnAfterModify(var Rec: Record "Dimension Value"; var xRec: Record "Dimension Value")
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", OnAfterModifyEvent, '', false, false)]
+    local procedure DimensionValue_OnAfterModify(var Rec: Record "Dimension Value"; var xRec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension Value";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete();
+                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete(false);
                         DimVal := Rec;
-                        if DimVal.Insert Then;
+                        DimVal.Insert(false);
                     end;
                 Until Company.Next() = 0;
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure DimensionValue_OnAfterDelete(var Rec: Record "Dimension Value")
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", OnAfterDeleteEvent, '', false, false)]
+    local procedure DimensionValue_OnAfterDelete(var Rec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension Value";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete();
+                        if DimVal.get(Rec."Dimension Code", Rec.Code) Then DimVal.Delete(false);
                     end;
                 Until Company.Next() = 0;
         end;
@@ -2884,17 +2886,18 @@ codeunit 50016 ControldeEventosTables
     #endregion Tabla349
     #region Tabla348
     [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterInsertEvent', '', false, false)]
-    local procedure Dimension_OnAfterInsert(var Rec: Record "Dimension")
+    local procedure Dimension_OnAfterInsert(var Rec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec."Code") Then DimVal.Delete();
+                        if DimVal.get(Rec."Code") Then DimVal.Delete(false);
                         DimVal := Rec;
                         if DimVal.Insert Then;
                     end;
@@ -2902,18 +2905,19 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterModifyEvent', '', false, false)]
-    local procedure Dimension_OnAfterModify(var Rec: Record "Dimension"; var xRec: Record "Dimension")
+    [EventSubscriber(ObjectType::Table, Database::"Dimension", OnAfterModifyEvent, '', false, false)]
+    local procedure Dimension_OnAfterModify(var Rec: Record "Dimension"; var xRec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec.Code) Then DimVal.Delete();
+                        if DimVal.get(Rec.Code) Then DimVal.Delete(false);
                         DimVal := Rec;
                         if DimVal.Insert Then;
                     end;
@@ -2921,29 +2925,31 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure Dimension_OnAfterDelete(var Rec: Record "Dimension")
+    [EventSubscriber(ObjectType::Table, Database::"Dimension", OnAfterDeleteEvent, '', false, false)]
+    local procedure Dimension_OnAfterDelete(var Rec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
         DimVal: Record "Dimension";
     begin
+        if not RunTrigger then exit;
         if Company.FindFirst() Then begin
             if Company.Name <> CompanyName Then
                 repeat
                     If Procesos.Permiso_Empresas(Company.Name) Then begin
                         DimVal.ChangeCompany(Company.Name);
-                        if DimVal.get(Rec.Code) Then DimVal.Delete();
+                        if DimVal.get(Rec.Code) Then DimVal.Delete(false);
                     end;
                 Until Company.Next() = 0;
         end;
     end;
     #endregion Tabla348
     #region Tabla120
-    [EventSubscriber(ObjectType::Table, Database::"Purch. Rcpt. Header", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure PurchRcptHeader_OnAfterDelete(var Rec: Record "Purch. Rcpt. Header")
+    [EventSubscriber(ObjectType::Table, Database::"Purch. Rcpt. Header", OnAfterDeleteEvent, '', false, false)]
+    local procedure PurchRcptHeader_OnAfterDelete(var Rec: Record "Purch. Rcpt. Header"; RunTrigger: Boolean)
     begin
-        if Rec.Contabilizado then
-            Procesos.BORRCAALB();
+        if RunTrigger then
+            if Rec.Contabilizado then
+                Procesos.BORRCAALB();
     end;
     #endregion Tabla120
     #region Tabla481
@@ -2956,7 +2962,7 @@ codeunit 50016 ControldeEventosTables
         Procesos.Inserta(RecFef, CompanyName);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", 'OnAfterModifyEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", OnAfterModifyEvent, '', false, false)]
     local procedure DimensionValueCombination_OnAfterModify(var Rec: Record "Dimension Value Combination"; var xRec: Record "Dimension Value Combination")
     var
         RecFef: RecordRef;
@@ -2983,30 +2989,38 @@ codeunit 50016 ControldeEventosTables
     #region Tabla1003
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Cartel', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Cartel(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
+    var
+        Control: Codeunit "ControlProcesos";
     begin
         If Rec.Cartel then
-            Rec.CrearLineaProduccion('Cartel', false, Rec);
+            Control.CrearLineaProduccion(Rec, 'Cartel', false, Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Lona', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Lona(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
+    var
+        Control: Codeunit "ControlProcesos";
     begin
         If Rec.Lona then
-            Rec.CrearLineaProduccion('Lona', false, Rec);
+            Control.CrearLineaProduccion(Rec, 'Lona', false, Rec);
     end;
     //Vinilo
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Vinilo', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Vinilo(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
+    var
+        Control: Codeunit "ControlProcesos";
     begin
         If Rec.Vinilo then
-            Rec.CrearLineaProduccion('Vinilo', false, Rec);
+            Control.CrearLineaProduccion(Rec, 'Vinilo', false, Rec);
     end;
     //Otros 
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Otros', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Otros(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
+    var
+        Control: Codeunit "ControlProcesos";
     begin
         If Rec.Otros then
-            Rec.CrearLineaProduccion('Otros', false, Rec);
+            Control.CrearLineaProduccion(Rec, 'Otros', false, Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Solo Producción', false, false)]
@@ -3022,6 +3036,7 @@ codeunit 50016 ControldeEventosTables
         rLin: Record 1003 temporary;
         Resource: Record Resource;
         Crear: Boolean;
+        Control: Codeunit "ControlProcesos";
     begin
         Rec."Sin Producción" := false;
 
@@ -3068,9 +3083,9 @@ codeunit 50016 ControldeEventosTables
                 Commit();
                 Asis.Lineas(rlin);
                 if rLin.Count = 0 then
-                    Linea.ProduccionNueva(Prod.Empresa, prod."Nº Proyecto")
+                    Control.ProduccionNueva(Rec, Prod.Empresa, prod."Nº Proyecto")
                 else
-                    Linea.ProduccionNuevaxLinea(Prod.Empresa, rLin);
+                    Control.ProduccionNuevaxLinea(Rec, Prod.Empresa, rLin);
             end else begin
                 if Prod.Incluida then
                     Rec."Crear pedidos" := Rec."Crear pedidos"::"De Compra"
@@ -3093,30 +3108,127 @@ codeunit 50016 ControldeEventosTables
                 Commit();
                 Asis.Lineas(rlin);
                 if rLin.Count = 0 then
-                    Rec.ProduccionNueva(Prod.Empresa, prod."Nº Proyecto")
+                    Control.ProduccionNueva(Rec, Prod.Empresa, prod."Nº Proyecto")
                 else
-                    Rec.ProduccionNuevaxLinea(Prod.Empresa, rLin);
+                    Control.ProduccionNuevaxLinea(Rec, Prod.Empresa, rLin);
             end;
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
+    local procedure JobPlanningLine_OnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
+    var
+        rSelf: Record "Job Planning Line";
+        Job: Record Job;
+        EsJulia: Boolean;
+        Text50001: Label 'OJO. El proyecto ya esta en estado Contrato, y ya se han \creado los pedidos de venta y compra. Si quiere modificarlos\debera hacerlo a mano.';
+    begin
+        If Rec."No." = '' Then Exit;
+        If Not Job.Get(Rec."Job No.") Then exit;
+        If Rec.IsTemporary() Then Exit;
+        EsJulia := UserId in ['GRUPOMALLA\JULIÀ.SASTRE', 'JULIÀ.SASTRE'];
+        // $001 -
+        if RunTrigger then
+            Job.TESTFIELD("Cód. vendedor");
+        if Job.Status = Job.Status::Open THEN
+            If not EsJulia then
+                If RunTrigger then MESSAGE(Text50001);
+        Rec."Planning Date" := Job."Starting Date";
+        Rec."Fecha Final" := Job."Ending Date";
+        //Mirar_Estado;
+        // $001 +
+
+        // $003-
+        Rec.Tipo := Job.Tipo;
+        Rec."Soporte de" := Job."Soporte de";
+        Rec."Fija/Papel" := Job."Fija/Papel";
+        // $003+
+        Rec."Subtipo cabecera" := Job.Subtipo;
+
+        rSelf.SETRANGE(rSelf."Job No.", Rec."Job No.");
+        rSelf.SETRANGE(rSelf."Job Task No.", Rec."Job Task No.");
+        if rSelf.FINDLAST THEN
+            If Rec."Line No." = 0 Then
+                Rec."Line No." := rSelf."Line No." + 10000;
+        // if BuscarecursosRelacionados("Line No.", "Job No.", "No.") = FALSE THEN
+        //   Produccion;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterModifyEvent, '', false, false)]
+    local procedure JobPlanningLine_OnAfterModify(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; RunTrigger: Boolean)
+    begin
+        if xRec."No." <> Rec."No." THEN BEGIN
+            //  VALIDATE("Unit Price", 0);
+            if RunTrigger then
+                Rec.BorrarecursosRelacionados(Rec."Line No.", Rec."Job No.");
+        END;
+        //if BuscarecursosRelacionados("Line No.", "Job No.", "No.") = FALSE THEN
+        //  Produccion; TODO Revisar
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterDeleteEvent, '', false, false)]
+    local procedure JobPlanningLine_OnAfterDelete(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
+    var
+        rSelf: Record "Job Planning Line";
+        rOrden: Record "Cab. orden publicidad";
+        rTexto: Record "Texto Presupuesto";
+        Text50003: Label 'No se puede eliminar esta linea, ya que tiene una orden de publicidad Validada.';
+    begin
+        //TESTFIELD(Transferred,FALSE);
+        if not RunTrigger then exit;
+
+        Rec.BorrarecursosRelacionados(Rec."Line No.", Rec."Job No.");
+        // MNC 211098
+        if (Rec."Cdad. Reservada" <> 0) THEN
+            ERROR('No se puede borrar esta linea, porque ya se han creado reservas');
+        Rec.CALCFIELDS("No. Orden Publicidad");
+        if (Rec."No. Orden Publicidad" <> '') THEN BEGIN
+            if (Rec."Estado Orden Publicidad" = Rec."Estado Orden Publicidad"::Validada) THEN
+                ERROR(Text50003);
+            rOrden.RESET;
+            if rOrden.GET(Rec."No. Orden Publicidad") Then
+                rOrden.DELETE(TRUE);
+        END;
+
+        rTexto.SETRANGE("Nº proyecto", Rec."Job No.");
+        //  $001 -
+        // {
+        // rTexto.SETRANGE("Cód. fase","Phase Code");
+        // rTexto.SETRANGE("Cód. subfase","Task Code");
+        // rTexto.SETRANGE("Cód. tarea","Step Code");
+        // }
+        rTexto.SETRANGE("Cód. tarea", Rec."Job Task No.");
+        rTexto.SETRANGE("Nº linea aux", Rec."Line No.");
+        //  $001 +
+        rTexto.SETRANGE(Tipo, Rec.Type.AsInteger());
+        rTexto.SETRANGE("Nº", Rec."No.");
+        rTexto.SETRANGE("Cód. variante", Rec."Variant Code");
+        rTexto.DELETEALL;
+        // Fi MNC
+        rSelf.SETRANGE(rSelf."Job No.", Rec."Job No.");
+        rSelf.SETRANGE("Origin Line No.", Rec."Line No.");
+        rSelf.DELETEALL;
     end;
     #endregion Tabla1003
     #region Tabla289
     [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterInsertEvent', '', false, false)]
-    local procedure PaymentMethod_OnAfterInsert(var Rec: Record "Payment Method")
+    local procedure PaymentMethod_OnAfterInsert(var Rec: Record "Payment Method"; RunTrigger: Boolean)
     var
         RecFef: RecordRef;
     begin
+        If Rec.IsTemporary() Then Exit;
         RecFef.GetTable(Rec);
         If not Procesos.CompruebaPermisos(UserSecurityId, 'FORMAPAGO', CompanyName) then
             Error('No tienes permisos para insertar formas de pago');
         Procesos.Inserta(RecFef, CompanyName);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterModifyEvent', '', false, false)]
-    local procedure PaymentMethod_OnAfterModify(var Rec: Record "Payment Method"; var xRec: Record "Payment Method")
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", OnAfterModifyEvent, '', false, false)]
+    local procedure PaymentMethod_OnAfterModify(var Rec: Record "Payment Method"; var xRec: Record "Payment Method"; RunTrigger: Boolean)
     var
         RecFef: RecordRef;
     begin
+        if Rec.IsTemporary() Then Exit;
         RecFef.GetTable(Rec);
         If not Procesos.CompruebaPermisos(UserSecurityId, 'FORMAPAGO', CompanyName) then
             Error('No tienes permisos para modificar formas de pago');
@@ -3184,6 +3296,40 @@ codeunit 50016 ControldeEventosTables
         END;
     end;
     #endregion Tabla7001114
+    #region TablaLinOrdenPublicidad
+    [EventSubscriber(ObjectType::Table, Database::"Lin. orden publicidad", OnAfterDeleteEvent, '', false, false)]
+    local procedure LinOrdenPublicidad_OnAfterDelete(var Rec: Record "Lin. orden publicidad"; RunTrigger: Boolean)
+    var
+        cMedios: Codeunit "Gestion Medios";
+        rOrden: Record "Cab. orden publicidad";
+        rLinOrden: Record "Lin. orden publicidad";
+        wFechaIni: Date;
+        wFechaFin: Date;
+
+    begin
+        if not RunTrigger then exit;
+        if Rec."Dia conjunto" <> 0D THEN begin
+            rLinOrden.RESET;
+            rLinOrden.SETRANGE("Tipo orden", Rec."Tipo orden");
+            rLinOrden.SETRANGE("No. orden", Rec."No. orden");
+            rLinOrden.SETFILTER("No. linea", '<>%1', Rec."No. linea");              // Recalcular todas las lineas excepto la que borramos
+            rLinOrden.SETRANGE("Dia conjunto", Rec."Dia conjunto");
+            if rLinOrden.FIND('-') THEN
+                wFechaIni := rLinOrden."Fecha inicio";
+            if rLinOrden.FIND('+') THEN
+                wFechaFin := rLinOrden."Fecha inicio";
+            if (wFechaIni <> 0D) AND (wFechaFin <> 0D) THEN BEGIN
+                rLinOrden.DELETEALL;
+                if rOrden.GET(Rec."No. orden") THEN
+                    cMedios.GenerarLineasOrden(rOrden, wFechaIni, wFechaFin, 0);
+            END;
+        end;
+    end;
+
+
+
+
+    #endregion TablaLinOrdenPublicidad
 
     #endregion Tables
 }

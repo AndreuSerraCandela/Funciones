@@ -1,7 +1,7 @@
 /// <summary>
 /// Page SubForm Lineas Auxiliares (ID 50053).
 /// </summary>
-page 50053 "SubForm Lineas Auxiliares"
+page 50021 "SubForm Lineas Auxiliares"
 {
     //Version List=FH3.70,FINTIS,PAG,ES;
     PageType = ListPart;

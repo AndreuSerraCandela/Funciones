@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Ficha Proveedor Compra (ID 7001106).
+﻿/// <summary>
+/// Page Ficha Proveedor Compra (ID 50050).
 /// </summary>
-page 7001106 "Ficha Proveedor Compra"
+page 50050 "Ficha Proveedor Compra"
 {
 
     Caption = 'Ficha Proveedor Compra';

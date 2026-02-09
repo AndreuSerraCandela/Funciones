@@ -824,7 +824,10 @@ codeunit 50015 ControldeEventosCodeunits
         rLinDetFra: Record "Sales Comment Line";
         rLinDetFraDef: Record "Sales Comment Line";
         Cust: Record Customer;
-        Fac: Record 38;
+        Fac: Record "Purchase Header";
+        SalesLine: Record "Sales Line";
+        PurchLine: Record "Purchase Line";
+        Inf: Record "Company Information";
     begin
         if SalesHeader."Factura Compra" <> '' Then begin
             Fac.ChangeCompany(Salesheader."Empresa Origen Alb");
@@ -837,6 +840,25 @@ codeunit 50015 ControldeEventosCodeunits
                 Fac."Empresa Factura" := SalesHeader."Empresa Origen Alb";
             Fac.ContabilizaInter := true;
             Fac.Modify();
+            //CompruebaLineasCompra
+            PurchLine.ChangeCompany(Salesheader."Empresa Origen Alb");
+            PurchLine.SetRange("Document No.", SalesHeader."Factura Compra");
+            PurchLine.SetRange("Document Type", PurchLine."Document Type"::Invoice);
+            PurchLine.SetRange(Type, PurchLine.Type::Resource);
+            PurchLine.SetFilter("No.", '<>%1', '');
+            PurchLine.SetFilter(Quantity, '<>%1', 0);
+            if PurchLine.FindFirst() then begin
+                Inf.Get();
+                repeat
+                    SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                    SalesLine.SetRange("Document No.", SalesHeader."No.");
+                    SalesLine.SetRange("Line No.", PurchLine."Line No.");
+                    if SalesLine.FindFirst() then begin
+                        PurchLine."No." := INF."Clave Recursos" + SalesLine."No.";
+                        PurchLine.Modify();
+                    end;
+                until PurchLine.Next() = 0;
+            end;
         end;
         if Cust.GET(SalesInvHeader."Sell-to Customer No.") THEN
             if Cust."Permite Efactura" THEN
@@ -889,6 +911,10 @@ codeunit 50015 ControldeEventosCodeunits
         rContrato: Record "Sales Header";
         rLinDetFra: Record "Sales Comment Line";
         rLinDetFraDef: Record "Sales Comment Line";
+        Fac: Record "Purchase Header";
+        PurchLine: Record "Purchase Line";
+        Inf: Record "Company Information";
+        SalesLine: Record "Sales Line";
     begin
 
         //-SII
@@ -897,6 +923,37 @@ codeunit 50015 ControldeEventosCodeunits
             SalesCrMemoHeader."Clave registro SII expedidas" := VATBusPostGrp."Clave registro SII expedidas";
         END;
         SalesCrMemoHeader."Pte Contabilicación" := true;
+        if SalesHeader."Factura Compra" <> '' Then begin
+            Fac.ChangeCompany(Salesheader."Empresa Origen Alb");
+            Fac.Get(Fac."Document Type"::"Credit Memo", SalesHeader."Factura Compra");
+            Fac."Vendor Cr. Memo No." := SalesCrMemoHeader."No.";
+            Fac."Posting Date" := SalesCrMemoHeader."Posting Date";
+            Fac."Document Date" := SalesCrMemoHeader."Document Date";
+            Fac."VAT Reporting Date" := SalesCrMemoHeader."VAT Reporting Date";
+            if Fac."Empresa Factura" = '' Then
+                Fac."Empresa Factura" := SalesHeader."Empresa Origen Alb";
+            Fac.ContabilizaInter := true;
+            Fac.Modify();
+            //CompruebaLineasCompra
+            PurchLine.ChangeCompany(Salesheader."Empresa Origen Alb");
+            PurchLine.SetRange("Document No.", SalesHeader."Factura Compra");
+            PurchLine.SetRange("Document Type", PurchLine."Document Type"::"Credit Memo");
+            PurchLine.SetRange(Type, PurchLine.Type::Resource);
+            PurchLine.SetFilter("No.", '<>%1', '');
+            PurchLine.SetFilter(Quantity, '<>%1', 0);
+            if PurchLine.FindFirst() then begin
+                Inf.Get();
+                repeat
+                    SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                    SalesLine.SetRange("Document No.", SalesHeader."No.");
+                    SalesLine.SetRange("Line No.", PurchLine."Line No.");
+                    if SalesLine.FindFirst() then begin
+                        PurchLine."No." := INF."Clave Recursos" + SalesLine."No.";
+                        PurchLine.Modify();
+                    end;
+                until PurchLine.Next() = 0;
+            end;
+        end;
         //Lineas de factura de impresión
         rLinDetFra.SETRANGE("Document Type", rLinDetFra."Document Type"::"Detalle Abono");
         rLinDetFra.SETRANGE("No.", SalesHeader."No.");
@@ -1206,10 +1263,12 @@ codeunit 50015 ControldeEventosCodeunits
     //             TempSalesLine.Insert;
     //         UNTIL SelesDesgl.NEXT = 0;
     // end;
+#pragma warning disable AL0432
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesLines', '', false, false)]
     local procedure OnBeforePostSalesLines(var SalesHeader: Record "Sales Header"; var TempSalesLineGlobal: Record "Sales Line" temporary; var TempVATAmountLine: Record "VAT Amount Line" temporary)
     begin
+#pragma warning restore AL0432
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"] Then
             ContabAlb.Desglosar(SalesHeader);
         // OnAfterCopyToTempLines(TempSalesLineGlobal, SalesHeader);
@@ -1825,6 +1884,8 @@ codeunit 50015 ControldeEventosCodeunits
 #pragma warning restore AL0432 // TODO: - Invoice Posting Buffer codunit 825
 #endif
 #endif
+
+
     [EventSubscriber(ObjectType::codeunit, 826, 'OnPostLinesOnBeforeGenJnlLinePost', '', false, false)]
 
     local procedure OnPostLinesOnBeforeGenJnlLinePost(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; SuppressCommit: Boolean)
@@ -1857,8 +1918,9 @@ codeunit 50015 ControldeEventosCodeunits
 
     end;
 
-    [EventSubscriber(ObjectType::Table, 55, 'OnAfterPreparePurchase', '', false, false)]
-    local procedure OnAfterPreparePurchase(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", OnAfterPrepareInvoicePostingBuffer, '', false, false)]
+    local procedure OnAfterPrepareInvoicePostingBuffer(var PurchaseLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+
     var
         GlSetup: Record "General Ledger Setup";
         PurchaseHeader: Record "Purchase Header";
@@ -1891,7 +1953,149 @@ codeunit 50015 ControldeEventosCodeunits
             InvoicePostingBuffer."Tipo factura rectificativa" := PurchaseHeader."Tipo factura rectificativa";
         END;
         //+SII
+        InvoicePostingBuffer."Global Dimension 1 Code" := PurchaseLine."Shortcut Dimension 1 Code";
+        InvoicePostingBuffer."Global Dimension 2 Code" := PurchaseLine."Shortcut Dimension 2 Code";
+        InvoicePostingBuffer."Global Dimension 3 Code" := PurchaseLine."Shortcut Dimension 3 Code";
 
+
+        InvoicePostingBuffer."Global Dimension 4 Code" := PurchaseLine."Shortcut Dimension 4 Code";
+
+
+        InvoicePostingBuffer."Global Dimension 5 Code" := PurchaseLine."Shortcut Dimension 5 Code";
+
+        PurchaseHeader.GET(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        //-SII
+        GLSetup.GET;
+        if GLSetup."Activar SII" THEN BEGIN
+            if VATPostingSetup.GET(PurchaseLine."VAT Bus. Posting Group", PurchaseLine."VAT Prod. Posting Group") THEN;
+            if VATBus.GET(PurchaseLine."VAT Bus. Posting Group") THEN;
+            //PurchaseHeader.GET(PurchLine."Document Type",PurchLine."Document No.");
+
+            InvoicePostingBuffer."Tipo factura SII" := PurchaseHeader."Tipo factura SII";
+
+
+            InvoicePostingBuffer."Clave registro SII recibidas" := VATBus."Clave registro SII recibidas";
+
+
+            InvoicePostingBuffer."Descripción operación" := PurchaseHeader."Descripción operación";
+
+
+            InvoicePostingBuffer."Tipo desglose emitidas" := VATPostingSetup."Tipo desglose emitidas";
+
+
+            InvoicePostingBuffer."Sujeta exenta" := VATPostingSetup."Sujeta exenta";
+
+
+            InvoicePostingBuffer."Tipo de operación" := VATPostingSetup."Tipo de operación";
+
+
+            InvoicePostingBuffer."Tipo factura rectificativa" := PurchaseHeader."Tipo factura rectificativa";
+
+        END;
+        //+SII
+
+
+        InvoicePostingBuffer."Periodo de Pago" := PurchaseLine."Periodo de Pago";
+
+
+        //ASC
+        InvoicePostingBuffer."Tax Area Code" := PurchaseLine."Receipt No.";
+        if PurchaseLine."Return Shipment No." <> '' THEN
+            InvoicePostingBuffer."Tax Area Code" := PurchaseLine."Return Shipment No.";
+        //ASC
+
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", OnAfterGetPurchAccount, '', false, false)]
+    local procedure CorreccionInvBufer(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
+    VAR
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
+        PurchShptHeader: Record 6650;
+        VendPostingGr: Record "Vendor Posting Group";
+        PurchaseHeader: Record 38;
+        Vendor: Record Vendor;
+        GrupoProv: Record "Vendor Posting Group";
+        r14: Record Location;
+        VATBus: Record "VAT Business Posting Group";
+        GLSetup: Record "General Ledger Setup";
+        VatPostingSetup: Record "VAT Posting Setup";
+        Calculo: Record "Calculo Albaranes";
+    begin
+        if (PurchLine.Type <> PurchLine.Type::"Fixed Asset") THEN BEGIN
+            PurchaseHeader.GET(PurchLine."Document Type", PurchLine."Document No.");
+            //if PurchaseHeader."Last Receiving No." <> '' THEN PurchLine."Receipt No." := PurchaseHeader."Last Receiving No.";
+            if (PurchLine."Receipt No." <> '')
+            //{AND (PurchLine.Type = PurchLine.Type::"G/L Account")} 
+            THEN BEGIN
+                if Not PurchRcptHeader.GET(PurchLine."Receipt No.") Then PurchRcptHeader.Init();
+                if Calculo.Get(PurchRcptHeader."No.") Then Begin Calculo.Calculado := False; Calculo.Modify() End;
+                if PurchRcptHeader.Contabilizado THEN BEGIN
+                    VendPostingGr.GET(PurchRcptHeader."Vendor Posting Group");
+                    VendPostingGr.TESTFIELD(FPR);
+                    SalesAccountNo := VendPostingGr.FPR;
+                    //     InvoicePostBuffer.MODIFY;
+                END else
+                    if Not ContabAlb.TestActivosAlb(PurchRcptHeader) Then
+                        if PurchRcptHeader."No." <> '' then
+                            Error(NoContab, PurchRcptHeader."No.");
+
+            END;
+            //if PurchaseHeader."Last Return Shipment No." <> '' THEN PurchLine."Return Shipment No." := PurchaseHeader."Last Return Shipment No.";
+            if (PurchLine."Return Shipment No." <> '')
+            //{AND (PurchLine.Type = PurchLine.Type::"G/L Account")} 
+            THEN BEGIN
+                PurchShptHeader.GET(PurchLine."Return Shipment No.");
+                if PurchShptHeader.Contabilizado THEN BEGIN
+                    VendPostingGr.GET(PurchShptHeader."Vendor Posting Group");
+                    VendPostingGr.TESTFIELD(FPR);
+                    SalesAccountNo := VendPostingGr.FPR;
+                    //InvoicePostBuffer.MODIFY;
+                END else
+                    if Not ContabAlb.TestActivosShp(PurchShptHeader) then error(DevolNotConta, PurchShptHeader."No.");
+            END;
+        END;
+        PurchaseHeader.GET(PurchLine."Document Type", PurchLine."Document No.");
+        if (PurchLine.Type = PurchLine.Type::"G/L Account") OR (PurchLine.Type = PurchLine.Type::"Fixed Asset") THEN
+            SalesAccountNo := PurchLine."No."
+        ELSE
+            if PurchLine."Document Type" IN [PurchLine."Document Type"::"Return Order", PurchLine."Document Type"::"Credit Memo"] THEN BEGIN
+                if NOT r14.GET(PurchLine."Location Code") THEN r14.INIT;
+                if r14."Cta. Compras" <> '' THEN BEGIN
+                    SalesAccountNo := r14."Cta. Compras";
+                END ELSE BEGIN
+                    GenPostingSetup.Get(PurchLine."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                    GenPostingSetup.TESTFIELD("Purch. Credit Memo Account");
+                    SalesAccountNo := GenPostingSetup."Purch. Credit Memo Account";
+                END;
+            END ELSE BEGIN
+                if NOT r14.GET(PurchLine."Location Code") THEN r14.INIT;
+                if r14."Cta. Compras" <> '' THEN BEGIN
+                    SalesAccountNo := r14."Cta. Compras";
+                END ELSE BEGIN
+                    GenPostingSetup.Get(PurchLine."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
+                    GenPostingSetup.TESTFIELD("Purch. Account");
+                    SalesAccountNo := GenPostingSetup."Purch. Account";
+                END;
+            END;
+        if ContabAlb.CompruebaAlbarán(PurchLine."Receipt No.", PurchaseHeader) THEN BEGIN
+            if Calculo.Get(PurchLine."Receipt No.") Then Begin Calculo.Calculado := False; Calculo.Modify() End;
+            Vendor.GET(PurchLine."Pay-to Vendor No.");
+            GrupoProv.GET(Vendor."Vendor Posting Group");
+            SalesAccountNo := GrupoProv.FPR;
+        END else begin
+            if PurchRcptHeader.GET(PurchLine."Receipt No.") Then
+                if Not ContabAlb.TestActivosAlb(PurchRcptHeader) Then
+                    error(NoContab, PurchLine."Receipt No.");
+        end;
+        if ContabAlb.CompruebaDevolución(PurchLine."Return Shipment No.", PurchaseHeader) THEN BEGIN
+            Vendor.GET(PurchLine."Pay-to Vendor No.");
+            GrupoProv.GET(Vendor."Vendor Posting Group");
+            SalesAccountNo := GrupoProv.FPR;
+        END else begin
+            if PurchShptHeader.GET(PurchLine."Return Shipment No.") then
+                if Not ContabAlb.TestActivosShp(PurchShptHeader) then
+                    error(DevolNotConta, PurchLine."Return Shipment No.");
+        end;
     end;
 
 

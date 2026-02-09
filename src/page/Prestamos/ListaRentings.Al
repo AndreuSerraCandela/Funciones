@@ -1,8 +1,8 @@
 
 /// <summary>
-/// Page Lista Rentings (ID 7001175).
+/// Page Lista Rentings (ID 50070).
 /// </summary>
-page 7001175 "Lista Rentings"
+page 50070 "Lista Rentings"
 {
     ApplicationArea = All;
     PageType = List;

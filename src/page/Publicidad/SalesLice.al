@@ -1,4 +1,4 @@
-page 50043 "Lista Líneas Factura"
+page 50015 "Lista Líneas Factura"
 {
     Caption = 'Lista Lineas Factura';
     Editable = false;

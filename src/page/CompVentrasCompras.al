@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Compras vs Ventas (ID 50086).
 /// </summary>
-page 50086 "Compras vs Ventas"
+page 50043 "Compras vs Ventas"
 {
 
     Editable = false;

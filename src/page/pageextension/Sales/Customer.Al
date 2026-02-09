@@ -129,7 +129,7 @@ pageextension 80134 CustomerKuara extends "Customer Card"
             // }
         }
 
-        addafter("Attached Documents")
+        addafter("Attached Documents List")
         {
             part(Correos; "Sent Emails List Part")
             {

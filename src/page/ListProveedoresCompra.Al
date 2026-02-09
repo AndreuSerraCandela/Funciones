@@ -1,7 +1,7 @@
-/// <summary>
-/// Page Lista Proveedores Compra (ID 7001105).
+﻿/// <summary>
+/// Page Lista Proveedores Compra (ID 50049).
 /// </summary>
-page 7001105 "Lista Proveedores Compra"
+page 50049 "Lista Proveedores Compra"
 {
     Caption = 'Lista Proveedores Compra';
     PageType = List;

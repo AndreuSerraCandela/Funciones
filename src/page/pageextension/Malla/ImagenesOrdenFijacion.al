@@ -7,9 +7,10 @@ pageextension 75019 ImagenesOrdenFijacion extends "Imagenes Orden fijacion"
             trigger OnDrillDown()
             var
                 Selection: Integer;
+                Control: Codeunit "ControlProcesos";
             begin
                 if Rec."Image".HasValue() then
-                    Rec.Export(true)
+                    Control.Export(Rec, true)
                 else
                     if not IsOfficeAddin or not EmailHasAttachments then
                         InitiateUploadFile()
@@ -40,9 +41,11 @@ pageextension 75019 ImagenesOrdenFijacion extends "Imagenes Orden fijacion"
                 ToolTip = 'Download the file to your device. Depending on the file, you will need an app to view or edit the file.';
 
                 trigger OnAction()
+                var
+                    Control: Codeunit "ControlProcesos";
                 begin
                     if Rec."Nombre" <> '' then
-                        Rec.Export(true);
+                        Control.Export(Rec, true);
                 end;
             }
 
@@ -86,6 +89,7 @@ pageextension 75019 ImagenesOrdenFijacion extends "Imagenes Orden fijacion"
         Norden: Integer;
         DocStream: InStream;
         IsHandled: Boolean;
+        Control: Codeunit "ControlProcesos";
     begin
         OnBeforeImportWithFilter(Rec, EsIncidencia, VallaFijada, IsHandled);
         if IsHandled then begin
@@ -112,7 +116,7 @@ pageextension 75019 ImagenesOrdenFijacion extends "Imagenes Orden fijacion"
             Rec."Nº Imagen" := NImagen + 1;
             Rec."Nombre" := FileName;
             TempBlob.CreateInStream(DocStream);
-            Rec.InsertAttachment(DocStream, FileName, true);
+            Control.InsertAttachment(Rec, DocStream, FileName, true);
         end;
         CurrPage.Update(false);
     end;

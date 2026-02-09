@@ -1,7 +1,7 @@
 /// <summary>
 /// Page MLL-Presupuesto proyecto compr (ID 50050).
 /// </summary>
-page 50050 "MLL-Presupuesto proyecto compr"
+page 50018 "MLL-Presupuesto proyecto compr"
 {
 
     SourceTable = "Job Planning Line";
@@ -40,7 +40,7 @@ page 50050 "MLL-Presupuesto proyecto compr"
                     trigger OnAssistEdit()
                     VAR
                         rJobPl: Record 1003;
-                        fJobl: page 50019;
+                        fJobl: page JobLinesSub;
                         rRes: Record 156;
                         rCost: Record "Price List Line";
                         Linea: Integer;
@@ -398,6 +398,7 @@ page 50050 "MLL-Presupuesto proyecto compr"
         rOrden: Record "Cab. orden publicidad";
         rProyecto: Record 167;
         rProv: Record Vendor;
+        ControlProcesos: Codeunit "ControlProcesos";
     BEGIN
         // $002
         Rec.TESTFIELD("Compra a-Nº proveedor");
@@ -436,7 +437,7 @@ page 50050 "MLL-Presupuesto proyecto compr"
             Rec.TESTFIELD("No.");
             rOrden.VALIDATE(Concepto, Rec."No.");
             rOrden.MODIFY(TRUE);
-            rOrden.ActualizarLineas(TRUE);
+            ControlProcesos.ActualizarLineas(rOrden, TRUE);
             COMMIT;
         END;
 

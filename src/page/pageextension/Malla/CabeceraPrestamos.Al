@@ -13,7 +13,7 @@ pageextension 75012 CabeceraPrestamos extends "Cabecera Prestamo"
         END;
     END;
 
-    PROCEDURE Empresa(Cia: Text[30]);
+    PROCEDURE CambiarEmpresa(Cia: Text[30]);
     BEGIN
         DefEmpresa := Cia;
     END;

@@ -1,4 +1,4 @@
-page 50051 "Comentario orden publicidad"
+page 50019 "Comentario orden publicidad"
 {
     PageType = List;
     UsageCategory = Lists;

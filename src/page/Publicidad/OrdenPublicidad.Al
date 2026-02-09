@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Orden de Publicidad (ID 50024).
 /// </summary>
-page 50024 "Orden de Publicidad"
+page 50008 "Orden de Publicidad"
 {
     PageType = Card;
     SourceTable = "Cab. orden publicidad";
@@ -25,8 +25,10 @@ page 50024 "Orden de Publicidad"
                 Editable = AltoEditable;
 
                 trigger OnValidate()
+                var
+                    ControlProcesos: Codeunit "ControlProcesos";
                 BEGIN
-                    if Rec.ActualizarLineas(FALSE) THEN
+                    if ControlProcesos.ActualizarLineas(Rec, FALSE) THEN
                         CurrPage.SubPage.Page.Actualizar
                     ELSE
                         Rec."Cod. Soporte" := xRec."Cod. Soporte";
@@ -47,9 +49,11 @@ page 50024 "Orden de Publicidad"
                 Editable = NoclienteEditable;
                 ApplicationArea = All;
                 trigger OnValidate()
+                var
+                    ControlProcesos: Codeunit "ControlProcesos";
                 BEGIN
                     MostrarComentariosCliente;
-                    if Rec.ActualizarLineas(FALSE) THEN BEGIN
+                    if ControlProcesos.ActualizarLineas(Rec, FALSE) THEN BEGIN
                         CurrPage.SubPage.Page.Actualizar;
                         Rec.ActualizarClienteLineas;
                     END
@@ -71,8 +75,10 @@ page 50024 "Orden de Publicidad"
                 Editable = CodSoporteEditable;
                 ApplicationArea = All;
                 trigger OnValidate()
+                var
+                    ControlProcesos: Codeunit "ControlProcesos";
                 BEGIN
-                    if Rec.ActualizarLineas(TRUE) THEN BEGIN
+                    if ControlProcesos.ActualizarLineas(Rec, TRUE) THEN BEGIN
                         CurrPage.SubPage.Page.Actualizar;
                         CurrPage.SubPageTar.Page.Actualizar;
                     END

@@ -801,10 +801,14 @@ report 50016 "Contrato"
                                 if rRecurs.Get("No.") Then begin
                                     If Not TipoRecurso.Get(rRecurs."Tipo Recurso") Then
                                         TipoRecurso.Init();
-                                    If (TipoRecurso."Tiene Medidas") and (rRecurs.Medidas <> '') Then
-                                        "Unit of Measure" := rRecurs."Tipo Recurso" + ' ' + rRecurs.Medidas
-                                    else
-                                        "Unit of Measure" := rRecurs."Tipo Recurso";
+                                    If (TipoRecurso."Tiene Medidas") and (rRecurs.Medidas <> '') Then begin
+                                        If Not TipoRecurso."Ocultar Tipo Recurso" Then
+                                            "Unit of Measure" := rRecurs."Tipo Recurso" + ' ' + rRecurs.Medidas
+                                        else
+                                            "Unit of Measure" := rRecurs.Medidas;
+                                    end else
+                                        If Not TipoRecurso."Ocultar Tipo Recurso" Then
+                                            "Unit of Measure" := rRecurs."Tipo Recurso";
                                 end;
                             end;
                             if wToTal2 = wToTal2::"Solo Totales" Then begin
@@ -1323,7 +1327,9 @@ report 50016 "Contrato"
 
                 trigger OnPreDataItem()
                 begin
+#pragma warning disable AL0432 // TODO: - Eliminar Copias
                     NoOfLoops := ABS(NoOfCopies) + Cust."Invoice Copies" + 1;
+#pragma warning restore AL0432 // TODO: - Eliminar Copias
                     if NoOfLoops <= 0 THEN
                         NoOfLoops := 1;
                     CopyText := '';
@@ -1834,7 +1840,9 @@ report 50016 "Contrato"
         SalesSetup: Record 311;
         SalesShipmentBuffer: Record 7190 temporary;
         Cust: Record Customer;
-        VATAmountLine: Record 290 temporary;
+#pragma warning disable AL0432
+        VATAmountLine: Record "VAT Amount Line" temporary;
+#pragma warning restore AL0432
         DimSetEntry1: Record 480;
         DimSetEntry2: Record 480;
         RespCenter: Record 5714;
@@ -2015,7 +2023,9 @@ report 50016 "Contrato"
         rLinVtaPre: Record "Sales Line";
         TempSalesLine: Record "Sales Line" temporary;
         SalesPostPrepmt: Codeunit "Sales-Post Prepayments";
+#pragma warning disable AL0432
         TempVATAmountLine4: Record "VAT Amount Line" temporary;
+#pragma warning restore AL0432
         PrepmtTotalAmount: Decimal;
         PrepmtVATAmount: Decimal;
         PrepmtVATAmountText: Text;

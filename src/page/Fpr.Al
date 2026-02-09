@@ -1,4 +1,4 @@
-page 7001134 "Saldo Proveedores FPR"
+﻿page 50057 "Saldo Proveedores FPR"
 {
     SourceTable = 23;
     UsageCategory = Tasks;

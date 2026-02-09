@@ -90,13 +90,14 @@ pageextension 80143 SalesInvoSubform extends "Sales Invoice Subform"
                 Var
                     rDet: Record 1003;
                     SalesHeader: Record "Sales Header";
+                    Control: Codeunit "ControlProcesos";
                 BEGIN
                     SalesHeader.Get(Rec."Document Type", Rec."Document No.");
                     If Rec."Job No." = '' Then Rec."Job No." := SalesHeader."Nº Proyecto";
                     rDet.SetRange("Job No.", Rec."Job No.");
                     rDet.SetRange("Line No.", Rec."No linea proyecto");
                     rDet.FindFirst();
-                    rDet.Produccion;
+                    Control.Produccion(rDet);
                 END;
             }
         }

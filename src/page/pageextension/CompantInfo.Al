@@ -40,6 +40,16 @@ pageextension 80198 CompantInfo extends "Company Information"
 
 
                 }
+                field("Pie de Correo"; Rec."Email-Foot")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the email footer that has been set up for the company.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.SaveRecord();
+                    end;
+                }
             }
             group(Mensajes)
             {

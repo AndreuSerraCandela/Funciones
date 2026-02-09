@@ -234,7 +234,7 @@ pageextension 75004 ContratoVenta extends "Ficha Contrato Venta"
     var
         cGestFact: Codeunit "Gestion Facturación";
 
-    procedure PostDocument(PostingCodeunitID: Integer; Navigate: Option)
+    procedure PostDocument(PostingCodeunitID: Integer; Navigate: Enum "Navigate After Posting")
     var
         SalesHeader: Record "Sales Header";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";

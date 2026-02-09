@@ -89,6 +89,7 @@ Report 50049 "Etiqueta Qr Opis"
                 Base64: Text;
                 OutStr: OutStream;
                 InStr: InStream;
+                Control: Codeunit "ControlProcesos";
             BEGIN
                 a += 1;
                 If Det_Orden_fijacion."Nº Qr" <> 0 Then begin
@@ -96,7 +97,7 @@ Report 50049 "Etiqueta Qr Opis"
                     Qrs.SetRange("Nº Orden", Det_Orden_fijacion."Nº Orden");
                     If Qrs.FindSet() then
                         If Qrs.Url <> '' Then begin
-                            Base64 := Qrs.ToBase64StringOcr(Qrs.Url);
+                            Base64 := Control.ToBase64StringOcr(Qrs.Url);
                             Clear(TempBlob);
                             Clear(OutStr);
                             TempBlob.CreateOutStream(OutStr);
@@ -112,7 +113,7 @@ Report 50049 "Etiqueta Qr Opis"
                     Qrs.SetRange("Nº Orden", Det_Orden_fijacion."Nº Orden");
                     If Qrs.FindSet() then
                         If Qrs.Url <> '' Then begin
-                            Base64 := Qrs.ToBase64StringOcr(Qrs.Url);
+                            Base64 := Control.ToBase64StringOcr(Qrs.Url);
                             Clear(TempBlob);
                             Clear(OutStr);
                             TempBlob.CreateOutStream(OutStr);
@@ -128,7 +129,7 @@ Report 50049 "Etiqueta Qr Opis"
                     Qrs.SetRange("Nº Orden", Det_Orden_fijacion."Nº Orden");
                     If Qrs.FindSet() then
                         If Qrs.Url <> '' Then begin
-                            Base64 := Qrs.ToBase64StringOcr(Qrs.Url);
+                            Base64 := Control.ToBase64StringOcr(Qrs.Url);
                             Clear(TempBlob);
                             Clear(OutStr);
                             TempBlob.CreateOutStream(OutStr);
@@ -214,6 +215,7 @@ Report 50049 "Etiqueta Qr Opis"
         Base64: Text;
         Base64Convert: Codeunit "Base64 Convert";
         gTask: Codeunit DropBox;
+        Control: Codeunit "ControlProcesos";
     begin
         Imagenes.SetRange("Nº Orden", 0);
         Imagenes.ModifyAll(Id, 0);
@@ -232,13 +234,13 @@ Report 50049 "Etiqueta Qr Opis"
                 Base64 := '';
                 If Resource.qr <> '' then begin
                     Imagenes.Url := Resource.qr;
-                    Base64 := Imagenes.ToBase64StringOcr(Imagenes.Url);
+                    Base64 := Control.ToBase64StringOcr(Imagenes.Url);
                 end;
                 If Base64 = '' then begin
                     gTask.GenerateQRCodeImage('https://gtasks-app.deploy.malla.es/IdQr/' + Resource."No.", TempBlob);
                     tempblob.CreateInStream(InStream);
                     Base64 := Base64Convert.ToBase64(InStream);
-                    Imagenes.Url := Imagenes.FormBase64ToUrl(Base64, Imagenes.Nombre, Imagenes.Id);
+                    Imagenes.Url := Control.FormBase64ToUrl(Base64, Imagenes.Nombre, Imagenes.Id);
                 end;
                 Imagenes.Insert();
                 Resource.qr := Imagenes.Url;

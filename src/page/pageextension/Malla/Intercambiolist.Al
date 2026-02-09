@@ -1,4 +1,4 @@
-pageextension 75002 Intercambiolist extends "Intercambio list"
+﻿pageextension 75002 Intercambiolist extends "Intercambio list"
 {
     actions
     {
@@ -172,7 +172,7 @@ pageextension 75002 Intercambiolist extends "Intercambio list"
         rEmp: Record "Company Information";
         Customer: Record Customer;
         Vendor: Record Vendor;
-        RxE: Record 7001119;
+        RxE: Record "Intercambio x Empresa";
         Cli: Code[20];
         Prov: Code[20];
         Control: Codeunit ControlProcesos;

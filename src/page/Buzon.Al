@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Lista de Fact. Buzón Entrada (ID 50074).
 /// </summary>
-page 50074 "Lista de Fact. Buzón Entrada"
+page 50039 "Lista de Fact. Buzón Entrada"
 {
 
     PageType = List;

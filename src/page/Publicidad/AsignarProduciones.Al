@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Asignar Producciones (ID 50096).
 /// </summary>
-page 50096 "Asignar Producciones"
+page 50045 "Asignar Producciones"
 {
     PageType = ListPart;
     SourceTable = "Produccines Relacionadas";

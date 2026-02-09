@@ -28,6 +28,7 @@ Report 50040 "Etiqueta orden fijacion Opis"
                 Base64Convert: Codeunit "Base64 Convert";
                 Orden_fijacion: Record "Cab Orden fijación";
                 Qrs: Record "Imagenes Orden fijación";
+                Control: Codeunit "ControlProcesos";
             begin
                 If Orden_fijacion.GET("Nº Orden") then
                     Cab := Orden_fijacion;
@@ -37,7 +38,7 @@ Report 50040 "Etiqueta orden fijacion Opis"
                     Clear(OutStr);
                     Clear(InStr);
                     Clear(Base64Convert);
-                    Base64 := ToBase64StringOcr(Url);
+                    Base64 := Control.ToBase64StringOcr(Url);
                     TempBlob.CreateOutStream(OutStr);
                     Base64Convert.FromBase64(base64, OutStr);
                     TempBlob.CreateInStream(InStr);
@@ -53,14 +54,16 @@ Report 50040 "Etiqueta orden fijacion Opis"
                         Qrs.SetRange("Nº Orden", Det_Orden_fijacion."Nº Orden");
                         If Qrs.FindSet() then
                             If Qrs.Url <> '' Then begin
-                                Base64 := ToBase64StringOcr(Qrs.Url);
+                                Base64 := Control.ToBase64StringOcr(Qrs.Url);
                                 Clear(TempBlob);
                                 Clear(OutStr);
                                 TempBlob.CreateOutStream(OutStr);
                                 Base64Convert.FromBase64(base64, OutStr);
                                 Clear(InStr);
                                 TempBlob.CreateInStream(InStr);
+                                If Nombre = '' Then Nombre := 'Qr_' + Format("Nº Imagen") + '.png';
                                 Qr.ImportStream(InStr, Qrs.Nombre);
+                                "Es Qr" := True;
                                 Modify();
                             end;
                     end;

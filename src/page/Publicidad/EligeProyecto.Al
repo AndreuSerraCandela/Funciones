@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Elige Proyecto (ID 50097).
 /// </summary>
-page 50097 "Elige Proyecto"
+page 50046 "Elige Proyecto"
 {
     SourceTable = "Job Planning Line";
     SourceTableTemporary = true;

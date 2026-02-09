@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Historico Recurso (ID 50079).
 /// </summary>
-page 50079 "Historico Recurso"
+page 50042 "Historico Recurso"
 {
     SourceTable = "Reserva";
     SourceTableView = SORTING("Nº Recurso", "Fecha inicio", "Fecha fin");

@@ -1,7 +1,7 @@
 /// <summary>
 /// Page Plazos recursos reservados (ID 50022).
 /// </summary>
-page 50022 "Plazos recursos reservados"
+page 50006 "Plazos recursos reservados"
 {
     Caption = 'Plazos recurso';
     //ApplicationArea=all;
