@@ -320,19 +320,20 @@ codeunit 50003 ControldeEventos
         Cust: Record Customer;
     begin
         Setup.Get;
+        if SalesHeader.GetFilter("No.") = '' then Error('¿Otra vez Manolo?');
         //Message('1');
         if Setup."Activar Cont a 0" = false then exit;
         if SalesHeader.Count = 1 Then begin
             SalesHeader.CalcFields(Amount, "Amount Including VAT");
             SalesHeader.FindFirst();
-            Message('%1', SalesHeader."Amount Including VAT");
+            //Message('%1', SalesHeader."Amount Including VAT");
             if (Round(SalesHeader.Amount, 0.01, '=') = 0) And
             (Round(SalesHeader."Amount Including VAT", 0.01, '=') <> 0) then
                 Error('La factura/albarán es 0, pero tiene Iva');
             if ABS(SalesHeader."Amount Including VAT") < 1 Then begin
                 Cust.Get(SalesHeader."Bill-to Customer No.");
                 if Cust."Generar facturas a 0" Then exit;
-                if not SalesHeader.Invoice then exit;
+                //if not SalesHeader.Invoice then exit;
                 SalesLine.SetRange(SalesLine."Document Type", SalesHeader."Document Type");
                 SalesLine.SetRange(SalesLine."Document No.", SalesHeader."No.");
 

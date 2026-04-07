@@ -63,7 +63,7 @@ Report 50040 "Etiqueta orden fijacion Opis"
                                 TempBlob.CreateInStream(InStr);
                                 If Nombre = '' Then Nombre := 'Qr_' + Format("Nº Imagen") + '.png';
                                 Qr.ImportStream(InStr, Qrs.Nombre);
-                                "Es Qr" := True;
+                                //"Es Qr" := True;
                                 Modify();
                             end;
                     end;

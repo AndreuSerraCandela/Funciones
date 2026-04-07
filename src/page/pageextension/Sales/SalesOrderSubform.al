@@ -28,6 +28,8 @@ pageextension 80139 SalesOrderSubform extends "Sales Order Subform"
         {
             field("% Dto. Volumen"; Rec."% Dto. Venta 1") { ApplicationArea = All; }
             field("% Dto. Agencia"; Rec."% Dto. Venta 2") { ApplicationArea = All; }
+            field("Precio Compra"; Rec."Precio Compra") { ApplicationArea = All; }
+            field("Dto. Compra"; Rec."Dto. Compra") { ApplicationArea = All; }
         }
         modify("Line Discount %")
         {
@@ -94,13 +96,11 @@ pageextension 80139 SalesOrderSubform extends "Sales Order Subform"
             {
                 ApplicationArea = All;
                 trigger OnValidate()
-
-                BEGIN
-                    if xRec."No linea proyecto" <> 0 THEN ERROR('No se puede cambiar la línea si esta no era 0');
-                    SalesHeader.GET(Rec."Document Type", Rec."Document No.");
-                    SalesHeader.CALCFIELDS(SalesHeader."Borradores de Factura");
-                    if SalesHeader."Borradores de Factura" > 0 THEN ERROR('No se puede cambiar la linea porque ya hay borradores de factura');
-                END;
+                begin
+                    if xRec."No linea proyecto" <> 0 then
+                        Error('No se puede cambiar la línea si esta no era 0');
+                    VerificarRestriccionModificacionLineasContrato('No se puede cambiar la línea porque ya hay borradores de factura o facturas registradas');
+                end;
             }
             field("Imprimir fecha recurso"; Rec."Imprimir fecha recurso")
             {
@@ -152,13 +152,24 @@ pageextension 80139 SalesOrderSubform extends "Sales Order Subform"
             }
         }
     }
-    VAR
-        SalesHeader: Record 36;
+    var
         // SalesPriceCalcMgt: Codeunit 7000;
         TransferExtendedText: Codeunit 378;
         SalesInfoPaneMgt: Codeunit 7171;
         ShortcutDimCode: ARRAY[8] OF Code[20];
         Color: Text;
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        VerificarRestriccionModificacionLineasContrato('No se puede insertar la línea porque ya hay borradores de factura o facturas registradas');
+        exit(true);
+    end;
+
+    trigger OnDeleteRecord(): Boolean
+    begin
+        VerificarRestriccionModificacionLineasContrato('No se puede borrar la línea porque ya hay borradores de factura o facturas registradas');
+        exit(true);
+    end;
 
     trigger OnAfterGetRecord()
     var
@@ -207,5 +218,24 @@ pageextension 80139 SalesOrderSubform extends "Sales Order Subform"
         CurrPage.UPDATE;
     END;
 
+    local procedure VerificarRestriccionModificacionLineasContrato(TxtAccion: Text[100])
+    var
+        Permisos: Codeunit ControlProcesos;
+        CabVenta: Record "Sales Header";
+        FacturasPrepago: Record "Sales Header";
+    begin
+        if Permisos.AccesoProibido_Empresas(CompanyName, 'MODCONTRATOS') then
+            exit;
+        CabVenta.Get(Rec."Document Type", Rec."Document No.");
+        CabVenta.CalcFields("Borradores de Factura", "Facturas Registradas");
+        if CabVenta."Borradores de Factura" > 0 then
+            Error('%1 porque ya hay borradores de factura.', TxtAccion);
+        if CabVenta."Facturas Registradas" > 0 then
+            Error('%1 porque ya hay facturas registradas.', TxtAccion);
+        FacturasPrepago.SetRange("Document Type", FacturasPrepago."Document Type"::Invoice);
+        FacturasPrepago.SetRange("Nº Contrato", CabVenta."No.");
+        if FacturasPrepago.FindFirst() then
+            Error('%1 porque el contrato tiene factura de prepago.', TxtAccion);
+    end;
 }
 

@@ -120,6 +120,7 @@ report 50038 DisponibilidadWord
                 if Resource."Tipo Recurso" = 'LED' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'OPIDIGITAL' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'OPI DIGIT.' then Mes := '/Mes';
+                if Resource."Tipo Recurso" = 'P.LEDS' then Mes := '/Mes';
                 //Indicador
                 if Resource."Tipo Recurso" = 'INDICADOR' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'IND.CALLE' then Mes := '/Mes';
@@ -130,6 +131,7 @@ report 50038 DisponibilidadWord
                 //Digitales
                 if Resource."Tipo Recurso" = 'OPIDIGITAL' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'OPI DIGIT.' then Mes := '/Mes';
+                if Resource."Tipo Recurso" = 'P.LEDS' then Mes := '/Mes';
                 // 'ASCENSORES' | 'ASCENSOR'
                 if Resource."Tipo Recurso" = 'ASCENSORES' then Mes := '/Mes';
                 if Resource."Tipo Recurso" = 'ASCENSOR' then Mes := '/Mes';
@@ -172,8 +174,8 @@ report 50038 DisponibilidadWord
                 if Ordenar Then Resource.SetCurrentKey(Empresa, "Tipo Recurso", Municipio);
                 Resource.SetRange(Seleccionar, true);
                 Resource.SetRange(UserId, UserId());
-                if CompanyName <> 'Malla Publicidad' then
-                    Resource.SetRange(Empresa, CompanyName);
+                // if CompanyName <> 'Malla Publicidad' then
+                //   Resource.SetRange(Empresa, CompanyName);
                 Resource.FindFirst();
 
             end;

@@ -185,7 +185,8 @@ page 50068 "Seleccionar Recursos"
                 part(Digitales; SeleccionRecursos)
                 {
                     Caption = 'Digitales';
-                    SubPageView = where("Tipo Recurso" = Filter('OPIDIGITAL' | 'OPI DIGIT.'));
+                    //añadir P.LEDS
+                    SubPageView = where("Tipo Recurso" = Filter('OPIDIGITAL' | 'OPI DIGIT.' | 'P.LEDS'));
                 }
                 part(Relojes; SeleccionRecursos)
                 {
@@ -400,7 +401,7 @@ page 50068 "Seleccionar Recursos"
                 end;
 
             }
-            action(Desmaracar)
+            action(Desmarcar)
             {
                 ApplicationArea = all;
                 Image = UnApply;

@@ -40,12 +40,12 @@ page 50007 "Plazos recursos Matrix"
                     ApplicationArea = All;
                     Visible = true;
                 }
-                field("Dimensión Zona"; Rec."Dimensión Zona")
+                field("Dimensión Zona"; Rec."Global Dimension 4 Code")
                 {
                     ApplicationArea = All;
                     Visible = false;
                 }
-                field("Nombre Zona"; DescZona(Rec."Dimensión Zona"))
+                field("Nombre Zona"; DescZona(Rec."Global Dimension 4 Code"))
                 {
                     ApplicationArea = All;
                     Visible = false;

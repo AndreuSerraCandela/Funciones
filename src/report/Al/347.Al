@@ -115,7 +115,7 @@ report 50037 "Declaración 347 Malla"
                                   UpperCase(Name347) + LetterDTxt +
                                   CountyCode + CVCountryCode + PadStr('', 1, ' ') + LetterBTxt + AmountText + PadStr('', 2, ' ') +
                                   CashAmtText + FormatAmount(0) + YearText + GetSalesQuarterAmountsText + PadStr('', 17, ' ') +
-                                  GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, ReverseChargeOperation);
+                                  GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, ReverseChargeOperation) + '000000';
                                 OutText := PadStr(OutText, 500, ' ');
 
                                 OutFile.Write(OutText);
@@ -139,7 +139,7 @@ report 50037 "Declaración 347 Malla"
                                           '2347' + FiscalYear + UpperCase(VATRegNo) + UpperCase(VATRegNo347) + PadStr('', 9, ' ') + UpperCase(Name347) +
                                           LetterDTxt + CountyCode + CVCountryCode + PadStr('', 1, ' ') + LetterBTxt + AmountText + PadStr('', 2, ' ') +
                                           CashAmtText + FormatAmount(0) + YearText + GetQuarterZeroAmountsText + PadStr('', 17, ' ') +
-                                          GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, ReverseChargeOperation);
+                                          GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, ReverseChargeOperation) + '000000';
                                         OutText := PadStr(OutText, 500, ' ');
                                         OutFile.Write(OutText);
                                         // Increase RecordCount
@@ -307,7 +307,7 @@ report 50037 "Declaración 347 Malla"
                                       UpperCase(Name347) + LetterDTxt + CountyCode + CVCountryCode + PadStr('', 1, ' ') + LetterATxt +
                                       AmountText + PadStr('', 2, ' ') + PadStr('', 15, '0') + ' ' + PadStr('', 15, '0') + PadStr('', 4, '0') +
                                       GetPurchQuarterAmountsText(1) + PadStr('', 17, ' ') +
-                                      GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, '');
+                                      GetVATCashRegimeText(AnnualAmountVATCashRegime, OperationsCashAccountingCriteria, '') + '000000';
                                     OutText := PadStr(OutText, 500, ' ');
 
                                     OutFile.Write(OutText);
@@ -322,7 +322,7 @@ report 50037 "Declaración 347 Malla"
                                       UpperCase(Name347) + LetterDTxt + CountyCode + CVCountryCode + PadStr('', 1, ' ') + LetterATxt +
                                       AmountText + PadStr('', 2, ' ') + PadStr('', 15, '0') + ' ' + PadStr('', 15, '0') + PadStr('', 4, '0') +
                                       GetPurchQuarterAmountsText(2) + PadStr('', 17, ' ') +
-                                      GetVATCashRegimeText(0, '', ReverseChargeOperation);
+                                      GetVATCashRegimeText(0, '', ReverseChargeOperation) + '000000';
                                     OutText := PadStr(OutText, 500, ' ');
 
                                     OutFile.Write(OutText);

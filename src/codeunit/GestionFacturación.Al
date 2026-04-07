@@ -731,6 +731,7 @@ codeunit 50001 "Gestion Facturación"
             rPropVto.SETRANGE(rPropVto."No. linea", i);               //números de línea están grabados de 1 en 1
             if rPropVto.FIND('-') THEN
                 wFecVto := rPropVto."Fecha Vencimiento";
+            rCabFra."Fecha Vencimiento" := wFecVto;
             if (rCabFra."Due Date" <> wFecVto) AND (wFecVto <> 0D) THEN
                 rCabFra.VALIDATE("Due Date", wFecVto);
             if rPropVto.FIND('-') THEN

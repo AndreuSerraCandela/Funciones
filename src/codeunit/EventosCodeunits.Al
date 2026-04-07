@@ -756,14 +756,15 @@ codeunit 50015 ControldeEventosCodeunits
     #endregion Codeunit74
     #region Codeunit80
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforeValidatePostingAndDocumentDate', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnBeforeValidatePostingAndDocumentDate, '', false, false)]
     local procedure OnBeforeValidatePostingAndDocumentDate(var SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean)
     begin
-        SalesHeader."Fecha Vencimiento" := SalesHeader."Due Date";
+        If SalesHeader."Fecha Vencimiento" = 0D then
+            SalesHeader."Fecha Vencimiento" := SalesHeader."Due Date";
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterValidatePostingAndDocumentDate', '', false, false)]
-    local procedure OnAfterValidatePostingAndDocumentDate(var SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; ReplacePostingDate: Boolean; ReplaceDocumentDate: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnValidatePostingAndDocumentDateOnBeforeSalesHeaderModify, '', false, false)]
+    local procedure OnValidatePostingAndDocumentDateOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
     begin
         if SalesHeader."Fecha Vencimiento" <> 0D then
             if SalesHeader."Due Date" <> SalesHeader."Fecha Vencimiento" Then begin
