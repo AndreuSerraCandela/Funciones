@@ -798,7 +798,7 @@ report 50016 "Contrato"
                             END;
                             "Unit of Measure" := '';
                             if Type = Type::Resource then begin
-                                if rRecurs.Get("No.") Then begin
+                                if (rRecurs.Get("No.") and rRecurs."Recurso Agrupado" = False) Then begin
                                     If Not TipoRecurso.Get(rRecurs."Tipo Recurso") Then
                                         TipoRecurso.Init();
                                     If (TipoRecurso."Tiene Medidas") and (rRecurs.Medidas <> '') Then begin

@@ -462,8 +462,13 @@ codeunit 50002 "Gestion Proyecto"
                         if JobPlanningLine."Unit Cost" = 0 Then
                             Error('No puede crear líneas de recursos de otra empresa sin precio de compra, revise la linea % 1 con el recurso %2 del proyecto %3',
                             JobPlanningLine."Line No.", JobPlanningLine."No.", JobPlanningLine."Job No.");
-                        JobPlanningLineT."Unit Price" := JobPlanningLine."Unit Cost";
-                        JobPlanningLineT."Total Price" := (JobPlanningLine."Total Cost" * (1 - JobPlanningLine."% Dto. Compra" / 100));
+                        JobPlanningLineT."Precio Tarifa" := JobPlanningLine."Unit Cost";
+                        JobPlanningLineT."Dto. Tarifa" := JobPlanningLine."% Dto. Compra";
+                        JobPlanningLineT."Unit Price" := Round(
+                            JobPlanningLineT."Precio Tarifa" * (1 - JobPlanningLineT."Dto. Tarifa" / 100),
+                            0.01);
+                        JobPlanningLineT."Total Price" := JobPlanningLineT."Unit Price" * JobPlanningLineT.Quantity;
+                        JobPlanningLineT."Total Price (LCY)" := JobPlanningLineT."Total Price";
                         JobPlanningLineT."Unit Cost (LCY)" := 0;
                         JobPlanningLineT."Total Cost (LCY)" := 0;
                         JobPlanningLineT."Direct Unit Cost (LCY)" := 0;
@@ -471,8 +476,8 @@ codeunit 50002 "Gestion Proyecto"
                         JobPlanningLineT."Total Cost" := 0;
                         JobPlanningLineT."Recurso en Empresa Origen" := JobPlanningLine."No.";
                         JobPlanningLineT."Linea en Empresa Origen" := JobPlanningLine."Line No.";
-                        JobPlanningLineT."% Dto. Venta 1" := JobPlanningLineT."% Dto. Compra";
-                        JobPlanningLineT."% Dto. Venta" := JobPlanningLineT."% Dto. Compra";
+                        JobPlanningLineT."% Dto. Venta 1" := 0;
+                        JobPlanningLineT."% Dto. Venta" := 0;
                         JobPlanningLineT."% Dto. Compra" := 0;
                         JobPlanningLineT."Compra a-Nº proveedor" := '';
                         JobPlanningLineT."Cdad. a Reservar" := 0;
@@ -1012,17 +1017,19 @@ codeunit 50002 "Gestion Proyecto"
                     REPEAT
                         If rJobPlanigLineOtraEmpresa."Unit Price" = 0 THEN begin
                             if rJobPlanigLine.get(rJob."No.", rJobPlanigLineOtraEmpresa."Job Task No.", rJobPlanigLineOtraEmpresa."Line No.") then begin
-                                If rJobPlanigLine."Unit Cost" = 0 Then begin
-                                    error('El recurso %1 no tiene precio de compra en la linea %2 del proyecto %3', rJobPlanigLine."No.", rJobPlanigLine."Line No.", rJobPlanigLine."Job No.");
+                                if rJobPlanigLine."Crear pedidos" in [rJobPlanigLine."Crear pedidos"::"De Compra", rJobPlanigLine."Crear pedidos"::"De Compra Y De Venta"] then begin
+                                    If rJobPlanigLine."Unit Cost" = 0 Then begin
+                                        error('El recurso %1 no tiene precio de compra en la linea %2 del proyecto %3 enpresa %4', rJobPlanigLine."No.", rJobPlanigLine."Line No.", rJobPlanigLine."Job No.", rJobt."Bill-to Contact");
 
+                                    end;
+                                    rJobPlanigLineOtraEmpresa."Unit Price" := rJobPlanigLine."Unit Cost";
+                                    rJobPlanigLineOtraEmpresa."% Dto. Venta 1" := rJobPlanigLine."% Dto. Compra";
+                                    rJobPlanigLineOtraEmpresa."% Dto. Venta" := rJobPlanigLineOtraEmpresa."% Dto. Venta 1";
+                                    rJobPlanigLineOtraEmpresa."Total Price (LCY)" := ROUND(rJobPlanigLineOtraEmpresa."Unit Price (LCY)" *
+                                    rJobPlanigLineOtraEmpresa.Quantity, Currency."Amount Rounding Precision");
+                                    rJobPlanigLineOtraEmpresa."Total Price" := ROUND(rJobPlanigLineOtraEmpresa.Quantity * rJobPlanigLineOtraEmpresa."Unit Price", Currency."Amount Rounding Precision");
+                                    rJobPlanigLineOtraEmpresa."Line Amount" := rJobPlanigLineOtraEmpresa."Line Amount";
                                 end;
-                                rJobPlanigLineOtraEmpresa."Unit Price" := rJobPlanigLine."Unit Cost";
-                                rJobPlanigLineOtraEmpresa."% Dto. Venta 1" := rJobPlanigLine."% Dto. Compra";
-                                rJobPlanigLineOtraEmpresa."% Dto. Venta" := rJobPlanigLineOtraEmpresa."% Dto. Venta 1";
-                                rJobPlanigLineOtraEmpresa."Total Price (LCY)" := ROUND(rJobPlanigLineOtraEmpresa."Unit Price (LCY)" *
-                                rJobPlanigLineOtraEmpresa.Quantity * (1 - rJobPlanigLineOtraEmpresa."% Dto. Venta" / 100), Currency."Amount Rounding Precision");
-                                rJobPlanigLineOtraEmpresa."Total Price" := ROUND(rJobPlanigLineOtraEmpresa.Quantity * rJobPlanigLineOtraEmpresa."Unit Price" * (1 - rJobPlanigLineOtraEmpresa."% Dto. Venta" / 100), Currency."Amount Rounding Precision");
-                                rJobPlanigLineOtraEmpresa."Line Amount" := rJobPlanigLineOtraEmpresa."Line Amount" * (1 - rJobPlanigLineOtraEmpresa."% Dto. Venta" / 100);
                             end;
 
                         end;

@@ -300,11 +300,24 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 Caption = 'Añadir a Planificacion';
                 trigger OnAction()
                 var
-                    Soportes: Page "Soportes proyecto";
-                Begin
-                    Soportes.SetRecord(Rec);
-                    Soportes.RUNMODAL;
-                END;
+                    PlanificacionFijaciontemp: Record "Planificación Fijación" temporary;
+                    PlanificacionFijacion: Record "Planificación Fijación";
+                    Job: Record Job;
+                    ControlProcesos: Codeunit ControlProcesos;
+                begin
+                    Job.Get(Rec."No.");
+                    ControlProcesos.PlanifFijInicializarDesdeProyecto(PlanificacionFijaciontemp, Job);
+                    If PlanificacionFijaciontemp.Insert() then;
+                    Commit();
+                    If Page.RunModal(Page::"Planificar Fijación", PlanificacionFijaciontemp) = Action::LookupOK Then begin
+                        PlanificacionFijacion := PlanificacionFijaciontemp;
+                        if PlanificacionFijacion."Fecha generación" = 0D then
+                            PlanificacionFijacion."Fecha generación" := WorkDate();
+                        PlanificacionFijacion."No. Opis" := PlanificacionFijacion."No. Soportes";
+                        PlanificacionFijacion.Insert(true);
+                    end;
+
+                end;
             }
             action("Crear Reportaje Fotográfico")
             {
@@ -363,6 +376,7 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 end;
 
             }
+
             action("Crear fijación")
             {
                 Image = CreateJobSalesCreditMemo;

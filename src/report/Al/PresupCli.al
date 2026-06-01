@@ -775,6 +775,7 @@ Report 50007 "Presupuesto proyecto para cli"
                                 VATAmountLine."Tax Group Code" := '';
                                 VATAmountLine."VAT %" := VATPostingSetup."VAT %";
                                 VATAmountLine."EC %" := VATPostingSetup."EC %";
+                                "Job Plannig Line"."VAT Line Amount" := Round(("Job Plannig Line"."Line Amount" * ("Vat %" / 100)), 0.01);
                                 VATAmountLine."VAT Base" := "Job Plannig Line"."Line Amount";
                                 VATAmountLine."Amount Including VAT" := "Job Plannig Line"."Line Amount" + "Job Plannig Line"."VAT Line Amount";
                                 VATAmountLine."Line Amount" := "Line Amount";
@@ -784,7 +785,7 @@ Report 50007 "Presupuesto proyecto para cli"
                                 VATAmountLine."VAT Difference" := 0;
                                 VATAmountLine."EC Difference" := 0;
                                 VATAmountLine."VAT Clause Code" := VATPostingSetup."VAT Clause Code";
-                                VATAmountLine.InsertLine;
+                                //VATAmountLine.InsertLine;
                                 // MNC 020201
                                 VATAmountLine.SetCurrencyCode(Job."Currency Code");
                                 // Fi MNC
@@ -803,9 +804,8 @@ Report 50007 "Presupuesto proyecto para cli"
                                 TotalSubTotal += "Total Venta";
                                 TotalInvoiceDiscountAmount -= 0;
                                 TotalAmount += "Total Venta";
-                                "VAT Line Amount" := "Total venta" * ("Vat %" / 100);
+                                if "Vat Line Amount" = 0 Then "VAT Line Amount" := Round(("Total venta" * ("Vat %" / 100)), 0.01);
                                 TotalAmountVAT += "VAT Line Amount";
-                                if "Vat Line Amount" = 0 Then "VAT Line Amount" := "Total venta" * ("Vat %" / 100);
                                 TotalAmountInclVAT += "Total Venta" + "VAT Line Amount";
                                 if wTotal2 = wTotal2::"Imprimir Total Sin IVA" then
                                     TotalAmountInclVAT := 0;

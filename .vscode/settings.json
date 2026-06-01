@@ -1,0 +1,15 @@
+{
+    "al.assemblyProbingPaths": [
+        "./.netpackages",
+        "C:/Windows/assembly"
+    ],
+    "editor.tabCompletion": "on",
+    "cSpell.words": [
+        "Emplazamientos"
+    ],
+    "diffEditor.codeLens": true,
+    "al.codeAnalyzers": [
+        "",
+        "${analyzerFolder}N24_Business_Central_Code_Cop.dll"
+    ]
+}

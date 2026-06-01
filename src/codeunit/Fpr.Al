@@ -3,9 +3,15 @@
 /// </summary>
 Codeunit 7001116 Fpr
 {
+    Permissions = tabledata 15 = rimd, tabledata 17 = rimd, tabledata 2000000006 = rimd, tabledata 23 = rimd, tabledata 6650 = rimd, tabledata 92 = rimd;
+
     var
         a: Integer;
 
+    trigger OnRun()
+    begin
+        GeneraEliminaciones();
+    end;
 
     Procedure CalcularFpr()
     VAR
@@ -153,6 +159,106 @@ Codeunit 7001116 Fpr
         // if SoloDif THEN Rec.MARKEDONLY := TRUE;
 
     end;
+
+    Procedure GeneraEliminaciones()
+
+    VAR
+        rEmp: Record 2000000006;
+        rCom: Record "Company Information";
+        r18: Record Customer;
+        r23: Record Vendor;
+        rGrp: Record "Vendor Posting Group";
+        rGrc: Record 92;
+        r15: Record 15;
+        r50889: Record "Saldo Interempresa";
+        a: Integer;
+        r17: Record "G/L Entry";
+        Control: Codeunit ControlProcesos;
+    BEGIN
+        rEmp.SetRange("Evaluation Company", false);
+        if rEmp.FINDFIRST THEN
+            REPEAT
+                if Control.Permiso_Empresas(remp.Name) then begin
+                    rCom.ChangeCompany(rEmp.Name);
+                    rCom.Get();
+                    if rCom.InterEmpresas Then Begin
+                        //Ventana.UPDATE(4, rEmp.Name);
+                        r17.RESET;
+                        r17.CHANGECOMPANY(rEmp.Name);
+                        r17.SETCURRENTKEY("G/L Account No.", "Source Type", "Source No.", "Posting Date"
+                        , "Document Type", "Gen. Posting Type");
+                        //Desde dia i de ewnero a 31 de diciembrr del Año actúal
+                        r17.SetRange("Posting Date", CalcDate('PA-1A+1D', WORKDATE), CALCDATE('PA', WORKDATE));
+                        r17.MODIFYALL(Eliminaciones, FALSE);
+                        rGrp.CHANGECOMPANY(rEmp.Name);
+                        rGrp.SETRANGE(rGrp."Payables Account", '402', '4039999999');
+                        //Ventana.UPDATE(1, 'Proveedores');
+                        if rGrp.FINDFIRST THEN
+                            REPEAT
+                                r23.CHANGECOMPANY(rEmp.Name);
+                                r23.SETRANGE(r23."Vendor Posting Group", rGrp.Code);
+                                if r23.FINDFIRST THEN
+                                    REPEAT
+                                        //Ventana.UPDATE(2, r23."No.");
+                                        if r23.Blocked = r23.Blocked::" " THEN BEGIN
+                                            //
+                                            r15.CHANGECOMPANY(rEmp.Name);
+                                            r15.SETRANGE(r15."Account Type", r15."Account Type"::Posting);
+                                            if r15.FINDFIRST THEN
+                                                REPEAT
+                                                    //Ventana.UPDATE(3, r15."No.");
+                                                    r17.RESET;
+                                                    r17.CHANGECOMPANY(rEmp.Name);
+                                                    r17.SETCURRENTKEY("G/L Account No.", "Source Type", "Source No.", "Posting Date"
+                                                    , "Document Type", "Gen. Posting Type");
+                                                    r17.SETRANGE(r17."Source Type", r17."Source Type"::Vendor);
+                                                    r17.SETRANGE(r17."Source No.", r23."No.");
+                                                    r17.SETRANGE(r17."G/L Account No.", r15."No.");
+                                                    r17.SETFILTER(r17."Document Type", '%1|%2|%3',
+                                                    r17."Document Type"::Receipt, r17."Document Type"::Invoice, r17."Document Type"::"Credit Memo");
+                                                    r17.SetRange("Posting Date", CalcDate('PA-1A+1D', WORKDATE), CALCDATE('PA', WORKDATE));
+                                                    r17.MODIFYALL(Eliminaciones, TRUE);
+                                                UNTIL r15.NEXT = 0;
+                                        END;
+                                    UNTIL r23.NEXT = 0;
+                            UNTIL rGrp.NEXT = 0;
+                        rGrc.CHANGECOMPANY(rEmp.Name);
+                        //Ventana.UPDATE(1, 'Clientes');
+                        rGrc.SETRANGE(rGrc."Receivables Account", '432', '4339999999');
+                        if rGrc.FINDFIRST THEN
+                            REPEAT
+                                r18.CHANGECOMPANY(rEmp.Name);
+                                r18.SETRANGE(r18."Customer Posting Group", rGrc.Code);
+                                if r18.FINDFIRST THEN
+                                    REPEAT
+                                        if r18.Blocked = r18.Blocked::" " THEN BEGIN
+                                            //Ventana.UPDATE(2, r18."No.");
+                                            r15.CHANGECOMPANY(rEmp.Name);
+                                            r15.SETRANGE(r15."Account Type", r15."Account Type"::Posting);
+                                            if r15.FINDFIRST THEN
+                                                REPEAT
+                                                    //Ventana.UPDATE(3, r15."No.");
+                                                    r17.SETCURRENTKEY("G/L Account No.", "Source Type", "Source No.", "Posting Date"
+                                                    , "Document Type", "Gen. Posting Type");
+                                                    r17.RESET;
+                                                    r17.CHANGECOMPANY(rEmp.Name);
+                                                    r17.SETRANGE(r17."Source Type", r17."Source Type"::Customer);
+                                                    r17.SETRANGE(r17."Source No.", r18."No.");
+                                                    r17.SETRANGE(r17."G/L Account No.", r15."No.");
+                                                    r17.SetRange("Posting Date", CalcDate('PA-1A+1D', WORKDATE), CALCDATE('PA', WORKDATE));
+                                                    r17.SETFILTER(r17."Document Type", '%1|%2|%3',
+                                                    r17."Document Type"::Receipt, r17."Document Type"::Invoice, r17."Document Type"::"Credit Memo");
+
+                                                    r17.MODIFYALL(Eliminaciones, TRUE);
+                                                UNTIL r15.NEXT = 0;
+                                        END;
+                                    UNTIL r18.NEXT = 0;
+                            UNTIL rGrc.NEXT = 0;
+                    end;
+                end;
+            UNTIL rEmp.NEXT = 0;
+        //Ventana.CLOSE;
+    END;
 
     Procedure CalcularFpr(var r23: Record Vendor)
     VAR

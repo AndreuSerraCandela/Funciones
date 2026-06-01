@@ -159,7 +159,7 @@ codeunit 50016 ControldeEventosTables
         Rec."Unidad Tramitadora" := Rec."B2R Cod. Pagador";
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnAfterInsertEvent, '', false, false)]
     LOCAL PROCEDURE Tabla18_Insert(VAR Rec: Record Customer)
     begin
         Rec."Fecha de alta" := TODAY;
@@ -2130,7 +2130,7 @@ codeunit 50016 ControldeEventosTables
         // Fi MNC
     End;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterOnInsert', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterOnInsert, '', false, false)]
     Local PROCEDURE Table167_OnAfterInsert(VAR Job: Record Job; VAR xJob: Record Job)
     var
         rConf: Record "Jobs Setup";
@@ -2411,7 +2411,7 @@ codeunit 50016 ControldeEventosTables
         IsHandled := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Unit Price', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Unit Price', false, false)]
 
     local procedure OnBeforeValidateUnitPrice(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; currfieldno: Integer)
     var
@@ -2435,16 +2435,31 @@ codeunit 50016 ControldeEventosTables
         Up := Control.FindResourcePricenew(Customer."Customer Price Group" = 'AGENCIA', Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No."
         , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion");
         //if Up = Rec."Unit Price" then exit;
+        If Res."Empresa Origen" <> '' Then
+            Tipo.ChangeCompany(Res."Empresa Origen");
         if not Tipo.Get(Res."Tipo Recurso") then exit;
         //if tipo."% Dto. Compra" = 0 then exit;
-        if Up = 0 Then exit;
+        if Up = 0 Then begin
+            if Res."Empresa Origen" <> '' then
+                Rec.validate("% Dto. Compra", Tipo."% Dto. Compra");
+            exit;
+        end;
+        Dto := Tipo."% Dto. Compra";
+        if Res."Empresa Origen" <> '' then
+            Rec."Unit Cost" := Rec."Unit Price";
+        
         Rec."Precio Tarifa" := Up;
+        If Rec."Unit Price" <> 0 Then begin
+            if Res."Empresa Origen" <> '' then begin
+                Rec.validate("% Dto. Compra", Dto);
+            end;
+            exit;
+        end;
         //REDONDEAR.MAS(("Unit Price"*(Tipo."% Dto. Compra"-15))/Up+15;0)/100
-        DtO := ROUND(((Rec."Unit Price" * (Tipo."% Dto. Compra" - 15)) / Up) + 15, 1, '>') / 100;
-        if Res."Empresa Origen" = '' then begin
+        //DtO := ROUND(((Rec."Unit Price" * (Tipo."% Dto. Compra" - 15)) / Up) + 15, 1, '>');
+        if Res."Empresa Origen" <> '' then begin
             Rec.validate("% Dto. Compra", Dto);
         end;
-
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnBeforeFindPriceAndDiscount', '', false, false)]
@@ -2494,7 +2509,7 @@ codeunit 50016 ControldeEventosTables
                 Customer."Customer Posting Group" = 'AGENCIA', Res."Customer Price Group", WorkDate,
                 JobPlanningLine."VAT %", Job, JobPlanningLine."No.", JobPlanningLine."Cdad. Soportes", JobPlanningLine.Duracion, JobPlanningLine."Tipo Duracion"));
             if Tipo.Get(Res."Tipo Recurso") And (Res."Empresa Origen" <> '') then begin
-                JobPlanningLine.Validate("Unit Cost", JobPlanningLine."Unit Price" * (1 - Tipo."% Dto. Compra" / 100));
+                JobPlanningLine.Validate("Unit Cost", JobPlanningLine."Unit Price");
                 JobPlanningLine.validate("% Dto. Compra", Tipo."% Dto. Compra");
             end;
         end;
@@ -2653,7 +2668,7 @@ codeunit 50016 ControldeEventosTables
 
     end;
 
-    // [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
+    // [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterInsertEvent, '', false, false)]
     // local procedure OnAfterInsertEventJobLine(var Rec: Record "Job Planning Line")
     // Var
     //     rSelf: Record "Job Planning Line";
@@ -2761,7 +2776,7 @@ codeunit 50016 ControldeEventosTables
         if Res."Producción" Then JobPlanningLine."Cdad. a Reservar" := 0;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Quantity', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Quantity', false, false)]
     procedure ModificaQuantityJobPlaning(var Rec: Record "Job planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
         Control: Codeunit "ControlProcesos";
@@ -2781,6 +2796,7 @@ codeunit 50016 ControldeEventosTables
             Rec."Unit Price" := 0 else
             If Rec."Unit Price" = 0 Then Rec."Unit Price" := Rec."Precio Tarifa";
 
+        Rec.RecalcularCostesLineaProyecto();
     end;
     #endregion Tabla1003
     #region Tabla5080
@@ -2826,7 +2842,7 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion TableNombres
     #region Tabla349
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value", OnAfterInsertEvent, '', false, false)]
     local procedure DimensionValue_OnAfterInsert(var Rec: Record "Dimension Value"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2885,7 +2901,7 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla349
     #region Tabla348
-    [EventSubscriber(ObjectType::Table, Database::"Dimension", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension", OnAfterInsertEvent, '', false, false)]
     local procedure Dimension_OnAfterInsert(var Rec: Record "Dimension"; RunTrigger: Boolean)
     var
         Company: Record Company;
@@ -2953,7 +2969,7 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla120
     #region Tabla481
-    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Dimension Value Combination", OnAfterInsertEvent, '', false, false)]
     local procedure DimensionValueCombination_OnAfterInsert(var Rec: Record "Dimension Value Combination")
     var
         RecFef: RecordRef;
@@ -2996,7 +3012,7 @@ codeunit 50016 ControldeEventosTables
             Control.CrearLineaProduccion(Rec, 'Cartel', false, Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Lona', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Lona', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Lona(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
     var
         Control: Codeunit "ControlProcesos";
@@ -3005,7 +3021,7 @@ codeunit 50016 ControldeEventosTables
             Control.CrearLineaProduccion(Rec, 'Lona', false, Rec);
     end;
     //Vinilo
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Vinilo', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Vinilo', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Vinilo(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
     var
         Control: Codeunit "ControlProcesos";
@@ -3014,7 +3030,7 @@ codeunit 50016 ControldeEventosTables
             Control.CrearLineaProduccion(Rec, 'Vinilo', false, Rec);
     end;
     //Otros 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Otros', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Otros', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_Otros(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
     var
         Control: Codeunit "ControlProcesos";
@@ -3023,7 +3039,14 @@ codeunit 50016 ControldeEventosTables
             Control.CrearLineaProduccion(Rec, 'Otros', false, Rec);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterValidateEvent', 'Solo Producción', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnBeforeUpdateTotalCost, '', false, false)]
+    local procedure OnBeforeUpdateTotalCost(var JobPlanningLine: Record "Job Planning Line"; AmountRoundingPrecisionFCY: Decimal; AmountRoundingPrecision: Decimal; var IsHandled: Boolean)
+    begin
+        IsHandled := true;
+        JobPlanningLine.RecalcularCostesLineaProyecto();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Solo Producción', false, false)]
     local procedure JobPlanningLine_OnAfterValidate_SoloProduccion(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line")
     var
         Prod: Record "Recursos de Producción";
@@ -3115,7 +3138,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterInsertEvent, '', false, false)]
     local procedure JobPlanningLine_OnAfterInsert(var Rec: Record "Job Planning Line"; RunTrigger: Boolean)
     var
         rSelf: Record "Job Planning Line";
@@ -3211,7 +3234,7 @@ codeunit 50016 ControldeEventosTables
     end;
     #endregion Tabla1003
     #region Tabla289
-    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterInsertEvent', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", OnAfterInsertEvent, '', false, false)]
     local procedure PaymentMethod_OnAfterInsert(var Rec: Record "Payment Method"; RunTrigger: Boolean)
     var
         RecFef: RecordRef;
@@ -3283,6 +3306,56 @@ codeunit 50016 ControldeEventosTables
             Procesos.EnviarMailJm(Rec."No.", STRSUBSTNO('modificado la fecha estado de %1 a %2', xRec."Fecha Estado", Rec."Fecha Estado"));
     end;
     #endregion Tabla36
+    #region Tabla37
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterCopyPrepaymentFromVATPostingSetup, '', false, false)]
+    local procedure OnAfterCopyPrepaymentFromVATPostingSetup(var SalesLine: Record "Sales Line"; var VATPostingSetupFrom: Record "VAT Posting Setup")
+    begin
+        SalesLine."Prepayment VAT %" := SalesLine."VAT %";
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice, '', false, false)]
+    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean; xSalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; Currency: Record Currency)
+    var
+        VATClause: Record "VAT Clause";
+        HojaComen: Record "Sales Comment Line";
+        LineNo: Integer;
+        FullText: Text;
+        ChunkLen: Integer;
+        Pos: Integer;
+    begin
+        if VATPostingSetup."VAT Clause Code" <> '' then begin
+            if VATClause.Get(VATPostingSetup."VAT Clause Code") then begin
+                HojaComen.SetRange("Document Type", SalesLine."Document Type");
+                HojaComen.SetRange("No.", SalesLine."Document No.");
+                HojaComen.SetRange("Document Line No.", 0);
+                if HojaComen.FindLast() then
+                    LineNo := HojaComen."Line No." + 10000
+                else
+                    LineNo := 10000;
+                HojaComen.SetRange(Code, VATClause.Code);
+                if not HojaComen.FindFirst() then begin
+                    FullText := VATClause.Description + VATClause."Description 2";
+                    ChunkLen := MaxStrLen(HojaComen.Comment);
+                    Pos := 1;
+                    repeat
+                        HojaComen.Init();
+                        HojaComen."Document Type" := SalesLine."Document Type";
+                        HojaComen."No." := SalesLine."Document No.";
+                        HojaComen.Code := VATClause.Code;
+                        HojaComen."Document Line No." := 0;
+                        HojaComen."Line No." := LineNo;
+                        HojaComen.Comment := CopyStr(FullText, Pos, ChunkLen);
+                        HojaComen.Insert();
+                        LineNo += 10000;
+                        Pos += ChunkLen;
+                    until Pos > StrLen(FullText);
+                end;
+            end;
+        end;
+    end;
+
+    #endregion Tabla37
+
     #region Tabla7001114
     [EventSubscriber(ObjectType::Table, 7001114, 'OnAfterValidateEvent', 'fecha Baja', false, false)]
     local procedure Resource3_OnAfterValidate_FechaBaja(var Rec: Record 7001114; var xRec: Record 7001114)

@@ -196,6 +196,17 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
                     end;
                 end;
             }
+            //Cambiar Fecha Vencimiento
+            action("Cambiar Fecha Vencimiento")
+            {
+                Image = ChangeDate;
+                ApplicationArea = All;
+                trigger OnAction()
+                begin
+                    Rec."Fecha Vencimiento" := Rec."Due Date";
+                    Rec.Modify();
+                end;
+            }
             action("Recupera Dimensiones Contrato")
             {
                 Image = Dimensions;

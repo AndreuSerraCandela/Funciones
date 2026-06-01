@@ -169,6 +169,32 @@ pageextension 80110 "JobKuaraList" extends "Job List"
 
                 end;
             }
+            action("Añadir a Planificacion")
+            {
+                Image = Add;
+                ApplicationArea = All;
+                Caption = 'Añadir a Planificacion';
+                trigger OnAction()
+                var
+                    PlanificacionFijaciontemp: Record "Planificación Fijación" temporary;
+                    PlanificacionFijacion: Record "Planificación Fijación";
+                    Job: Record Job;
+                    ControlProcesos: Codeunit ControlProcesos;
+                begin
+                    Job.Get(Rec."No.");
+                    ControlProcesos.PlanifFijInicializarDesdeProyecto(PlanificacionFijaciontemp, Job);
+                    If PlanificacionFijaciontemp.Insert() then;
+                    Commit();
+                    If Page.RunModal(Page::"Planificar Fijación", PlanificacionFijaciontemp) = Action::LookupOK Then begin
+                        PlanificacionFijacion := PlanificacionFijaciontemp;
+                        if PlanificacionFijacion."Fecha generación" = 0D then
+                            PlanificacionFijacion."Fecha generación" := WorkDate();
+                        PlanificacionFijacion."No. Opis" := PlanificacionFijacion."No. Soportes";
+                        PlanificacionFijacion.Insert(true);
+                    end;
+
+                end;
+            }
             action("Crear Proyecto Fijación")
             {
                 ApplicationArea = All;

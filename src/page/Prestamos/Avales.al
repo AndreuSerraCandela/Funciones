@@ -1,17 +1,18 @@
 ﻿
 /// <summary>
-/// Page Rentings (ID 50098).
+/// Page Avales (ID 50075).
 /// </summary>
-page 50065 Rentings
+page 50075 Avales
 {
+    Caption = 'Avales';
     PageType = List;
     UsageCategory = Lists;
     ApplicationArea = All;
     SourceTable = "Cabecera Prestamo";
     SourceTableView = SORTING(Empresa)
                     WHERE(Empresa = FILTER(<> ''),
-                          "Importe Prestamo" = FILTER(<> 0), Renting = const(true));
-    CardPageId = "Cabecera Renting";
+                          "Importe Prestamo" = FILTER(<> 0), Aval = const(true));
+    CardPageId = "Cabecera Aval";
 
 
     layout
@@ -62,7 +63,7 @@ page 50065 Rentings
                 {
                     ApplicationArea = All;
                 }
-                field("Código Del Renting"; Cab)
+                field("Código Aval"; Cab)
                 {
                     ApplicationArea = All;
                 }
@@ -576,6 +577,14 @@ page 50065 Rentings
                     Contruye();
                 end;
             }
+            action("Resumen Avales")
+            {
+                ApplicationArea = All;
+                Image = Revenue;
+                Caption = 'Resumen Avales';
+                RunObject = page Avales;
+            }
+
         }
 
         // { 1170190013;TextBox;24250;4620 ;11177;440  ;ParentControl=1170190000;
@@ -917,6 +926,8 @@ page 50065 Rentings
 
     PROCEDURE Vto(var Cab: Record "Cabecera Prestamo"): Date;
     BEGIN
+        if Cab.Aval then
+            exit(Cab."Fecha Préstamo");
         if Cab."Fecha Préstamo" = 0D THEN EXIT(0D);
         EXIT(CALCDATE(STRSUBSTNO('%1M', Cab.Meses), Cab."Fecha Préstamo"));
     END;
@@ -957,6 +968,7 @@ page 50065 Rentings
                     rCab.SETFILTER(rCab.Empresa, '<>%1', '');
                     rCab.DELETEALL;
                     rCab.SETRANGE(rCab.Empresa);
+                    rCab.SetRange(Aval, true);
                     rDet.CHANGECOMPANY(rEmp.Name);
                     rDet.SETFILTER(rDet.Empresa, '<>%1', '');
                     rDet.DELETEALL;
@@ -1023,16 +1035,15 @@ page 50065 Rentings
     procedure DrilDown(i: Integer)
     var
         Cab: Record "Cabecera Prestamo";
-        Pres: Page "Cabecera Prestamo";
+        AvalCard: Page "Cabecera Aval";
     begin
         Cab.ChangeCompany(Rec.Empresa);
         Cab.SetRange("Código Del Prestamo", Rec."Cabecera Prestamo2");
-        if Cab.FindFirst() Then begin
-            Pres.Empresa(Rec.Empresa);
-            Pres.CambiarEmpresa(Rec.Empresa);
-            Pres.SetRecord(Cab);
-            Pres.SetTableView(Cab);
-            Pres.RunModal();
+        if Cab.FindFirst() then begin
+            AvalCard.Empresa(Rec.Empresa);
+            AvalCard.SetRecord(Cab);
+            AvalCard.SetTableView(Cab);
+            AvalCard.RunModal();
         end;
 
     end;

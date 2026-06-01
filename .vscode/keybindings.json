@@ -1,0 +1,16 @@
+[
+    {
+        "key": "ctrl+shift+b",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "al.package",
+                {
+                    "command": "workbench.action.tasks.runTask",
+                    "args": "Copiar .app a Malla"
+                }
+            ]
+        },
+        "when": "alExtensionActive"
+    }
+]

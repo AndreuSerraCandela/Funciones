@@ -2474,6 +2474,12 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
 
     end;
 
+    internal procedure CambiarVto(var Rec: Record "Sales Invoice Header"; NewDueDate: Date)
+    begin
+        Rec."Due Date" := NewDueDate;
+        Rec.Modify();
+    end;
+
     local procedure CreateCarteraDoc(Var PstDoc: Record "Posted Cartera Doc.")
     var
         Doc: Record "Cartera Doc.";
@@ -3645,6 +3651,86 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
         exit(Base64Content);
     end;
 
+    procedure PlanifFijInicializarDesdeProyecto(var PlanificacionFijacion: Record "Planificación Fijación"; Job: Record Job)
+    var
+        Customer: Record Customer;
+    begin
+        PlanificacionFijacion.Init();
+        PlanificacionFijacion."Nº Proyecto" := Job."No.";
+        PlanificacionFijacion.Nombre := CopyStr(Job.Description, 1, MaxStrLen(PlanificacionFijacion.Nombre));
+        PlanificacionFijacion.Fijar := CopyStr(Job.Description, 1, MaxStrLen(PlanificacionFijacion.Fijar));
+        PlanificacionFijacion."Nombre Comercial" := Job."Nombre Comercial";
+        PlanificacionFijacion."SalesPerson Code" := Job."Cód. vendedor";
+        PlanificacionFijacion."Fecha generación" := WorkDate();
+        PlanificacionFijacion."Fecha fijación" := Job."Fecha Fijación";
+        if PlanificacionFijacion."Fecha fijación" = 0D then
+            PlanificacionFijacion."Fecha fijación" := WorkDate();
+        PlanificacionFijacion."Tipo Soporte" := PlanifFijMapearTipoSoporteDesdeProyecto(Job);
+        PlanificacionFijacion.Validado := true;
+        if Customer.Get(Job."Bill-to Customer No.") then
+            PlanificacionFijacion.Grupo := Customer."No.";
+        PlanifFijActualizarNoSoportes(PlanificacionFijacion);
+    end;
+
+    procedure PlanifFijActualizarNoSoportes(var PlanificacionFijacion: Record "Planificación Fijación")
+    begin
+        PlanificacionFijacion."No. Soportes" := PlanifFijCalcularNoSoportes(PlanificacionFijacion."Nº Proyecto", PlanificacionFijacion."Tipo Soporte");
+        PlanificacionFijacion."No. Opis" := PlanificacionFijacion."No. Soportes";
+    end;
+
+    procedure PlanifFijCalcularNoSoportes(JobNo: Code[20]; TipoSoporte: Option): Integer
+    var
+        JobPlanningLine: Record "Job Planning Line";
+        Resource: Record Resource;
+        TotalSoportes: Decimal;
+    begin
+        if JobNo = '' then
+            exit(0);
+
+        JobPlanningLine.SetRange("Job No.", JobNo);
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
+        if JobPlanningLine.FindSet() then
+            repeat
+                if Resource.Get(JobPlanningLine."No.") then
+                    if PlanifFijRecursoCoincideTipoSoporte(Resource."Tipo Recurso", TipoSoporte) then
+                        TotalSoportes += JobPlanningLine."Cdad. Soportes";
+            until JobPlanningLine.Next() = 0;
+
+        exit(Round(TotalSoportes, 1, '='));
+    end;
+
+    local procedure PlanifFijRecursoCoincideTipoSoporte(TipoRecurso: Code[20]; TipoSoporte: Option): Boolean
+    var
+        PlanificacionFijacion: Record "Planificación Fijación";
+    begin
+        case TipoSoporte of
+            PlanificacionFijacion."Tipo Soporte"::Opis:
+                exit(TipoRecurso in ['OPI', 'OPIS', 'LUM1,5X1,1', 'OPI ROT.', 'PLANIMETRO', 'RELOJ']);
+            PlanificacionFijacion."Tipo Soporte"::Vallas,
+            PlanificacionFijacion."Tipo Soporte"::"Vallas Peatones":
+                exit(TipoRecurso in ['VALLA', 'VALLAS', 'P.PEATOAL', 'VPEATON']);
+            PlanificacionFijacion."Tipo Soporte"::Indicadores:
+                exit(TipoRecurso in ['INDICADOR', 'VPEATON', 'MEDIANERA']);
+        end;
+    end;
+
+    local procedure PlanifFijMapearTipoSoporteDesdeProyecto(Job: Record Job): Option
+    var
+        PlanificacionFijacion: Record "Planificación Fijación";
+    begin
+        case Job."Tipo soporte" of
+            Job."Tipo soporte"::Opis:
+                exit(PlanificacionFijacion."Tipo Soporte"::Opis);
+            Job."Tipo soporte"::"OPIs":
+                exit(PlanificacionFijacion."Tipo Soporte"::Opis);
+            Job."Tipo soporte"::Vallas:
+                exit(PlanificacionFijacion."Tipo Soporte"::Vallas);
+            Job."Tipo soporte"::Indicadores:
+                exit(PlanificacionFijacion."Tipo Soporte"::Indicadores);
+            else
+                exit(PlanificacionFijacion."Tipo Soporte"::" ");
+        end;
+    end;
 
 }
 

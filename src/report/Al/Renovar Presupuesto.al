@@ -194,6 +194,9 @@ report 50006 "Renovar presupuesto"
         Lin.VALIDATE("Unit Cost", DesdeLin."Unit Cost");
         Lin.Validate("% Dto. Compra", DesdeLin."% Dto. Compra");
         Lin.VALIDATE("Unit Price", DesdeLin."Unit Price");
+        lin."Cdad. Soportes" := DesdeLin."Cdad. Soportes";
+        lin.Duracion := DesdeLin.Duracion;
+        lin."Tipo Duracion" := DesdeLin."Tipo Duracion";
         //$003(F)
         lin.Renovando := false;
         If Resource.Get(DesdeLin."No.") then begin

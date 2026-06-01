@@ -34,6 +34,7 @@ codeunit 50001 "Gestion Facturación"
         FechaV: Date;
         FechaC: Date;
         Eventos: Codeunit ControldeEventosCodeunits;
+
     BEGIN
         //rCab.GET(rCab."Document Type"::Order,'CTO13-00898');
         //GeneraContrasientoprepago(rCab,TODAY);
@@ -67,6 +68,7 @@ codeunit 50001 "Gestion Facturación"
                 ReleaseSalesDoc.PerformManualRelease(Contratos);
                 commit;
             Until Contratos.Next() = 0;
+        Commit();
 
     END;
 
@@ -734,6 +736,7 @@ codeunit 50001 "Gestion Facturación"
             rCabFra."Fecha Vencimiento" := wFecVto;
             if (rCabFra."Due Date" <> wFecVto) AND (wFecVto <> 0D) THEN
                 rCabFra.VALIDATE("Due Date", wFecVto);
+            rCabFra."Fecha Vencimiento" := rCabFra."Due Date";
             if rPropVto.FIND('-') THEN
                 rCabFra."Línea Borrador" := i;
             if rPropVto."Customer Order No." <> '' THEN
@@ -1090,10 +1093,14 @@ codeunit 50001 "Gestion Facturación"
         END;
         //$034(F)
         rCab.TestField(Status, rCab.Status::Released);
+        rPlazos.Reset();
+        rPlazos.SetRange("Cód. términos facturación", rCab."Cód. términos prepago");
+        rPlazos.FindFirst();
         FOR i := 1 TO wBucle DO BEGIN
             finestra.UPDATE(3, i);
-            if rTnos."Nº de Facturas" = 0 then
+            if rTnos."Nº de Facturas" = 0 then begin
                 rPlazos.TESTFIELD("% del total");
+            end;
             rCab.Status := rCab.Status::Open;
             Plazo := rPlazos."% del total";
             if Prepago <> 0 then
@@ -1110,7 +1117,8 @@ codeunit 50001 "Gestion Facturación"
             Distancia := Round(wMesesCont * Plazo / 100, 1, '=');
 
             Hasta := Calcdate(Format(Distancia) + 'D', Desde);// CalcDate(rPlazos."Distancia entre plazos", Desde);
-            GenerarBorradorPrepago(rCab, 0, false, rPlazos."% del total", Desde, Hasta, fechar, i, true);
+            If not GenerarBorradorPrepago(rCab, 0, false, rPlazos."% del total", Desde, Hasta, fechar, i, true) then
+                Error('No se ha podido generar la factura prepago');
             fechaR := CALCDATE(rPlazos."Distancia entre plazos", fechaR);
             if Distancia < 0 Then Distancia := 0; //FCL-19/04/10';
             Desde := hasta;/////if (rTnos."Nº de plazos" = 13) AND (i = 2) THEN                   //FCL-18/06/04   //$023
@@ -2340,7 +2348,10 @@ codeunit 50001 "Gestion Facturación"
                     rPropuesta."Texto de registro" := rCab."No.";
                     rPropuesta."Fecha Factura" := rCab."Fecha registro prepago";
                     //If Not rTerminos.GET(rPropuesta."Cód. términos Pago") then rTerminos.Init();
-                    rPropuesta."Fecha Vencimiento" := rCab."Prepayment Due Date";       //cojo la fecha de la pantalla del contrato
+                    If rCab."Prepayment Due Date" = 0D Then
+                        rPropuesta."Fecha Vencimiento" := rCab."Fecha registro prepago"
+                    Else
+                        rPropuesta."Fecha Vencimiento" := rCab."Prepayment Due Date";       //cojo la fecha de la pantalla del contrato
                 END;
                 //$034(F)
 
@@ -2846,6 +2857,7 @@ codeunit 50001 "Gestion Facturación"
         rCabTemp."Assigned User ID" := UserId;
         rCabTemp.VALIDATE("Posting Date", pPropuesta."Fecha Factura");
         rCabTemp.VALIDATE("Due Date", pPropuesta."Fecha Vencimiento");
+        rCabTemp."Fecha Vencimiento" := rCabFra."Due Date";
         rCabTemp.VALIDATE("Sell-to Customer No.", pCab."Sell-to Customer No.");
         rCabTemp.VALIDATE("Bill-to Customer No.", pCab."Bill-to Customer No.");
         rCabTemp.VALIDATE("Currency Code", pCab."Currency Code");
@@ -3066,7 +3078,7 @@ codeunit 50001 "Gestion Facturación"
 
     PROCEDURE GenerarBorradorPrepago(VAR pSalesHeader: Record 36;
     pDocumentType: Option Invoice,"Credit Memo"; CompresPrepayment: Boolean;
-     PorCentajePrepago: Decimal; Desde: date; Hasta: Date; FECHAR: DATE; i: Integer; NuevoSistema: Boolean)
+     PorCentajePrepago: Decimal; Desde: date; Hasta: Date; FECHAR: DATE; i: Integer; NuevoSistema: Boolean): Boolean
     VAR
         rCabVenta: Record 36;
         rLinVenta: Record 37;
@@ -3114,12 +3126,12 @@ codeunit 50001 "Gestion Facturación"
         SalesHeader.TESTFIELD("Document Date");
 
         if NOT cPrepagoStd.CheckOpenPrepaymentLines(SalesHeader, pDocumentType) THEN
-            if not CompresPrepayment then exit else Error(Text1000);
+            if not CompresPrepayment then exit(false) else Error(Text1000);
 
         CASE pDocumentType OF
             pDocumentType::Invoice:
                 BEGIN
-                    SalesHeader.TESTFIELD("Prepayment Due Date");
+                    //SalesHeader.TESTFIELD("Prepayment Due Date");
                     SalesHeader.TESTFIELD("Prepmt. Cr. Memo No.", '');
                     if SalesHeader."Prepayment No." = '' THEN
                         SalesHeader.TESTFIELD("Prepayment No. Series");
@@ -3170,6 +3182,7 @@ codeunit 50001 "Gestion Facturación"
         rCabVenta.VALIDATE("Prepayment No. Series", SalesSetup."Posted Prepmt. Inv. Nos.");
         rCabVenta.VALIDATE("Posting Date", fechar);
         rCabVenta.VALIDATE("Document Date", FECHAR);
+        rCabVenta."Fecha Vencimiento" := rCabVenta."Due Date";
         rCabVenta.VALIDATE("Shortcut Dimension 1 Code", SalesHeader."Shortcut Dimension 1 Code");
         rCabVenta.VALIDATE("Shortcut Dimension 2 Code", SalesHeader."Shortcut Dimension 2 Code");
         if NuevoSistema then
@@ -3193,8 +3206,10 @@ codeunit 50001 "Gestion Facturación"
                 rCabFra."Línea Borrador" := i;
             if rPropVto."Customer Order No." <> '' THEN
                 rCabFra.VALIDATE("Customer Order No.", rPropVto."Customer Order No.");
+            rCabVenta."Fecha Vencimiento" := rCabVenta."Due Date";
         end else
             rCabVenta.VALIDATE("Due Date", SalesHeader."Prepayment Due Date");
+        rCabVenta."Fecha Vencimiento" := rCabVenta."Due Date";
         rCabVenta.VALIDATE("Pmt. Discount Date", SalesHeader."Prepmt. Pmt. Discount Date");
         rCabVenta.VALIDATE("Payment Discount %", SalesHeader."Prepmt. Payment Discount %");
         rCabVenta.VALIDATE("Invoice Disc. Code", SalesHeader."Invoice Disc. Code");                         //$026
@@ -3417,6 +3432,7 @@ codeunit 50001 "Gestion Facturación"
             rPropVto.FindLast();
             CalcularUtimaFactura(rCabVenta, rPropVto, true);
         end;
+        exit(true);
     END;
 
     PROCEDURE AñadirLineasPrepago(pSalesHeader: Record 36; pDocumentType: Option Invoice,"Credit Memo"; pDocumentNo: Code[20]; pLinea: Integer);

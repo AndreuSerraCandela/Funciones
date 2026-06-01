@@ -1532,6 +1532,7 @@ codeunit 50015 ControldeEventosCodeunits
         If PurchHeader."Document Type" = PurchHeader."Document Type"::Invoice Then begin
             If Not ImporteProv(PurchHeader, Impv, ImpC) Then Error(StrSubstNo('Compruebe los importes venta %1 compra %2', Impv, ImpC));
             If Not FechaProv(PurchHeader, Fechav, FechaC) Then Error(StrSubstNo('Compruebe las fechas venta %1 compra %2', Format(FechaV, 0, '<Day,2>/<Month,2>/<Year>'), Format(FechaC, 0, '<Day,2>/<Month,2>/<Year>')));
+            PurchHeader.TestField("VAT Registration No.");
         end;
         if PurchHeader."Empresa Factura" <> '' Then begin
             if PurchHeader.ContabilizaInter then

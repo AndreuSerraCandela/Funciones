@@ -985,7 +985,7 @@ Codeunit 50014 ContabAlb
         lGenLedgerSetup.GET;
         if lGenLedgerSetup."No Comprobar Redondeo" then exit;
         if pImporte <> 0 then
-            if ABS(pImporte) > 1000 Then Error('Imposible desglosar, concacte con informática');
+            if ABS(pImporte) > 1000 Then Error('Imposible desglosar, contacte con informática');
 
     End;
 
@@ -7737,12 +7737,12 @@ Codeunit 50014 ContabAlb
                         lPurchLineArchive."Qty. to Invoice" := 1;
                         lPurchLineArchive."Qty. to Receive" := 1;
                         lPurchLineArchive."Qty. Rcd. Not Invoiced" := 1;
-                        If ABS(lDImporte) > 1000 Then Error('Imposible desglosar, concacte con informática');
+                        If ABS(lDImporte) > 1000 Then Error('Imposible desglosar, contacte con informática');
                         lPurchLineArchive."Direct Unit Cost" := lDImporte;
                         lPurchLineArchive."Line Discount %" := 0;
                         lPurchLineArchive."VAT Base Amount" := lDImporte;
                         lPurchLineArchive.Amount := lDImporte;
-                        If ABS(lDImporteIvaIncluido) > 1000 Then Error('Imposible desglosar, concacte con informática');
+                        If ABS(lDImporteIvaIncluido) > 1000 Then Error('Imposible desglosar, contacte con informática');
                         lPurchLineArchive."Amount Including VAT" := lDImporteIvaIncluido;
                         lPurchLineArchive."Quantity (Base)" := 1;
                         lPurchLineArchive."Line Amount" := lDImporte;
@@ -8366,6 +8366,12 @@ Codeunit 50014 ContabAlb
     begin
         gGenLedgerSetup.Get();
         lpCProdPostingGr := pCProdPostingGr;
+        If pResource."Global Dimension 1 Code" = '' Then begin
+            if Empresa <> '' Then begin
+                pResource.ChangeCompany(Empresa);
+                if not pResource.Get(pResource."No.") Then pResource.Init();
+            end;
+        end;
         if pResource."Global Dimension 1 Code" = '' THEN
             ERROR(glSinDimension
         + glEnelProyecto, pResource."No.", Empresa, gGenLedgerSetup."Global Dimension 1 Code", pCJob);
