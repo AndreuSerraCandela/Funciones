@@ -9,16 +9,7 @@ pageextension 80103 OrderProcesor extends "Order Processor Role Center"
         {
             Visible = false;
         }
-        addfirst(rolecenter)
-        {
-
-            part(PanelMedios; "Panel Medios")
-            {
-                ApplicationArea = All;
-                Caption = 'Panel Medios';
-                Visible = true;
-            }
-        }
+        // Panel Medios: usar perfil "Gestión Medios" (Role Center 50141). Aquí solo cues de contratos.
         addafter(Control1901851508)
         {
             part(ContratosASctivities; "Contratos Activities")
@@ -29,7 +20,6 @@ pageextension 80103 OrderProcesor extends "Order Processor Role Center"
             part(SystemActivities; "Systemas Activities")
             {
                 ApplicationArea = All;
-
             }
         }
     }

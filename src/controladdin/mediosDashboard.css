@@ -14,11 +14,20 @@
 html,
 body {
     background: var(--tip-bg);
+    box-sizing: border-box;
     color: var(--tip-text);
     font-family: "Segoe UI", Arial, sans-serif;
     height: 100%;
     margin: 0;
+    min-width: 100%;
     overflow: hidden;
+    width: 100%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 .tip-dashboard {
@@ -26,13 +35,55 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    height: 100vh;
+    height: 100%;
+    max-width: none;
     min-height: 0;
+    min-width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 14px;
     padding-bottom: 28px;
+    width: 100%;
+}
+
+/* Embebido en Role Center: ocupa todo el ancho del part */
+.tip-dashboard--embed {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+}
+
+html:has(.tip-dashboard--embed),
+body:has(.tip-dashboard--embed) {
+    height: auto;
+    overflow: visible;
+}
+
+.tip-dashboard--embed .tip-kpis--3 {
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+}
+
+.tip-dashboard--embed .tip-main-grid--2 {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+}
+
+.tip-dashboard--embed .tip-row-firma-fact {
+    grid-template-columns: minmax(220px, 0.75fr) minmax(360px, 1.25fr);
+}
+
+.tip-dashboard--embed .tip-header {
+    display: none;
+}
+
+.tip-dashboard--embed .tip-rc-period {
+    background: #e7f5ff;
+    border: 1px solid #b7ddff;
+    border-radius: 4px;
+    color: #115f9a;
+    font-size: 12px;
+    margin-bottom: 4px;
+    padding: 6px 10px;
 }
 
 .tip-header {

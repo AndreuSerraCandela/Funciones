@@ -1,8 +1,8 @@
 controladdin "Medios Dashboard AddIn"
 {
     HorizontalStretch = true;
-    MinimumHeight = 750;
-    RequestedHeight = 950;
+    MinimumHeight = 960;
+    RequestedHeight = 960;
     VerticalStretch = true;
 
     Scripts = 'src/controladdin/mediosDashboard.js';

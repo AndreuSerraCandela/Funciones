@@ -450,6 +450,8 @@
         filterYear = data.filterYear || '';
         prevYear = data.prevYear || '';
         proyTotal = (p.planning || 0) + (p.quote || 0) + (p.open || 0) + (p.completed || 0);
+        var embed = data.layoutMode === 'embed';
+        var dashboardClass = 'tip-dashboard' + (embed ? ' tip-dashboard--embed' : '');
         var firmaBottomSection = '';
         if (data.portafirmas) {
             firmaBottomSection =
@@ -474,12 +476,15 @@
         }
 
         document.body.innerHTML =
-            '<main class="tip-dashboard" data-filter-year="' + escapeHtml(filterYear) + '" data-prev-year="' + escapeHtml(prevYear) + '">' +
-            '<section class="tip-header">' +
-            '<div><div class="tip-title">Panel Medios</div>' +
-            '<div class="tip-subtitle">Proyectos, fijación y contratos</div></div>' +
-            '<div class="tip-pill">' + escapeHtml(data.period || '') + '</div>' +
-            '</section>' +
+            '<main class="' + dashboardClass + '" data-filter-year="' + escapeHtml(filterYear) + '" data-prev-year="' + escapeHtml(prevYear) + '">' +
+            (embed ? '' : (
+                '<section class="tip-header">' +
+                '<div><div class="tip-title">Panel Medios</div>' +
+                '<div class="tip-subtitle">Proyectos, fijación y contratos</div></div>' +
+                '<div class="tip-pill">' + escapeHtml(data.period || '') + '</div>' +
+                '</section>'
+            )) +
+            (embed && data.period ? '<div class="tip-rc-period">' + escapeHtml(data.period) + '</div>' : '') +
             '<section class="tip-kpis tip-kpis--3">' +
             kpi('Proyectos', proyTotal, 'sin fijación · abrir lista', '', 'proy-total', filterYear) +
             kpi('Fijación', f.total || 0, 'proyectos de fijación · abrir lista', 'good', 'fij-total', filterYear) +

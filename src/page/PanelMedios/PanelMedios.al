@@ -8,52 +8,6 @@ page 50140 "Panel Medios"
     {
         area(content)
         {
-            group(Filtros)
-            {
-                Caption = 'Filtros';
-
-                field(YearFilter; FilterYear)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Año';
-                    MinValue = 2000;
-                    MaxValue = 2100;
-                    ToolTip = 'Filtra por año (fecha de creación del proyecto / fecha registro del contrato).';
-
-                    trigger OnValidate()
-                    begin
-                        CalculateDashboard();
-                        RequestFacturacionCacheRefresh();
-                    end;
-                }
-                field(SalespersonFilter; FilterSalespersonCode)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Comercial';
-                    TableRelation = "Salesperson/Purchaser";
-                    ToolTip = 'Vacío = todos los comerciales.';
-
-                    trigger OnValidate()
-                    begin
-                        CalculateDashboard();
-                        RequestFacturacionCacheRefresh();
-                    end;
-                }
-                field(CustomerFilter; FilterCustomerNo)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Cliente';
-                    TableRelation = Customer;
-                    ToolTip = 'Vacío = todos los clientes.';
-
-                    trigger OnValidate()
-                    begin
-                        CalculateDashboard();
-                        RequestFacturacionCacheRefresh();
-                    end;
-                }
-            }
-
             usercontrol(Dashboard; "Medios Dashboard AddIn")
             {
                 ApplicationArea = All;
@@ -191,6 +145,18 @@ page 50140 "Panel Medios"
     {
         area(processing)
         {
+            action(FiltrosPanel)
+            {
+                ApplicationArea = All;
+                Caption = 'Filtros';
+                Image = Filter;
+                ToolTip = 'Año, comercial y cliente del panel.';
+
+                trigger OnAction()
+                begin
+                    OpenFiltersDialog();
+                end;
+            }
             //cLIENTES
             action(OpenCustomerList)
             {
@@ -447,6 +413,19 @@ page 50140 "Panel Medios"
         BuildPeriodText();
         BuildDashboardPayload();
         SendDashboard();
+    end;
+
+    local procedure OpenFiltersDialog()
+    var
+        FiltrosDlg: Page "Panel Medios Filtros";
+    begin
+        FiltrosDlg.SetValues(FilterYear, FilterSalespersonCode, FilterCustomerNo);
+        if FiltrosDlg.RunModal() = ACTION::OK then begin
+            FiltrosDlg.GetValues(FilterYear, FilterSalespersonCode, FilterCustomerNo);
+            CalculateDashboard();
+            RequestFacturacionCacheRefresh();
+            SendDashboard();
+        end;
     end;
 
     local procedure OpenCustomerList()
@@ -770,6 +749,7 @@ page 50140 "Panel Medios"
         Root.Add('billingCutoff', BillingCutoffText);
 
         Root.Add('period', PeriodText);
+        Root.Add('layoutMode', 'embed');
         Root.WriteTo(DashboardPayload);
     end;
 
