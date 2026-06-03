@@ -9,12 +9,23 @@ pageextension 80103 OrderProcesor extends "Order Processor Role Center"
         {
             Visible = false;
         }
+        addfirst(rolecenter)
+        {
+
+            part(PanelMedios; "Panel Medios")
+            {
+                ApplicationArea = All;
+                Caption = 'Panel Medios';
+                Visible = true;
+            }
+        }
         addafter(Control1901851508)
         {
             part(ContratosASctivities; "Contratos Activities")
             {
                 ApplicationArea = All;
             }
+
             part(SystemActivities; "Systemas Activities")
             {
                 ApplicationArea = All;

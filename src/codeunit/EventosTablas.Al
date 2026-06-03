@@ -36,6 +36,7 @@ codeunit 50016 ControldeEventosTables
     [EventSubscriber(ObjectType::Table, 13, 'OnBeforeDeleteEvent', '', false, false)]
     LOCAL PROCEDURE Table13_OnDelete(VAR Rec: Record 13; RunTrigger: Boolean)
     BEGIN
+        If Rec.IsTemporary() then exit;
         ERROR('No se pueden eliminar vendedores');
     END;
     #endregion Tabla13
@@ -2447,7 +2448,7 @@ codeunit 50016 ControldeEventosTables
         Dto := Tipo."% Dto. Compra";
         if Res."Empresa Origen" <> '' then
             Rec."Unit Cost" := Rec."Unit Price";
-        
+
         Rec."Precio Tarifa" := Up;
         If Rec."Unit Price" <> 0 Then begin
             if Res."Empresa Origen" <> '' then begin

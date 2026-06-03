@@ -3732,5 +3732,146 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
         end;
     end;
 
+    /// <summary>
+    /// Totales de contrato para panel y listas: importe contrato, facturado+borradores (TotImp) y desglose.
+    /// Mismo criterio que Lista contratos venta / Calcular totales.
+    /// </summary>
+    procedure GetContractAmounts(Contrato: Record "Sales Header"; UntilDate: Date; var TotCont: Decimal; var TotImp: Decimal; var ImporteFacturado: Decimal; var ImportePendiente: Decimal)
+    begin
+        TotCont := 0;
+        TotImp := 0;
+        ImporteFacturado := 0;
+        ImportePendiente := 0;
+        if Contrato."Document Type" <> Contrato."Document Type"::Order then
+            exit;
+        if Contrato.Estado in [Contrato.Estado::Cancelado, Contrato.Estado::Anulado] then
+            exit;
+
+        CalcContratoImportesFacturacion(Contrato, UntilDate, TotCont, ImporteFacturado, ImportePendiente);
+        TotImp := ImporteFacturado + ImportePendiente;
+    end;
+
+    procedure GetContratoFacturacionDesglose(Contrato: Record "Sales Header"; UntilDate: Date; var ImporteFacturado: Decimal; var ImportePendiente: Decimal)
+    var
+        TotCont: Decimal;
+        TotImp: Decimal;
+    begin
+        GetContractAmounts(Contrato, UntilDate, TotCont, TotImp, ImporteFacturado, ImportePendiente);
+    end;
+
+    local procedure CalcContratoImportesFacturacion(Contrato: Record "Sales Header"; UntilDate: Date; var TotCont: Decimal; var ImporteFacturado: Decimal; var ImportePendiente: Decimal)
+    begin
+        TotCont := GetContratoImporteTotal(Contrato);
+        ImporteFacturado := GetContratoImporteFacturadoRegistrado(Contrato, UntilDate);
+        ImportePendiente := GetContratoImporteBorradores(Contrato, UntilDate);
+    end;
+
+    local procedure GetContratoImporteTotal(Contrato: Record "Sales Header"): Decimal
+    var
+        TempSalesLine: Record "Sales Line" temporary;
+        TotalSalesLine: Record "Sales Line";
+        TotalSalesLineLCY: Record "Sales Line";
+        SalesPost: Codeunit "Sales-Post";
+    begin
+        Clear(TempSalesLine);
+        Clear(TotalSalesLine);
+        Clear(TotalSalesLineLCY);
+        SalesPost.GetSalesLines(Contrato, TempSalesLine, 0);
+        SumSalesLinesTempTarea(
+          Contrato, TempSalesLine, 0, TotalSalesLine, TotalSalesLineLCY, '',
+          TotalSalesLine, TotalSalesLineLCY);
+        exit(TotalSalesLineLCY."Amount Including VAT");
+    end;
+
+    local procedure GetContratoImporteBorradores(Contrato: Record "Sales Header"; UntilDate: Date): Decimal
+    var
+        DraftHeader: Record "Sales Header";
+        TempSalesLine: Record "Sales Line" temporary;
+        TotalSalesLine: Record "Sales Line";
+        TotalSalesLineLCY: Record "Sales Line";
+        SalesPost: Codeunit "Sales-Post";
+        ImpBorFac: Decimal;
+        ImpBorAbo: Decimal;
+        DummyDec: Decimal;
+        DummyTxt: Text[250];
+    begin
+        ImpBorFac := 0;
+        ImpBorAbo := 0;
+        if Contrato."No." = '' then
+            exit(0);
+
+        Contrato.CalcFields("Borradores de Factura", "Borradores de Abono");
+        if (Contrato."Borradores de Factura" = 0) and (Contrato."Borradores de Abono" = 0) then
+            exit(0);
+
+        DraftHeader.Reset();
+        DraftHeader.SetCurrentKey("Nº Proyecto");
+        if Contrato."Nº Proyecto" <> '' then
+            DraftHeader.SetRange("Nº Proyecto", Contrato."Nº Proyecto");
+        DraftHeader.SetRange("Nº Contrato", Contrato."No.");
+        DraftHeader.SetFilter("Document Type", '%1|%2', DraftHeader."Document Type"::Invoice, DraftHeader."Document Type"::"Credit Memo");
+        if DraftHeader.FindSet() then
+            repeat
+                if (UntilDate = 0D) or (DraftHeader."Posting Date" = 0D) or (DraftHeader."Posting Date" <= UntilDate) then begin
+                    Clear(TempSalesLine);
+                    Clear(TotalSalesLine);
+                    Clear(TotalSalesLineLCY);
+                    SalesPost.GetSalesLines(DraftHeader, TempSalesLine, 0);
+                    SalesPost.SumSalesLinesTemp(
+                      DraftHeader, TempSalesLine, 0, TotalSalesLine, TotalSalesLineLCY,
+                      DummyDec, DummyTxt, DummyDec, DummyDec, DummyDec);
+                    if DraftHeader."Document Type" = DraftHeader."Document Type"::Invoice then
+                        ImpBorFac += TotalSalesLineLCY."Amount Including VAT"
+                    else
+                        ImpBorAbo += TotalSalesLineLCY."Amount Including VAT";
+                end;
+            until DraftHeader.Next() = 0;
+
+        exit(ImpBorFac - ImpBorAbo);
+    end;
+
+    local procedure GetContratoImporteFacturadoRegistrado(Contrato: Record "Sales Header"; UntilDate: Date): Decimal
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        ImpFac: Decimal;
+        ImpAbo: Decimal;
+    begin
+        ImpFac := 0;
+        ImpAbo := 0;
+        if Contrato."No." = '' then
+            exit(0);
+
+        Contrato.CalcFields("Facturas Registradas", "Abonos Registrados");
+
+        if Contrato."Facturas Registradas" <> 0 then begin
+            SalesInvHeader.Reset();
+            SalesInvHeader.SetCurrentKey("Nº Proyecto", "Nº Contrato");
+            SalesInvHeader.SetRange("Nº Contrato", Contrato."No.");
+            if UntilDate <> 0D then
+                SalesInvHeader.SetFilter("Posting Date", '..%1', UntilDate);
+            if SalesInvHeader.FindSet() then
+                repeat
+                    SalesInvHeader.CalcFields("Amount Including VAT");
+                    ImpFac += SalesInvHeader."Amount Including VAT";
+                until SalesInvHeader.Next() = 0;
+        end;
+
+        if Contrato."Abonos Registrados" <> 0 then begin
+            SalesCrMemoHeader.Reset();
+            SalesCrMemoHeader.SetCurrentKey("Nº Proyecto", "Nº Contrato");
+            SalesCrMemoHeader.SetRange("Nº Contrato", Contrato."No.");
+            if UntilDate <> 0D then
+                SalesCrMemoHeader.SetFilter("Posting Date", '..%1', UntilDate);
+            if SalesCrMemoHeader.FindSet() then
+                repeat
+                    SalesCrMemoHeader.CalcFields("Amount Including VAT");
+                    ImpAbo += SalesCrMemoHeader."Amount Including VAT";
+                until SalesCrMemoHeader.Next() = 0;
+        end;
+
+        exit(ImpFac - ImpAbo);
+    end;
+
 }
 

@@ -44,6 +44,10 @@ pageextension 80126 "SetupUsuarioKuara" extends "User Setup"
                 ApplicationArea = All;
 
             }
+            field("Mostrar Panel Medios"; Rec."Mostrar Pannel de Medios")
+            {
+                ApplicationArea = All;
+            }
 
 
 

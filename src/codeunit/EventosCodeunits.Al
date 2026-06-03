@@ -41,34 +41,47 @@ codeunit 50015 ControldeEventosCodeunits
         ProcesoCancelado: Label 'Proceso Cancelado por el usuario';
         Contacte: Label 'El proceso no puede continuar, Contacte con informática';
     #region Codeunit1
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
-    internal procedure OnAfterLogin()
-    var
-        Fichajes: Record Punches;
-        UserSetup: Record "User Setup";
-        Http: Codeunit HttpKuara;
-        Fecha: Date;
-        Como: Option User,Employee;
-    begin
-        // if UserSetup.Get(UserId) Then begin
-        //     if (UserSetup."employee gotimecloud" <> '')
-        //     and (UserSetup."username gotimecloud" <> '')
-        //     and (UserSetup."password gotimecloud" <> '') then begin
-        //         Fichajes.SetRange(Empleado, UserSetup."employee gotimecloud");
-        //         if Not Fichajes.FindLast() Then begin
-        //             Http.CreateFichaje(Userid, Como::User);
-        //         end else begin
-        //             Fecha := DT2Date(Fichajes.Fecha);
-        //             if Fecha < Today then begin
-        //                 Http.CreateFichaje(UserId, Como::User);
-        //                 exit;
-        //             end;
-        //             if Fichajes.Fecha < CreateDateTime(Today, 150000T) then
-        //                 Http.CreateFichaje(UserId, Como::User);
+    // [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', false, false)]
+    // internal procedure OnAfterLogin()
+    // var
+    //     Fichajes: Record Punches;
+    //     UserSetup: Record "User Setup";
+    //     Http: Codeunit HttpKuara;
+    //     Fecha: Date;
+    //     Como: Option User,Employee;
+    // begin
+    //     // if UserSetup.Get(UserId) Then begin
+    //     //     if (UserSetup."employee gotimecloud" <> '')
+    //     //     and (UserSetup."username gotimecloud" <> '')
+    //     //     and (UserSetup."password gotimecloud" <> '') then begin
+    //     //         Fichajes.SetRange(Empleado, UserSetup."employee gotimecloud");
+    //     //         if Not Fichajes.FindLast() Then begin
+    //     //             Http.CreateFichaje(Userid, Como::User);
+    //     //         end else begin
+    //     //             Fecha := DT2Date(Fichajes.Fecha);
+    //     //             if Fecha < Today then begin
+    //     //                 Http.CreateFichaje(UserId, Como::User);
+    //     //                 exit;
+    //     //             end;
+    //     //             if Fichajes.Fecha < CreateDateTime(Today, 150000T) then
+    //     //                 Http.CreateFichaje(UserId, Como::User);
 
-        //         end;
-        //     end;
-        //end;
+    //     //         end;
+    //     //     end;
+    //     //end;
+    // end;
+
+    // No usar OnCompanyOpen / OnCompanyOpenCompleted: se ejecutan sin cliente (publicación, Data Services).
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company Triggers", OnCompanyOpen, '', false, false)]
+    local procedure OpenPanelMediosAfterLogin()
+    var
+        UserSetup: Record "User Setup";
+    begin
+        if not GuiAllowed then
+            exit;
+        If UserSetup.Get(UserId) Then
+            if UserSetup."Mostrar Pannel de Medios" then
+                Page.RunModal(Page::"Panel Medios");
     end;
     #endregion Codeunit1
     #region Codeunit8

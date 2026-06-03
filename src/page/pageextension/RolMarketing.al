@@ -7,11 +7,12 @@ pageextension 80101 RolMarketing extends "Sales & Relationship Mgr. RC"
     {
         addafter(ApprovalsActivities)
         {
+
             part(ContratosActivities; "Contratos Activities")
             {
                 ApplicationArea = All;
                 Caption = 'Contratos';
-                Visible = true;
+
             }
         }
         modify(ApprovalsActivities)
@@ -175,4 +176,7 @@ pageextension 80101 RolMarketing extends "Sales & Relationship Mgr. RC"
 
 
     }
+
+
+
 }
