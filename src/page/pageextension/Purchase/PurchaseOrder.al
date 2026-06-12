@@ -80,6 +80,20 @@ pageextension 80114 "PedidoCompraKuara" extends "Purchase Order"
                 field("Contrato Venta"; Rec."Nº Contrato Venta") { ApplicationArea = All; }
                 field("Nombre Cliente Venta"; Rec."Nombre Cliente Venta") { ApplicationArea = All; }
                 field("Nombre 2 Cliente Venta"; Rec."Nombre 2 Cliente Venta") { ApplicationArea = All; }
+                field(PrimeraFacturaVentaCobrada; PrimeraFacturaVentaEstado(Rec."Nº Contrato Venta"))
+                {
+                    ApplicationArea = All;
+                    Caption = '1ª Factura venta cobrada';
+                    Editable = false;
+                    ToolTip = 'Indica si la primera factura de venta del contrato está registrada y cobrada.';
+                }
+                field(AutorizadoDireccion; TraeAutorizadoDireccion(Rec."Nº Proyecto"))
+                {
+                    ApplicationArea = All;
+                    Caption = 'Autorizado Dirección';
+                    Editable = false;
+                    ToolTip = 'Indica si el proyecto asociado está autorizado por Dirección.';
+                }
             }
         }
         modify("Order Date")
@@ -452,6 +466,60 @@ pageextension 80114 "PedidoCompraKuara" extends "Purchase Order"
         if rProy.GET(numproy) THEN
             EXIT(rProy.Description);
     END;
+
+    procedure TraeAutorizadoDireccion(NumProy: Code[20]): Boolean
+    var
+        Job: Record Job;
+    begin
+        if NumProy = '' then
+            exit(false);
+        if Job.Get(NumProy) then
+            exit(Job."Autorizado Dirección");
+        exit(false);
+    end;
+
+    procedure PrimeraFacturaVentaEstado(ContratoVentaNo: Code[20]): Text[50]
+    var
+        SalesContract: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        PrimeraFacturaEncontrada: Boolean;
+        PendienteCobroLbl: Label 'Pendiente de cobro';
+        NoFacturadaLbl: Label 'No facturada';
+        SiLbl: Label 'Sí';
+    begin
+        if ContratoVentaNo = '' then
+            exit('');
+
+        if not SalesContract.Get(SalesContract."Document Type"::Order, ContratoVentaNo) then
+            exit('');
+
+        SalesContract.CalcFields("Facturas Registradas");
+        if SalesContract."Facturas Registradas" = 0 then
+            exit(NoFacturadaLbl);
+
+        SalesInvoiceHeader.SetCurrentKey("Nº Proyecto", "Nº Contrato");
+        SalesInvoiceHeader.SetRange("Nº Contrato", ContratoVentaNo);
+        if not SalesInvoiceHeader.FindFirst() then
+            exit(NoFacturadaLbl);
+
+        PrimeraFacturaEncontrada := false;
+        CustLedgerEntry.SetRange("Customer No.", SalesInvoiceHeader."Sell-to Customer No.");
+        CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+        CustLedgerEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+        if CustLedgerEntry.FindSet() then
+            repeat
+                PrimeraFacturaEncontrada := true;
+                CustLedgerEntry.CalcFields("Remaining Amount");
+                if CustLedgerEntry."Remaining Amount" <> 0 then
+                    exit(PendienteCobroLbl);
+            until CustLedgerEntry.Next() = 0;
+
+        if not PrimeraFacturaEncontrada then
+            exit(PendienteCobroLbl);
+
+        exit(SiLbl);
+    end;
 
     PROCEDURE TraeFechaProy(fi: Text[1]): Date;
     VAR

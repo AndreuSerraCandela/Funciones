@@ -1423,7 +1423,7 @@ codeunit 50016 ControldeEventosTables
         If not Customer.Get(Rec."Sell-to Customer No.") then exit;
         if Rec."Precio Tarifa" = 0 Then
             Rec."Precio Tarifa" := Control.FindResourcePriceNew(Customer."Customer Posting Group" = 'AGENCIA',
-             Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No.", Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion");
+             Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No.", Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion", companyname);
 
     end;
     #endregion Tabla37
@@ -2191,7 +2191,7 @@ codeunit 50016 ControldeEventosTables
         Job.Status := Job.Status::Planning;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Status', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterValidateEvent, Status, false, false)]
     LOCAL PROCEDURE Tabla167_TipoOnValidateStatus(VAR Rec: Record 167; VAR xRec: Record 167; CurrFieldNo: Integer)
     VAR
         JobPlanningLine: Record "Job Planning Line";
@@ -2434,7 +2434,7 @@ codeunit 50016 ControldeEventosTables
         if Not Job.Get(Rec."Job No.") then exit;
         If not Customer.Get(Job."Bill-to Customer No.") then exit;
         Up := Control.FindResourcePricenew(Customer."Customer Price Group" = 'AGENCIA', Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No."
-        , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion");
+        , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion", companyname);
         //if Up = Rec."Unit Price" then exit;
         If Res."Empresa Origen" <> '' Then
             Tipo.ChangeCompany(Res."Empresa Origen");
@@ -2508,7 +2508,7 @@ codeunit 50016 ControldeEventosTables
         if Res.Get(JobPlanningLine."No.") then begin
             JobPlanningLine.Validate("Unit Price", Control.FindResourcePriceNew(
                 Customer."Customer Posting Group" = 'AGENCIA', Res."Customer Price Group", WorkDate,
-                JobPlanningLine."VAT %", Job, JobPlanningLine."No.", JobPlanningLine."Cdad. Soportes", JobPlanningLine.Duracion, JobPlanningLine."Tipo Duracion"));
+                JobPlanningLine."VAT %", Job, JobPlanningLine."No.", JobPlanningLine."Cdad. Soportes", JobPlanningLine.Duracion, JobPlanningLine."Tipo Duracion", companyname));
             if Tipo.Get(Res."Tipo Recurso") And (Res."Empresa Origen" <> '') then begin
                 JobPlanningLine.Validate("Unit Cost", JobPlanningLine."Unit Price");
                 JobPlanningLine.validate("% Dto. Compra", Tipo."% Dto. Compra");
@@ -2792,7 +2792,7 @@ codeunit 50016 ControldeEventosTables
         If not Customer.Get(Job."Bill-to Customer No.") then exit;
         if Rec."Precio Tarifa" = 0 Then
             Rec."Precio Tarifa" := Control.FindResourcePriceNew(Customer."Customer Posting Group" = 'AGENCIA', Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No."
-            , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion");
+            , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion", companyname);
         if Rec."Crear pedidos" = Rec."Crear pedidos"::"No crear pedido" then
             Rec."Unit Price" := 0 else
             If Rec."Unit Price" = 0 Then Rec."Unit Price" := Rec."Precio Tarifa";
@@ -3404,6 +3404,16 @@ codeunit 50016 ControldeEventosTables
 
 
     #endregion TablaLinOrdenPublicidad
+
+    #region Document Attachment
+    [EventSubscriber(ObjectType::Table, Database::"Document Attachment", OnAfterInsertEvent, '', false, false)]
+    local procedure DocumentAttachment_OnAfterInsert(var Rec: Record "Document Attachment"; RunTrigger: Boolean)
+    begin
+        if not RunTrigger then
+            exit;
+        Procesos.MediosRC_OnDocumentAttachmentInserted(Rec);
+    end;
+    #endregion Document Attachment
 
     #endregion Tables
 }

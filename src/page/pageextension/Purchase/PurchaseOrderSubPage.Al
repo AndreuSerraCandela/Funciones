@@ -103,6 +103,14 @@ pageextension 80202 PurchaseOrderSubPage Extends "Purchase Order Subform"
             field("Ref. catastral inmueble SII"; Rec."Ref. catastral inmueble SII") { ApplicationArea = All; }
             field(JobTaskNo; Rec."Job Task No.") { ApplicationArea = All; }
         }
+        modify("Direct Unit Cost")
+        {
+            Visible = Permiso;
+        }
+        modify("Line Amount")
+        {
+            Visible = Permiso;
+        }
     }
     VAR
         rCabCompra: Record 38;
@@ -114,6 +122,7 @@ pageextension 80202 PurchaseOrderSubPage Extends "Purchase Order Subform"
         wImporte: Decimal;
         wImpIvaInc: Decimal;
         ControldeProcesos: Codeunit ControlProcesos;
+        Permiso: Boolean;
 
     PROCEDURE CalcInvDisc();
     BEGIN
@@ -195,4 +204,15 @@ pageextension 80202 PurchaseOrderSubPage Extends "Purchase Order Subform"
     //     }
     //     END.
     //   }
+    trigger OnAfterGetRecord()
+    var
+        Control: Codeunit ControlProcesos;
+        Resource: Record Resource;
+    begin
+        Permiso := true;
+        If Resource.Get(Rec."No.") Then
+            if Resource."Producción" Then
+                If Resource."Empresa Origen" = '' Then
+                    Permiso := Control.CompruebaPermisos(UserSecurityId(), 'VERPRECIOS', CompanyName);
+    end;
 }

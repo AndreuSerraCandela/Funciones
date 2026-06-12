@@ -368,7 +368,9 @@
             '</div>' +
             '<div class="tip-contracts-pies">' +
             billingPieBlock(escapeHtml(prevYear) + ' · a mismo día', pieAnterior) +
+            '<br>'+
             billingPieBlock(escapeHtml(filterYear) + ' · a mismo día', pieActual) +
+            '</br>'+
             '</div>' +
             '</div></div>';
     }

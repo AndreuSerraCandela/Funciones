@@ -215,7 +215,8 @@ codeunit 50019 ControlProcesos
 
 
 
-    Procedure FindResourcePriceNew(Agencia: Boolean; ItemDiscGroup: Code[20]; pdStartingDate: Date; pDIva: Decimal; var Proyecto: Record Job; Resno: Code[20]; Cantidad: decimal; Duracion: Decimal; TipoDuracion: Enum Duracion): Decimal
+
+    Procedure FindResourcePriceNew(Agencia: Boolean; ItemDiscGroup: Code[20]; pdStartingDate: Date; pDIva: Decimal; var Proyecto: Record Job; Resno: Code[20]; Cantidad: decimal; Duracion: Decimal; TipoDuracion: Enum Duracion; Empresa: Text[30]): Decimal
     var
         FromSalesPrice: Record "Price List Line";
         TempTargetCampaignGr: Record "Campaign Target Group";
@@ -242,28 +243,37 @@ codeunit 50019 ControlProcesos
                 SetRange("Tipo Duracion");
             end;
             CalcBestUnitPrice(FromSalesPrice, Cantidad, TipoDuracion, Duracion, FoundsalesPrice);
-            if not FoundSalesPrice then exit(0);
-            //SETRANGE("Source No.", pCCustPriceGrCode);
+            if FoundSalesPrice then begin
+                //SETRANGE("Source No.", pCCustPriceGrCode);
 
-            if not customer.Get(Proyecto."Bill-to Customer No.") then
-                Customer.Init();
-            if Proyecto."Ending Date" = 0D THEN Proyecto."Ending Date" := WORKDATE;
-            if Proyecto."Starting Date" = 0D THEN Proyecto."Starting Date" := WORKDATE;
-            Duracion := Proyecto."Ending Date" - Proyecto."Starting Date";
-            Duracion := ROUND(Duracion / 30.42, 1);
-            SetFilter("Minimum Quantity", '<=%1', Duracion);
-            if Not FINDLAST then
-                SetFilter("Source No.", '<>1%', 'AGENCIA');
-            if FINDLAST THEN BEGIN
+                if not customer.Get(Proyecto."Bill-to Customer No.") then
+                    Customer.Init();
+                if Proyecto."Ending Date" = 0D THEN Proyecto."Ending Date" := WORKDATE;
+                if Proyecto."Starting Date" = 0D THEN Proyecto."Starting Date" := WORKDATE;
+                Duracion := Proyecto."Ending Date" - Proyecto."Starting Date";
+                Duracion := ROUND(Duracion / 30.42, 1);
+                SetFilter("Minimum Quantity", '<=%1', Duracion);
+                if Not FINDLAST then
+                    SetFilter("Source No.", '<>1%', 'AGENCIA');
+                if FINDLAST THEN BEGIN
 
-                if FromSalesPrice."Price Includes VAT" THEN BEGIN
-                    //Esto es un arreglo momentaneo. Debe corregirse
+                    if FromSalesPrice."Price Includes VAT" THEN BEGIN
+                        //Esto es un arreglo momentaneo. Debe corregirse
 
-                    "Unit Price" := "Unit Price" / (1 + pDIva / 100);
-                END;
-                EXIT("Unit Price");
-            END
+                        "Unit Price" := "Unit Price" / (1 + pDIva / 100);
+                    END;
+                    If "Unit Price" <> 0 then
+                        EXIT("Unit Price");
+                END
+            end;
         END;
+        Recursos.ChangeCompany(Empresa);
+        If Recursos.Get(Resno) then begin
+            exit(Recursos."Alquiler Anual");
+        end;
+
+
+
     end;
 
 
@@ -3871,6 +3881,173 @@ VAR TempVATAmountLineRemainder: Record "VAT Amount Line" temporary);
         end;
 
         exit(ImpFac - ImpAbo);
+    end;
+
+    procedure MediosRC_OnDocumentAttachmentInserted(DocumentAttachment: Record "Document Attachment")
+    var
+        Job: Record Job;
+        CabOrdenFijacion: Record "Cab Orden fijación";
+        ProjectNo: Code[20];
+        MessageText: Text[250];
+    begin
+        if DocumentAttachment."Table ID" <> Database::"Cab Orden fijación" then
+            exit;
+        if not DocumentAttachment."Document Flow Service" then
+            exit;
+        if not MediosRC_IsPhotoAttachment(DocumentAttachment) then
+            exit;
+
+        ProjectNo := DocumentAttachment."No.";
+        if ProjectNo = '' then
+            exit;
+
+        if not Job.Get(ProjectNo) then begin
+            CabOrdenFijacion.Reset();
+            if CabOrdenFijacion.Get(DocumentAttachment."No.") then begin
+                ProjectNo := CabOrdenFijacion."Nº Proyecto";
+                if ProjectNo = '' then
+                    exit;
+                if not Job.Get(ProjectNo) then
+                    Clear(Job);
+            end else
+                Clear(Job);
+        end;
+
+        if Job."No." <> '' then
+            MessageText := StrSubstNo(
+                'Se ha añadido una foto de fijación al proyecto %1 - %2.',
+                ProjectNo, Job.Description)
+        else
+            MessageText := StrSubstNo(
+                'Se ha añadido una foto de fijación al proyecto %1.',
+                ProjectNo);
+
+        MediosRC_RegisterFijacionMessage(MessageText, ProjectNo);
+    end;
+
+    procedure MediosRC_LoadFijacionHeadlines(
+        var Headline1: Text;
+        var Headline2: Text;
+        var Headline3: Text;
+        var Headline1Visible: Boolean;
+        var Headline2Visible: Boolean;
+        var Headline3Visible: Boolean)
+    var
+        Headlines: Codeunit Headlines;
+        RCHeadlinesUserData: Record "RC Headlines User Data";
+        QualifierLbl: Label 'Fijación';
+        UserSetup: Record "User Setup";
+    begin
+        Clear(Headline1);
+        Clear(Headline2);
+        Clear(Headline3);
+        Headline1Visible := false;
+        Headline2Visible := false;
+        Headline3Visible := false;
+        If UserSetup.get(UserId) then
+            if not UserSetup."Mostrar Pannel de Medios" then
+                exit;
+
+        if not MediosRC_TryGetUserData(RCHeadlinesUserData) then
+            exit;
+
+        if RCHeadlinesUserData."Fijacion Headline 1" <> '' then
+            Headline1Visible := Headlines.GetHeadlineText(
+                QualifierLbl,
+                RCHeadlinesUserData."Fijacion Headline 1",
+                Headline1);
+        if RCHeadlinesUserData."Fijacion Headline 2" <> '' then
+            Headline2Visible := Headlines.GetHeadlineText(
+                QualifierLbl,
+                RCHeadlinesUserData."Fijacion Headline 2",
+                Headline2);
+        if RCHeadlinesUserData."Fijacion Headline 3" <> '' then
+            Headline3Visible := Headlines.GetHeadlineText(
+                QualifierLbl,
+                RCHeadlinesUserData."Fijacion Headline 3",
+                Headline3);
+    end;
+
+    procedure MediosRC_HasVisibleFijacionHeadlines(): Boolean
+    var
+        RCHeadlinesUserData: Record "RC Headlines User Data";
+    begin
+        if not MediosRC_TryGetUserData(RCHeadlinesUserData) then
+            exit(false);
+        exit(
+            (RCHeadlinesUserData."Fijacion Headline 1" <> '') or
+            (RCHeadlinesUserData."Fijacion Headline 2" <> '') or
+            (RCHeadlinesUserData."Fijacion Headline 3" <> ''));
+    end;
+
+    procedure MediosRC_DrillDownFijacionHeadline(HeadlineIndex: Integer)
+    var
+        RCHeadlinesUserData: Record "RC Headlines User Data";
+        Job: Record Job;
+        ProjectNo: Code[20];
+    begin
+        if not MediosRC_TryGetUserData(RCHeadlinesUserData) then
+            exit;
+
+        case HeadlineIndex of
+            1:
+                ProjectNo := RCHeadlinesUserData."Fijacion Project No. 1";
+            2:
+                ProjectNo := RCHeadlinesUserData."Fijacion Project No. 2";
+            3:
+                ProjectNo := RCHeadlinesUserData."Fijacion Project No. 3";
+        end;
+
+        if ProjectNo = '' then
+            exit;
+        Job.SetRange("No.", ProjectNo);
+        Page.Run(Page::"Job Card", Job);
+    end;
+
+    local procedure MediosRC_RegisterFijacionMessage(MessageText: Text[250]; ProjectNo: Code[20])
+    var
+        RCHeadlinesUserData: Record "RC Headlines User Data";
+    begin
+        MediosRC_EnsureUserData(RCHeadlinesUserData);
+
+        RCHeadlinesUserData."Fijacion Headline 3" := RCHeadlinesUserData."Fijacion Headline 2";
+        RCHeadlinesUserData."Fijacion Project No. 3" := RCHeadlinesUserData."Fijacion Project No. 2";
+        RCHeadlinesUserData."Fijacion Headline 2" := RCHeadlinesUserData."Fijacion Headline 1";
+        RCHeadlinesUserData."Fijacion Project No. 2" := RCHeadlinesUserData."Fijacion Project No. 1";
+
+        RCHeadlinesUserData."Fijacion Headline 1" := CopyStr(MessageText, 1, MaxStrLen(RCHeadlinesUserData."Fijacion Headline 1"));
+        RCHeadlinesUserData."Fijacion Project No. 1" := ProjectNo;
+        RCHeadlinesUserData."User workdate" := WorkDate();
+        RCHeadlinesUserData."Last Computed" := CurrentDateTime;
+        RCHeadlinesUserData.Modify(true);
+    end;
+
+    local procedure MediosRC_EnsureUserData(var RCHeadlinesUserData: Record "RC Headlines User Data")
+    begin
+        if MediosRC_TryGetUserData(RCHeadlinesUserData) then
+            exit;
+
+        RCHeadlinesUserData.Init();
+        RCHeadlinesUserData."User ID" := UserSecurityId();
+        RCHeadlinesUserData."Role Center Page ID" := Page::"Medios Role Center";
+        RCHeadlinesUserData."User workdate" := WorkDate();
+        RCHeadlinesUserData.Insert(true);
+    end;
+
+    local procedure MediosRC_TryGetUserData(var RCHeadlinesUserData: Record "RC Headlines User Data"): Boolean
+    begin
+        RCHeadlinesUserData.Reset();
+        RCHeadlinesUserData.SetRange("User ID", UserSecurityId());
+        RCHeadlinesUserData.SetRange("Role Center Page ID", Page::"Medios Role Center");
+        exit(RCHeadlinesUserData.FindFirst());
+    end;
+
+    local procedure MediosRC_IsPhotoAttachment(DocumentAttachment: Record "Document Attachment"): Boolean
+    var
+        Extension: Text;
+    begin
+        Extension := LowerCase(DocumentAttachment."File Extension");
+        exit(Extension in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'heic', '']);
     end;
 
 }

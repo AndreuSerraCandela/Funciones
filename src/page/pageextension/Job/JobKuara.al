@@ -115,6 +115,11 @@ pageextension 80111 "JobKuara" extends "Job Card"
                 ApplicationArea = ALL;
 
             }
+            field("Autorizado Dirección"; Rec."Autorizado Dirección")
+            {
+                ApplicationArea = All;
+                Editable = false;
+            }
             field(Tipo; Rec.Tipo)
             {
                 ApplicationArea = ALL;
@@ -488,6 +493,27 @@ pageextension 80111 "JobKuara" extends "Job Card"
         }
         addfirst("&Job")
         {
+            action("Marcar Autorizado Dirección")
+            {
+                ApplicationArea = All;
+                Caption = 'Marcar Autorizado Dirección';
+                Image = Approve;
+                trigger OnAction()
+                var
+                    YaAutorizadoLbl: Label 'El proyecto ya está autorizado por Dirección.';
+                    AutorizadoLbl: Label 'Proyecto marcado como autorizado por Dirección.';
+                begin
+                    if Rec."Autorizado Dirección" then begin
+                        Message(YaAutorizadoLbl);
+                        exit;
+                    end;
+
+                    Rec.Validate("Autorizado Dirección", true);
+                    Rec.Modify(true);
+                    Message(AutorizadoLbl);
+                    CurrPage.Update(false);
+                end;
+            }
             action("Job Task Lines")
             {
                 ApplicationArea = all;

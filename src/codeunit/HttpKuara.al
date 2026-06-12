@@ -15,17 +15,40 @@ codeunit 50017 "HttpKuara"
     var
         Ficheros: Record Ficheros;
         actioncontenxt: WebServiceActionContext;
+        SalesInvHeader: Record "Sales Invoice Header";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
         a: Integer;
     begin
         if Not Evaluate(a, Doc) Then exit(StrSubstNo('%1 no es un número válido', Doc));
         if Ficheros.Get(a) Then begin
             Ficheros.Procesado := Valor;
+            if Ficheros.Procesado then begin
+                If ficheros.proceso = 'SII' then begin
+                    if SalesInvHeader.Get(Doc) then begin
+                        SalesInvHeader.Estado := 'Procesado';
+                        SalesInvHeader.Modify();
+                    end;
+                    if PurchInvHeader.Get(Doc) then begin
+                        PurchInvHeader.Estado := 'Procesado';
+                        PurchInvHeader.Modify();
+                    end;
+                    if SalesCrMemoHeader.Get(Doc) then begin
+                        SalesCrMemoHeader.Estado := 'Procesado';
+                        SalesCrMemoHeader.Modify();
+                    end;
+                    if PurchCrMemoHeader.Get(Doc) then begin
+                        PurchCrMemoHeader.Estado := 'Procesado';
+                        PurchCrMemoHeader.Modify();
+                    end;
+                end;
+            end;
             Ficheros.Modify();
         end else
             exit(StrSubstNo('Nº doc %1, no encontrado', a));
         exit(StrSubstNo('Doc %1 se ha cambiado a procesado %2', a, valor));
     end;
-
     /// <summary>
     /// EnviarSii.
     /// </summary>
@@ -66,6 +89,106 @@ codeunit 50017 "HttpKuara"
         exit(Json);
     end;
 
+    /// <summary>
+    /// MarcarDocumentoEnviado.
+    /// </summary>
+    /// <param name="Doc">Text.</param>
+    /// <param name="Valor">Boolean.</param>
+    /// <returns>Return value of type Text.</returns>
+    procedure MarcarDocumentoEnviado(Doc: Text; Valor: Boolean): Text
+    var
+        Ficheros: Record Ficheros;
+        actioncontenxt: WebServiceActionContext;
+        SalesInvHeader: Record "Sales Invoice Header";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
+        a: Integer;
+    begin
+        if Not Evaluate(a, Doc) Then exit(StrSubstNo('%1 no es un número válido', Doc));
+        if Ficheros.Get(a) Then begin
+            Ficheros.Enviado := Valor;
+            if Ficheros.Procesado then begin
+                If ficheros.proceso = 'SII' then begin
+                    if SalesInvHeader.Get(Doc) then begin
+                        SalesInvHeader.Estado := 'Enviado';
+                        SalesInvHeader.Modify();
+                    end;
+                    if PurchInvHeader.Get(Doc) then begin
+                        PurchInvHeader.Estado := 'Enviado';
+                        PurchInvHeader.Modify();
+                    end;
+                    if SalesCrMemoHeader.Get(Doc) then begin
+                        SalesCrMemoHeader.Estado := 'Enviado';
+                        SalesCrMemoHeader.Modify();
+                    end;
+                    if PurchCrMemoHeader.Get(Doc) then begin
+                        PurchCrMemoHeader.Estado := 'Enviado';
+                        PurchCrMemoHeader.Modify();
+                    end;
+                end;
+            end;
+            Ficheros.Modify();
+        end else
+            exit(StrSubstNo('Nº doc %1, no encontrado', a));
+        exit(StrSubstNo('Doc %1 se ha cambiado a enviado %2', a, valor));
+    end;
+
+    procedure EnviarProcesadosSii() Json: Text
+    var
+        JsonObj: Codeunit "Json Text Reader/Writer";
+        JsonText: Text;
+        Recref: RecordRef;
+        idReport: Integer;
+        Ficheros: Record Ficheros;
+        Ficheros2: Record Ficheros;
+        TxtINStream: InStream;
+        Base64Codeunit: Codeunit "Base64 Convert";
+        Base64: Text;
+    begin
+        //ShipmentHeader.SetRange("No. Printed", 0);
+        JsonObj.WriteStartArray('');
+        Ficheros.SetRange(Procesado, true);
+        Ficheros.SetRange(Enviado, false);
+        Ficheros.SetRange(Proceso, 'SII');
+        Ficheros.CalcFields(Fichero);
+        if Ficheros.FindSet() then
+            repeat
+                Ficheros2.SetRange(Secuencia, Ficheros."Secuencia");
+                Ficheros2.FindFirst();
+                Recref.GetTable(Ficheros2);
+                JsonObj.WriteStartObject('');
+                JsonObj.WriteStringProperty('Id', Ficheros2.Secuencia);
+                JsonObj.WriteStringProperty('Nombre', GetSiiSendedFilePath(Ficheros2."Nombre fichero"));
+                JsonObj.WriteEndObject();
+            until Ficheros.Next() = 0;
+        JsonObj.WriteEndArray();
+        Json := JsonObj.GetJSonAsText();
+        exit(Json);
+    end;
+
+
+    local procedure GetSiiSendedFilePath(OriginalPath: Text): Text
+    var
+        PathUpper: Text;
+        OutFolderPos: Integer;
+        OutFolderToken: Text;
+        FileNamePart: Text;
+        PathPrefix: Text;
+    begin
+        if OriginalPath = '' then
+            exit('');
+
+        OutFolderToken := '\OUT\';
+        PathUpper := UpperCase(OriginalPath);
+        OutFolderPos := StrPos(PathUpper, OutFolderToken);
+        if OutFolderPos = 0 then
+            exit(OriginalPath);
+
+        PathPrefix := CopyStr(OriginalPath, 1, OutFolderPos + StrLen(OutFolderToken) - 1);
+        FileNamePart := CopyStr(OriginalPath, OutFolderPos + StrLen(OutFolderToken));
+        exit(PathPrefix + 'sended\' + FileNamePart);
+    end;
 
     /// <summary>
     /// GuardaPdfContrato.

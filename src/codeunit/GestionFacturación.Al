@@ -73,10 +73,7 @@ codeunit 50001 "Gestion Facturación"
                 commit;
             Until Contratos.Next() = 0;
         Commit();
-        if ParseMediosJobParameter(Rec."Parameter String", FilterYear, FilterSalespersonCode, FilterCustomerNo) then
-            RefreshPanelMediosCache(FilterYear, FilterSalespersonCode, FilterCustomerNo)
-        else
-            RefreshDefaultPanelMediosCaches();
+
     END;
 
 
@@ -4590,7 +4587,7 @@ codeunit 50001 "Gestion Facturación"
         exit(StrSubstNo('MEDIOS;%1;%2;%3', FilterYear, FilterSalespersonCode, FilterCustomerNo));
     end;
 
-    local procedure ParseMediosJobParameter(ParameterString: Text; var FilterYear: Integer; var FilterSalespersonCode: text[20]; var FilterCustomerNo: text[20]): Boolean
+    procedure ParseMediosJobParameter(ParameterString: Text; var FilterYear: Integer; var FilterSalespersonCode: text[20]; var FilterCustomerNo: text[20]): Boolean
     var
         Parts: List of [Text];
         YearText: Text;

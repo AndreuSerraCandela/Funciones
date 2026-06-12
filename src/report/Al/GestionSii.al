@@ -2563,6 +2563,7 @@ report 50011 "Gestión SII"
         Ficheros."Nombre fichero" := RutaFichero;
         Ficheros.Procesado := false;
         Ficheros.Proceso := 'SII';
+        Ficheros.Factura := Doc;
         Ficheros."Fecha Caducidad" := CalcDate('PM+2M', WorkDate());
         Ficheros.Id_Url := 0;
         Ficheros.Insert(True);

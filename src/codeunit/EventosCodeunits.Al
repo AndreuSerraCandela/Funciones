@@ -2786,5 +2786,17 @@ codeunit 50015 ControldeEventosCodeunits
         CarteraDoc.SetRange("Document Type");
     end;
     #endregion Codeunit7000008
+
+    #region RC Headlines Medios
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"RC Headlines Page Common", OnIsAnyExtensionHeadlineVisible, '', false, false)]
+    local procedure MediosRCHeadline_OnIsAnyExtensionHeadlineVisible(var ExtensionHeadlinesVisible: Boolean; RoleCenterPageID: Integer)
+    begin
+        if RoleCenterPageID <> Page::"Medios Role Center" then
+            exit;
+        if Procesos.MediosRC_HasVisibleFijacionHeadlines() then
+            ExtensionHeadlinesVisible := true;
+    end;
+    #endregion RC Headlines Medios
+
     #endregion Codeunits
 }

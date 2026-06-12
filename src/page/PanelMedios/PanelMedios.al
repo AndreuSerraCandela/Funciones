@@ -261,7 +261,7 @@ page 50140 "Panel Medios"
 
                 trigger OnAction()
                 var
-                    Fpr: Codeunit Fpr;
+                    Fpr: Codeunit "Gestion Facturación";
                 begin
                     Fpr.RefreshPanelMediosCache(FilterYear, FilterSalespersonCode, FilterCustomerNo);
                     CalculateDashboard();
@@ -802,7 +802,7 @@ page 50140 "Panel Medios"
 
     local procedure CalculateFacturacionMetrics()
     var
-        Fpr: Codeunit Fpr;
+        FPR: Codeunit "Gestion Facturación";
     begin
         Clear(FactPctPendiente);
         Clear(FactPctFacturado);
@@ -825,7 +825,7 @@ page 50140 "Panel Medios"
 
     local procedure RequestFacturacionCacheRefresh()
     var
-        Fpr: Codeunit Fpr;
+        Fpr: Codeunit "Gestion Facturación";
     begin
         if FilterYear = 0 then
             exit;
@@ -1143,6 +1143,7 @@ page 50140 "Panel Medios"
     begin
         ApplyContractFilters(Contratos, Year);
         GetRenovacionDateRange(Year, FromDate, ToDate);
+        Contratos.SetRange("Posting Date");
         Contratos.SetFilter("Fecha renovacion", '%1..%2', FromDate, ToDate);
         Contratos.SetFilter(Estado, '<>%1&<>%2', Contratos.Estado::Cancelado, Contratos.Estado::Anulado);
     end;

@@ -8,9 +8,9 @@ page 50141 "Medios Role Center"
     {
         area(rolecenter)
         {
-            part(Control104; "Headline RC Order Processor")
+            part(HeadlineMedios; "Headline RC Medios")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = All;
             }
             part(PanelMedios; "Panel Medios")
             {
