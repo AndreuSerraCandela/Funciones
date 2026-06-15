@@ -54,6 +54,27 @@ Page 50066 "Systemas Activities"
                 field("SII pendiente"; SIIPendiente())
                 {
                     ApplicationArea = All;
+                    StyleExpr = NoEnviados;
+                    trigger OnDrillDown()
+                    var
+                        SalesInvHeader: Record "Sales Invoice Header";
+                        PurchInvHeader: Record "Purch. Inv. Header";
+                        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+                        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
+                    begin
+                        SalesInvHeader.SetRange("Estado", '');
+                        if SalesInvHeader.Count() <> 0 Then
+                            Page.RunModal(Page::"Posted Sales Invoices", SalesInvHeader);
+                        PurchInvHeader.SetRange("Estado", '');
+                        if PurchInvHeader.Count() <> 0 Then
+                            Page.RunModal(Page::"Posted Purchase Invoices", PurchInvHeader);
+                        SalesCrMemoHeader.SetRange("Estado", '');
+                        if SalesCrMemoHeader.Count() <> 0 Then
+                            Page.RunModal(Page::"Posted Sales Credit Memos", SalesCrMemoHeader);
+                        PurchCrMemoHeader.SetRange("Estado", '');
+                        if PurchCrMemoHeader.Count() <> 0 Then
+                            Page.RunModal(Page::"Posted Purchase Credit Memos", PurchCrMemoHeader);
+                    end;
                 }
             }
         }
@@ -65,6 +86,8 @@ Page 50066 "Systemas Activities"
         Errores: Text;
         Control: Codeunit ControlProcesos;
         MallaAdm: Boolean;
+        NoEnviados: Text;
+
 
     trigger OnOpenPage()
     var
@@ -85,6 +108,20 @@ Page 50066 "Systemas Activities"
         PurchInvHeader.SetRange("Estado", '');
         SalesCrMemoHeader.SetRange("Estado", '');
         PurchCrMemoHeader.SetRange("Estado", '');
+        exit(SalesInvHeader.Count() + PurchInvHeader.Count() + SalesCrMemoHeader.Count() + PurchCrMemoHeader.Count());
+    end;
+
+    procedure SIIProcesados(): Integer
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
+    begin
+        SalesInvHeader.SetRange("Estado", 'Procesado');
+        PurchInvHeader.SetRange("Estado", 'Procesado');
+        SalesCrMemoHeader.SetRange("Estado", 'Procesado');
+        PurchCrMemoHeader.SetRange("Estado", 'Procesado');
         exit(SalesInvHeader.Count() + PurchInvHeader.Count() + SalesCrMemoHeader.Count() + PurchCrMemoHeader.Count());
     end;
 
@@ -116,6 +153,9 @@ Page 50066 "Systemas Activities"
         end;
         if faltan <> 0 Then Extensiones := 'Unfavorable' else Extensiones := 'Favorable';
         if (faltan = 0) and (NoInstaladas <> 0) Then Extensiones := 'Attention';
+        if SIIProcesados() > 10 Then
+            NoEnviados := 'Unfavorable' else
+            if SIIPendiente() <> 0 Then NoEnviados := 'Attention' else NoEnviados := 'Favorable';
         //exit(faltan);
     end;
 

@@ -26,19 +26,19 @@ codeunit 50017 "HttpKuara"
             Ficheros.Procesado := Valor;
             if Ficheros.Procesado then begin
                 If ficheros.proceso = 'SII' then begin
-                    if SalesInvHeader.Get(Doc) then begin
+                    if SalesInvHeader.Get(Ficheros.Factura) then begin
                         SalesInvHeader.Estado := 'Procesado';
                         SalesInvHeader.Modify();
                     end;
-                    if PurchInvHeader.Get(Doc) then begin
+                    if PurchInvHeader.Get(Ficheros.Factura) then begin
                         PurchInvHeader.Estado := 'Procesado';
                         PurchInvHeader.Modify();
                     end;
-                    if SalesCrMemoHeader.Get(Doc) then begin
+                    if SalesCrMemoHeader.Get(Ficheros.Factura) then begin
                         SalesCrMemoHeader.Estado := 'Procesado';
                         SalesCrMemoHeader.Modify();
                     end;
-                    if PurchCrMemoHeader.Get(Doc) then begin
+                    if PurchCrMemoHeader.Get(Ficheros.Factura) then begin
                         PurchCrMemoHeader.Estado := 'Procesado';
                         PurchCrMemoHeader.Modify();
                     end;
@@ -110,19 +110,19 @@ codeunit 50017 "HttpKuara"
             Ficheros.Enviado := Valor;
             if Ficheros.Procesado then begin
                 If ficheros.proceso = 'SII' then begin
-                    if SalesInvHeader.Get(Doc) then begin
+                    if SalesInvHeader.Get(Ficheros.Factura) then begin
                         SalesInvHeader.Estado := 'Enviado';
                         SalesInvHeader.Modify();
                     end;
-                    if PurchInvHeader.Get(Doc) then begin
+                    if PurchInvHeader.Get(Ficheros.Factura) then begin
                         PurchInvHeader.Estado := 'Enviado';
                         PurchInvHeader.Modify();
                     end;
-                    if SalesCrMemoHeader.Get(Doc) then begin
+                    if SalesCrMemoHeader.Get(Ficheros.Factura) then begin
                         SalesCrMemoHeader.Estado := 'Enviado';
                         SalesCrMemoHeader.Modify();
                     end;
-                    if PurchCrMemoHeader.Get(Doc) then begin
+                    if PurchCrMemoHeader.Get(Ficheros.Factura) then begin
                         PurchCrMemoHeader.Estado := 'Enviado';
                         PurchCrMemoHeader.Modify();
                     end;
