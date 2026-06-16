@@ -23,11 +23,55 @@ Codeunit 7001116 Fpr
     begin
 
         GeneraEliminaciones();
+        CompruebaSii();
         if GestionFacturación.ParseMediosJobParameter(Rec."Parameter String", FilterYear, FilterSalespersonCode, FilterCustomerNo) then
             GestionFacturación.RefreshPanelMediosCache(FilterYear, FilterSalespersonCode, FilterCustomerNo)
         else
             GestionFacturación.RefreshDefaultPanelMediosCaches();
 
+    end;
+
+    Procedure CompruebaSii()
+    var
+        Ficheros: Record Ficheros;
+        EmailItem: Record "Email Item" temporary;
+        EmailScenario: Enum "Email Scenario";
+        Body: Text;
+        LimiteFecha: DateTime;
+        HayAlerta: Boolean;
+        Subject: Text;
+    begin
+        LimiteFecha := CreateDateTime(CalcDate('-4D', Today), 0T);
+        Ficheros.SetRange(Proceso, 'SII');
+        Ficheros.SetRange(Enviado, false);
+        Ficheros.SetFilter(SystemCreatedAt, '<%1', LimiteFecha);
+
+        Body := StrSubstNo('En la empresa %1 hay ficheros del proceso SII sin enviar desde hace 4 o más días.\', COMPANYNAME);
+        HayAlerta := false;
+
+        Ficheros.SetRange(Procesado, true);
+        if Ficheros.FindFirst() then begin
+            HayAlerta := true;
+            Subject := 'Alerta SII - ficheros procesados pero no enviados';
+            Body += '\Ficheros procesados pero no enviados: FTP detenido en servidor eDiversa.\';
+        end;
+
+        Ficheros.SetRange(Procesado, false);
+        if Ficheros.FindFirst() then begin
+            HayAlerta := true;
+            Subject := 'Alerta SII - ficheros no procesados';
+            Body += '\Ficheros no procesados: revisar el equipo 187 y el servidor 215.\';
+        end;
+
+        if not HayAlerta then
+            exit;
+
+        Clear(EmailItem);
+        EmailItem."Send to" := 'andreuserra@malla.es';
+        EmailItem."Send CC" := 'lllompart@malla.es;luisuguet@malla.es';
+        EmailItem.Subject := Subject;
+        EmailItem.SetBodyText(Body);
+        EmailItem.Send(true, EmailScenario::Informes);
     end;
 
     Procedure CalcularFpr()

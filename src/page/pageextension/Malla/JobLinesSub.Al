@@ -189,6 +189,20 @@ pageextension 75006 JobLinesSub extends "JobLinesSub"
         rLinP.SetRange("Cdad. a Reservar");
         if rLinP.FindSet() THEN
             REPEAT
+            if rlinp."Crear pedidos"=rlinp."Crear pedidos"::"No crear pedido" then begin
+                rLinP."Unit Price (LCY)" := 0;
+                rLinP."Unit Price" := 0;
+                rLinP."Unit Cost" := 0;
+                rLinP."Unit Cost (LCY)" := 0;
+                rLinP."Total Price" := 0;
+                rLinP."Total Price (LCY)" := 0;
+                rLinP."Total Cost" := 0;
+                rLinP."Total Cost (LCY)" := 0;
+                rLinP."Line Amount" := 0;
+                rLinP."Line Amount (LCY)" := 0;
+                rLinP."Direct Unit Cost (LCY)" := 0;
+                
+            end;
                 if (RecursoAgrupado <> '') AND (rLinP."Unit Price (LCY)" <> 0) THEN
                     if Job."Proyecto Mixto" = False Then
                         ERROR('No se pueden crear circuitos con Recursos con precio a no ser que se trate de un proyecto mixto');

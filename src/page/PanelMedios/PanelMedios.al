@@ -158,7 +158,7 @@ page 50140 "Panel Medios"
                 end;
             }
             //cLIENTES
-            action(OpenCustomerList)
+            action(CustomerList)
             {
                 ApplicationArea = All;
                 Caption = 'Lista clientes';
@@ -172,7 +172,7 @@ page 50140 "Panel Medios"
             }
 
             //PROYECTOS
-            action(OpenJobList)
+            action(JobList)
             {
                 ApplicationArea = All;
                 Caption = 'Lista proyectos';

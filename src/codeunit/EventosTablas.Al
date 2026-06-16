@@ -33,8 +33,8 @@ codeunit 50016 ControldeEventosTables
         ContabAlb: Codeunit ContabAlb;
     #region Tables
     #region Tabla13
-    [EventSubscriber(ObjectType::Table, 13, 'OnBeforeDeleteEvent', '', false, false)]
-    LOCAL PROCEDURE Table13_OnDelete(VAR Rec: Record 13; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Table, database::"Salesperson/Purchaser", OnBeforeDeleteEvent, '', false, false)]
+    LOCAL PROCEDURE Table13_OnDelete(VAR Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
     BEGIN
         If Rec.IsTemporary() then exit;
         ERROR('No se pueden eliminar vendedores');
@@ -109,7 +109,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterValidateEvent', 'Amount', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterValidateEvent, Amount, false, false)]
     LOCAL PROCEDURE Tabla17_Amount(VAR Rec: Record "G/L Entry"; VAR xRec: Record "G/L Entry"; CurrFieldNo: Integer)
     BEGIN
         //WITH Rec DO BEGIN
@@ -120,7 +120,7 @@ codeunit 50016 ControldeEventosTables
         //  END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterValidateEvent', 'Debit Amount', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterValidateEvent, "Debit Amount", false, false)]
     LOCAL PROCEDURE Tabla17_Debit(VAR Rec: Record "G/L Entry"; VAR xRec: Record "G/L Entry"; CurrFieldNo: Integer)
     BEGIN
         //WITH Rec DO BEGIN
@@ -129,7 +129,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", 'OnAfterValidateEvent', 'Credit Amount', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"G/L Entry", OnAfterValidateEvent, "Credit Amount", false, false)]
     LOCAL PROCEDURE Tabla17_Credit(VAR Rec: Record "G/L Entry"; VAR xRec: Record "G/L Entry"; CurrFieldNo: Integer)
     BEGIN
         //WITH Rec DO BEGIN
@@ -140,7 +140,7 @@ codeunit 50016 ControldeEventosTables
 
     #endregion Tabla17
     #region Tabla18
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterValidateEvent', 'B2R Cod. Fiscal', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnAfterValidateEvent, "B2R Cod. Fiscal", false, false)]
     LOCAL PROCEDURE Tabla18_Oficina(VAR Rec: Record Customer; VAR xRec: Record Customer; CurrFieldNo: Integer)
     BEGIN
         if rec."Oficina Contable" = '' Then
@@ -148,13 +148,13 @@ codeunit 50016 ControldeEventosTables
         Rec."Permite Efactura" := true;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterValidateEvent', 'B2R Cod. Receptor', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnAfterValidateEvent, "B2R Cod. Receptor", false, false)]
     LOCAL PROCEDURE Tabla18_Gestor(VAR Rec: Record Customer; VAR xRec: Record Customer; CurrFieldNo: Integer)
     BEGIN
         Rec."Organo Gestor" := Rec."B2R Cod. Receptor";
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterValidateEvent', 'B2R Cod. Pagador', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnAfterValidateEvent, "B2R Cod. Pagador", false, false)]
     LOCAL PROCEDURE Tabla18_Unidad(VAR Rec: Record Customer; VAR xRec: Record Customer; CurrFieldNo: Integer)
     BEGIN
         Rec."Unidad Tramitadora" := Rec."B2R Cod. Pagador";
@@ -176,7 +176,7 @@ codeunit 50016 ControldeEventosTables
     /// <param name="xCustomer">Record "Customer".</param>
     /// <param name="FieldNumber">Integer.</param>
     /// <param name="IsHandled">VAR Boolean.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnBeforeValidateVATRegistrationNo', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnBeforeValidateVATRegistrationNo, '', false, false)]
     procedure OnBeforeValidateVATRegistrationNo(var Customer: Record "Customer"; xCustomer: Record "Customer"; FieldNumber: Integer; var IsHandled: Boolean)
     var
         Company: Record "Company";
@@ -271,7 +271,7 @@ codeunit 50016 ControldeEventosTables
 
 
 
-    [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnBeforeValidateEvent', 'Nombre Comercial', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Customer", OnBeforeValidateEvent, "Nombre Comercial", false, false)]
     local procedure OnAfterValidateEventCust(var Rec: Record "Customer"; xRec: Record "Customer")
     var
         Nombres: Record "Nombre Comercial";
@@ -357,7 +357,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Sell-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Sell-to Customer No.", false, false)]
     LOCAL PROCEDURE Tabla36_SellToCustomerOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         Cust: Record Customer;
@@ -402,7 +402,7 @@ codeunit 50016 ControldeEventosTables
         // Fi MNC
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Posting Description', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Posting Description", false, false)]
     LOCAL PROCEDURE Tabla36_PostDescr(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         WorkText: Text;
@@ -414,7 +414,7 @@ codeunit 50016 ControldeEventosTables
         end;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Bill-to Customer No.", false, false)]
     LOCAL PROCEDURE Tabla36_BillToCustomerOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         Cust: Record Customer;
@@ -432,7 +432,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Bill-to Customer No.", false, false)]
     LOCAL PROCEDURE Tabla36_PostingDateOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         cProyecTo: Codeunit "Gestion Proyecto";
@@ -448,7 +448,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'SalesPerson Code', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "SalesPerson Code", false, false)]
     LOCAL PROCEDURE Tabla36_SalesPersonCodeOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         SalesPerson: Record 13;
@@ -462,7 +462,7 @@ codeunit 50016 ControldeEventosTables
     END;
 
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Payment Terms Code', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Payment Terms Code", false, false)]
     LOCAL PROCEDURE Tabla36_PaymenTermsCodeOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     BEGIN
         // WITH Rec DO BEGIN
@@ -472,7 +472,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Payment Method Code', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Payment Method Code", false, false)]
     LOCAL PROCEDURE Tabla36_PaymenMethodCodeOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         PaymentMethod: Record 289;
@@ -497,7 +497,7 @@ codeunit 50016 ControldeEventosTables
         //END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Prepayment %', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Prepayment %", false, false)]
     LOCAL PROCEDURE Tabla36_PrePaymenPorOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         PaymentMethod: Record 289;
@@ -510,7 +510,7 @@ codeunit 50016 ControldeEventosTables
     END;
 
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterRecreateSalesLine', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterRecreateSalesLine, '', false, false)]
     PROCEDURE Tabla36_RecreateSalesline(VAR SalesLine: Record 37; VAR TempSalesLine: Record 37 TEMPORARY)
     BEGIN
 
@@ -531,7 +531,7 @@ codeunit 50016 ControldeEventosTables
         //$018(F)
     END;//$018(F)
         //END;
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeSalesLineByChangedFieldNo', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeSalesLineByChangedFieldNo, '', false, false)]
     PROCEDURE Tabla36_UpdateSalesline(SalesHeader: Record "Sales Header"; VAR SalesLine: Record 37; ChangedFieldNo: Integer; VAR IsHandled: Boolean)
     BEGIN
 
@@ -546,7 +546,7 @@ codeunit 50016 ControldeEventosTables
         END;
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeValidatePaymentTermsCode', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeValidatePaymentTermsCode, '', false, false)]
     Procedure OnBeforeValidatePaymentTermsCode(var SalesHeader: Record "Sales Header"; var xSalesHeader: Record "Sales Header"; CallingFieldNo: Integer; UpdateDocumentDate: Boolean; var IsHandled: Boolean)
     var
         PaymentTerms: Record "Payment Terms";
@@ -623,7 +623,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeValidatePrepmtPaymentTermsCode', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeValidatePrepmtPaymentTermsCode, '', false, false)]
     local procedure OnBeforeValidatePrepmtPaymentTermsCode(var SalesHeader: Record "Sales Header"; var xSalesHeader: Record "Sales Header"; CalledByFieldNo: Integer; CallingFieldNo: Integer; UpdateDocumentDate: Boolean; var IsHandled: Boolean)
     var
         PaymentTerms: Record "Payment Terms";
@@ -667,7 +667,7 @@ codeunit 50016 ControldeEventosTables
 
 
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Estado', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, Estado, false, false)]
     PROCEDURE Tabla36_EstadoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
@@ -823,7 +823,7 @@ codeunit 50016 ControldeEventosTables
         //$011(F)
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeIsApprovedForPosting', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeIsApprovedForPosting, '', false, false)]
     local procedure OnBeforeIsApprovedForPosting(var SalesHeader: Record "Sales Header"; var Approved: Boolean; var IsHandled: Boolean)
     var
         SalesLine: Record 37;
@@ -945,7 +945,7 @@ codeunit 50016 ControldeEventosTables
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Estado Contrato', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterValidateEvent, "Estado Contrato", false, false)]
     LOCAL PROCEDURE Tabla36_EstadoContratoOnValidate(VAR Rec: Record "Sales Header"; VAR xRec: Record "Sales Header"; CurrFieldNo: Integer)
     VAR
         FecAnul: Date;
@@ -2032,13 +2032,13 @@ codeunit 50016 ControldeEventosTables
 
     #endregion Table121
     #region Tabla167
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterBillToCustomerNoUpdated', '', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterBillToCustomerNoUpdated, '', false, false)]
     local procedure OnAfterBillToCustomerNoUpdated(var Job: Record Job; BillToCustomer: Record Customer; CallingFieldNo: Integer)
     begin
         if BillToCustomer.Impagados THEN MESSAGE('Atención: Este cliente tiene impagados');
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Job", 'OnAfterValidateEvent', 'Bill-to Customer No.', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::"Job", OnAfterValidateEvent, "Bill-to Customer No.", false, false)]
     local procedure OnAfterValidateEventJobCust(var Rec: Record "Job"; xRec: Record "Job")
     var
         Cust: Record "Customer";
@@ -2050,7 +2050,7 @@ codeunit 50016 ControldeEventosTables
 
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Tipo', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterValidateEvent, Tipo, false, false)]
     LOCAL PROCEDURE Tabla167_TipoOnValidatetipo(VAR Rec: Record 167; VAR xRec: Record 167; CurrFieldNo: Integer)
     VAR
         rLinProy: Record 1003;
@@ -2098,7 +2098,7 @@ codeunit 50016 ControldeEventosTables
         //$013(F)
     END;
 
-    [EventSubscriber(ObjectType::Table, Database::Job, 'OnAfterValidateEvent', 'Firmado', false, false)]
+    [EventSubscriber(ObjectType::Table, Database::Job, OnAfterValidateEvent, Firmado, false, false)]
     LOCAL PROCEDURE Tabla167_TipoOnValidateFirmado(VAR Rec: Record 167; VAR xRec: Record 167; CurrFieldNo: Integer)
     VAR
         rCabC: Record "Purchase Header";
@@ -2240,8 +2240,24 @@ codeunit 50016 ControldeEventosTables
                 if (PL[4] = 0) THEN begin
                     JobPlanningLine.SETRANGE("Job No.", Rec."No.");
                     JobPlanningLine.SETRANGe(Type, JobPlanningLine.type::"Activo fijo");
-                    if not JobPlanningLine.FindFirst() Then
-                        ERROR(Text105);
+                    if not JobPlanningLine.FindFirst() Then begin
+                        JobPlanningLine.SETRANGe(Type);
+                        //Recalculamos los dtoa, porque avcese quedan mal
+                        If JobPlanningLine.FindFirst() Then
+                            repeat
+                                JobPlanningLine.validate(Quantity);
+                                JobPlanningLine.Modify();
+                            until JobPlanningLine.Next() = 0;
+                        JobCalcStatistics.JobCalculateCommonFilters(Rec);
+                        JobCalcStatistics.CalculateAmounts;
+                        JobCalcStatistics.GetLCYPriceAmounts(PL);
+                        if (PL[4] = 0) THEN begin
+
+                            JobPlanningLine.SETRANGE("Job No.", Rec."No.");
+                            JobPlanningLine.SETRANGe(Type, JobPlanningLine.type::"Activo fijo");
+                            ERROR(Text105);
+                        END;
+                    end;
                     JobPlanningLine.SETRANGe(Type);
                 end;
                 // $005 +
@@ -2493,6 +2509,8 @@ codeunit 50016 ControldeEventosTables
         Customer.GET(Job."Bill-to Customer No.");
         if JobPlanningLine."Crear pedidos" = JobPlanningLine."Crear pedidos"::"No crear pedido" then begin
             JobPlanningLine."Unit Price" := 0;
+            JobPlanningLine."Precio Tarifa" := 0;
+            JobPlanningLine."Unit Price (LCY)" := 0;
             JobPlanningLine."Unit Cost" := 0;
             exit;
         end;
@@ -2582,8 +2600,13 @@ codeunit 50016 ControldeEventosTables
                     If Res."Empresa Origen" <> '' then Tipo.ChangeCompany(Res."Empresa Origen");
                     if not Tipo.Get(Res."Tipo Recurso") Then Tipo.Init();
                     if (Res."Recurso Agrupado" = false) and (Job."Según disponibilidad") And (Tipo."Crea Reservas") Then begin
-                        if JobPlanningLine."Recurso en Empresa Origen" = '' then
-                            JobPlanningLine."Crear pedidos" := JobPlanningLine."Crear pedidos"::"No crear pedido"
+                        if JobPlanningLine."Recurso en Empresa Origen" = '' then BEGIN
+                            JobPlanningLine."Crear pedidos" := JobPlanningLine."Crear pedidos"::"No crear pedido";
+                            JobPlanningLine."Precio Tarifa" := 0;
+                            JobPlanningLine."Unit Price (LCY)" := 0;
+                            JobPlanningLine."Unit Cost" := 0;
+                            JobPlanningLine."Unit Price" := 0;
+                        END
                         else
                             JobPlanningLine."Crear pedidos" := JobPlanningLine."Crear pedidos"::"De Compra";
                         JobPlanningLine.Validate("Imprmir en Contrato/Factura", false);
@@ -2777,6 +2800,17 @@ codeunit 50016 ControldeEventosTables
         if Res."Producción" Then JobPlanningLine."Cdad. a Reservar" := 0;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Crear pedidos', false, false)]
+    procedure ModificarCrearPedidos(var Rec: Record "Job Planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
+    begin
+        if Rec."Crear pedidos" = Rec."Crear pedidos"::"No crear pedido" then begin
+            Rec."Unit Price" := 0;
+            Rec."Unit Price (LCY)" := 0;
+            Rec."Unit Cost" := 0;
+            Rec."Precio Tarifa" := 0;
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Job Planning Line", OnAfterValidateEvent, 'Quantity', false, false)]
     procedure ModificaQuantityJobPlaning(var Rec: Record "Job planning Line"; var xRec: Record "Job Planning Line"; CurrFieldNo: Integer)
     var
@@ -2793,8 +2827,12 @@ codeunit 50016 ControldeEventosTables
         if Rec."Precio Tarifa" = 0 Then
             Rec."Precio Tarifa" := Control.FindResourcePriceNew(Customer."Customer Posting Group" = 'AGENCIA', Res."Customer Price Group", WorkDate(), Rec."VAT %", Job, Res."No."
             , Rec."Cdad. Soportes", rec.Duracion, Rec."Tipo Duracion", companyname);
-        if Rec."Crear pedidos" = Rec."Crear pedidos"::"No crear pedido" then
-            Rec."Unit Price" := 0 else
+        if Rec."Crear pedidos" = Rec."Crear pedidos"::"No crear pedido" then begin
+            Rec."Unit Price" := 0;
+            Rec."Unit Price (LCY)" := 0;
+            Rec."Unit Cost" := 0;
+            rEC."Precio Tarifa" := 0;
+        END else
             If Rec."Unit Price" = 0 Then Rec."Unit Price" := Rec."Precio Tarifa";
 
         Rec.RecalcularCostesLineaProyecto();

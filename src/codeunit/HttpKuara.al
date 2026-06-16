@@ -4,6 +4,11 @@
 /// </summary>
 codeunit 50017 "HttpKuara"
 {
+    Permissions = TableData Ficheros = rimd,
+    TableData "Sales Invoice Header" = rimd,
+    TableData "Purch. Inv. Header" = rimd,
+    TableData "Sales Cr.Memo Header" = rimd,
+    TableData "Purch. Cr. Memo Hdr." = rimd;
 
     /// <summary>
     /// MarcarDocumento.
