@@ -1157,7 +1157,7 @@ codeunit 7001117 "Suggest Worksheet Lines New"
             if Fasctura.GET(pCustLedgerEntry."Document No.") THEN BEGIN
                 if Fasctura."Nuestra Cuenta" <> '' THEN
                     "Cod banco" := Fasctura."Nuestra Cuenta";
-                if Fasctura."Nuestra Cuenta Prepago" <> '' THEN
+                if (Fasctura."Nuestra Cuenta Prepago" <> '') and (Fasctura."Prepayment Invoice") THEN
                     "Cod banco" := Fasctura."Nuestra Cuenta Prepago";
 
             END;

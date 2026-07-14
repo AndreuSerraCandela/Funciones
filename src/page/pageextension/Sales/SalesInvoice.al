@@ -64,6 +64,10 @@ pageextension 80140 SalesInvoice extends "Sales Invoice"
             {
                 ApplicationArea = All;
             }
+            field("E-Mail-Facturación"; Rec."E-Mail-Facturación")
+            {
+                ApplicationArea = All;
+            }
         }
         addbefore(SalesLines)
         {

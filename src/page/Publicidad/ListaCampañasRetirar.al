@@ -42,6 +42,11 @@ page 50047 "Campañas a retirar"
                     ToolTip = 'Specifies the value of the Observaciones field';
                     ApplicationArea = All;
                 }
+                field("Tipo Soporte"; Rec."Tipo Soporte")
+                {
+                    ToolTip = 'Specifies the value of the Tipo Soporte field';
+                    ApplicationArea = All;
+                }
             }
         }
     }

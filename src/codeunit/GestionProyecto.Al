@@ -1497,6 +1497,194 @@ codeunit 50002 "Gestion Proyecto"
             UNTIL rJobt.NEXT = 0;
     END;
 
+
+    procedure CreaFacturaCompraEliminada(var Factura: Record "Sales Header")
+    var
+        rCabCompr: Record "Purchase Header";
+        rCabCompr2: Record "Purchase Header";
+        Vendor: Record Vendor;
+        rIc: Record "IC Setup";
+        rIcPartner: Record "IC Partner";
+        Customer: Record "Customer";
+        rComentProy: Record 97;
+        rComentCompra: Record 43;
+        SalesLineFac: Record "Sales Line";
+        rLinCompra: Record "Purchase Line" temporary;
+        rLinCompraDef: Record "Purchase Line";
+        Ult: Integer;
+        Recurs: Record "Resource";
+        Borrar: Boolean;
+        VatPostingSetup: Record "Vat Posting Setup";
+        confcompra: Record "Purchases & Payables Setup";
+    begin
+        rIc.Get();
+        Customer.Get(Factura."Bill-to Customer No.");
+        rIcPartner.Get(Customer."IC Partner Code");
+        Vendor.ChangeCompany(Factura."Empresa Origen Alb");
+        rCabCompr.ChangeCompany(Factura."Empresa Origen Alb");
+        confcompra.ChangeCompany(Factura."Empresa Origen Alb");
+        confcompra.Get();
+        Vendor.SetRange("IC Partner Code", rIc."IC Partner Code");
+        Vendor.FindFirst();
+        rCabCompr.Init();
+        rCabCompr."Buy-from Vendor No." := Vendor."No.";
+        rCabCompr."Document Type" := rCabCompr."Document Type"::Invoice;
+
+        rCabCompr."No." := Factura."Factura Compra";
+        rCabCompr.INSERT(FALSE);
+        rCabCompr.VALIDATE("No. Series", ConfCompra."Order Nos.");
+        rCabCompr.VALIDATE("Posting No. Series", ConfCompra."Posted Invoice Nos.");
+        rCabCompr.VALIDATE("Receiving No. Series", ConfCompra."Posted Receipt Nos.");
+        rCabCompr.VALIDATE("Posting Date", Factura."Posting Date");
+        rCabCompr.VALIDATE("Document Date", rCabCompr."Posting Date");
+        rCabCompr.VALIDATE("Expected Receipt Date", WORKDATE);
+        rCabCompr.VALIDATE("Order Date", WORKDATE);
+        rCabCompr.VALIDATE("Posting Description", Factura."Posting Description");
+        rCabCompr."Buy-from Vendor Name" := Vendor.Name;
+        rCabCompr."VAT Registration No." := Vendor."VAT Registration No.";
+        rCabCompr."Payment Method Code" := Vendor."Payment Method Code";
+        rCabCompr."Buy-from Vendor No." := Vendor."No.";
+        rCabCompr."Buy-from Address" := Vendor.Address;
+        rCabCompr."Buy-from Address 2" := Vendor."Address 2";
+        rCabCompr."Buy-from City" := Vendor.City;
+        rCabCompr."Buy-from Post Code" := Vendor."Post Code";
+        rCabCompr."Buy-from County" := Vendor.County;
+        rCabCompr."Buy-from Country/Region Code" := Vendor."Country/Region Code";
+        rCabCompr."Purchaser Code" := Vendor."Purchaser Code";
+        rCabCompr."Gen. Bus. Posting Group" := Vendor."Gen. Bus. Posting Group";
+        rCabCompr."VAT Bus. Posting Group" := Vendor."VAT Bus. Posting Group";
+        rCabCompr."Tax Area Code" := Vendor."Tax Area Code";
+        rCabCompr."Tax Liable" := Vendor."Tax Liable";
+        rCabCompr."VAT Country/Region Code" := Vendor."Country/Region Code";
+        rCabCompr."Payment Terms Code" := Vendor."Payment Terms Code";
+        rCabCompr.Validate("Lead Time Calculation", Vendor."Lead Time Calculation");
+        rCabCompr."Shipment Method Code" := Vendor."Shipment Method Code";
+        rCabCompr."Buy-from IC Partner Code" := Vendor."IC Partner Code";
+        rCabCompr."Send IC Document" := false;
+        rCabCompr."Order Address Code" := '';
+        rCabCompr."Pay-to Vendor No." := Vendor."No.";
+        rCabCompr."Pay-to Address" := Vendor.Address;
+        rCabCompr."Pay-to Address 2" := Vendor."Address 2";
+        rCabCompr."Pay-to City" := Vendor.City;
+        rCabCompr."Pay-to Post Code" := Vendor."Post Code";
+        rCabCompr."Pay-to County" := Vendor.County;
+        rCabCompr."Pay-to Country/Region Code" := Vendor."Country/Region Code";
+        rCabCompr."Vendor Posting Group" := Vendor."Vendor Posting Group";
+        rCabCompr.VALIDATE("Fecha inicial proyecto", Factura."Fecha inicial proyecto");
+        rCabCompr.VALIDATE("Fecha fin proyecto", Factura."Fecha fin proyecto");
+        rCabCompr.VALIDATE(Firmado, Factura.Firmado);
+        rCabCompr.VALIDATE("Fecha Firma", Factura."Fecha Firma");
+        rCabCompr.VALIDATE("Shortcut Dimension 1 Code", Factura."ShortCut Dimension 1 Code");
+        rCabCompr.VALIDATE("Shortcut Dimension 2 Code", Factura."ShortCut Dimension 2 Code");
+        rCabCompr."Empresa Factura" := CompanyName;
+        rCabCompr."Posting Description" := Factura."Posting Description";
+        rCabCompr.VALIDATE("Your Reference", Factura."Nº Contrato");
+        rCabCompr.MODIFY(FALSE);
+        rCabCompr2 := rCabCompr;
+        If rCabCompr2.Insert() then Borrar := true;
+        //{ *** Tambien se traspasan los comentarios *** }
+        rComentProy.SETCURRENTKEY("Table Name", "No.", "Line No.");
+        rComentProy.SETRANGE("Table Name", rComentProy."Table Name"::Job);
+        rComentProy.SETRANGE("No.", Factura."Nº Proyecto");
+        rComentCompra.ChangeCompany(rIcPartner."Inbox Details");
+        if rComentProy.FIND('-') THEN
+            REPEAT
+                rComentCompra.INIT;
+                rComentCompra."Document Type" := rCabCompr."Document Type";
+                rComentCompra."No." := rCabCompr."No.";
+                rComentCompra."Line No." := rComentProy."Line No.";
+                rComentCompra.Date := rComentProy.Date;
+                rComentCompra.Code := rComentProy.Code;
+                rComentCompra.Comment := rComentProy.Comment;
+                rComentCompra.INSERT;
+            UNTIL rComentProy.NEXT = 0;
+
+        SalesLineFac.Reset();
+        SalesLineFac.SetRange("Document Type", Factura."Document Type");
+        SalesLineFac.SetRange("Document No.", Factura."No.");
+        SalesLineFac.FindFirst();
+
+        if SalesLineFac.FINDfirst THEN
+            REPEAT
+                if rLinCompra.get(rCabCompr."Document Type", rCabCompr."No.", SalesLineFac."Line No.") then
+                    rLinCompra.Delete();
+
+                rLinCompra.Init();
+                rLinCompra."Document Type" := rCabCompr."Document Type";
+                rLinCompra."Document No." := rCabCompr."No.";
+                ult += SalesLineFac."Line No.";
+                rLinCompra."Line No." := Ult;
+
+                rLinCompra."Empresa Venta" := CompanyName;
+                rLinCompra."Buy-from Vendor No." := rCabCompr."Buy-from Vendor No.";
+                rLinCompra."Pay-to Vendor No." := rCabCompr."Buy-from Vendor No.";
+                rLinCompra.VALIDATE(Type, SalesLineFac.Type);
+                rLinCompra.Validate("No.", SalesLineFac."No.");
+
+                //else
+                //     rLinCompra.VALIDATE("No.", SalesLineFac."No.");
+                // No := rLinCompra."No.";
+                rLinCompra.VALIDATE(Description, SalesLineFac.Description);
+                rLinCompra.VALIDATE(Quantity, SalesLineFac.Quantity);
+                // mig a 5.0     SalesLineFacOrTemp.CALCFIELDS(Quantity);
+                rLinCompra.VALIDATE("Direct Unit Cost", SalesLineFac."Unit Price");
+                rLinCompra.VALIDATE("Line Discount %", SalesLineFac."Line Discount %");    // $004
+                rLinCompra.VALIDATE("Shortcut Dimension 1 Code", SalesLineFac."Shortcut Dimension 1 Code");
+                rLinCompra.VALIDATE("Shortcut Dimension 2 Code", SalesLineFac."Shortcut Dimension 2 Code");
+                rLinCompra.VALIDATE("Shortcut Dimension 3 Code", SalesLineFac."Shortcut Dimension 3 Code");
+                rLinCompra.VALIDATE("Shortcut Dimension 4 Code", SalesLineFac."Shortcut Dimension 4 Code");
+                rLinCompra.VALIDATE("Shortcut Dimension 5 Code", SalesLineFac."Shortcut Dimension 5 Code");
+
+                rLinCompra.ValidateShortcutDimCode(3, SalesLineFac."Shortcut Dimension 3 Code");
+                rLinCompra.ValidateShortcutDimCode(4, SalesLineFac."Shortcut Dimension 4 Code");
+                rLinCompra.ValidateShortcutDimCode(5, SalesLineFac."Shortcut Dimension 5 Code");
+                If SalesLineFac.Type = SalesLineFac.Type::Resource then begin
+                    Recurs.ChangeCompany(rIcPartner."Inbox Details");
+                    Recurs.SetRange("Nº En Empresa origen", SalesLineFac."No.");
+                    if Recurs.FindSet() then begin
+                        rLinCompra."Vendor Item No." := Recurs."No.";
+                        rLinCompra."Gen. Prod. Posting Group" := Recurs."Gen. Prod. Posting Group";
+                        rLinCompra."VAT Prod. Posting Group" := Recurs."VAT Prod. Posting Group";
+                        VatPostingSetup.ChangeCompany(rIcPartner."Inbox Details");
+                        VatPostingSetup.SetRange("VAT Bus. Posting Group", Vendor."VAT Bus. Posting Group");
+                        VatPostingSetup.SetRange("VAT Prod. Posting Group", Recurs."VAT Prod. Posting Group");
+                        if VatPostingSetup.FindFirst() then
+                            If SalesLineFac."VAT %" <> VatPostingSetup."VAT %" then begin
+                                VatPostingSetup.SetRange("VAT Prod. Posting Group");
+                                VatPostingSetup.SetRange("VAT %", SalesLineFac."VAT %");
+                                if VatPostingSetup.FindFirst() then
+                                    rLinCompra."VAT Prod. Posting Group" := VatPostingSetup."VAT Prod. Posting Group";
+                            end;
+                    end;
+                end;
+                rLinCompra."VAT %" := SalesLineFac."VAT %";
+                rLinCompra."Fecha inicial recurso" := SalesLineFac."Fecha inicial recurso";
+                rLinCompra."Fecha final recurso" := SalesLineFac."Fecha final recurso";
+                rLinCompra."Empresa Origen" := CompanyName;
+                rLinCompra."Proyecto Origen" := Factura."Nº Proyecto";
+
+                rLinCompra.Description := SalesLineFac.Description;
+                if rLinCompra."No." = '' Then
+                    rLinCompra.Quantity := 0;
+                rLinCompra.insert;
+                SalesLineFac."Doc Intercompany Compra" := rCabCompr."No.";
+                SalesLineFac.Modify();
+            UNTIL SalesLineFac.NEXT = 0;
+        if Borrar then
+            rCabCompr2.DELETE;
+
+        rLinCompra.FindFirst();
+        repeat
+            rLinCompraDef.ChangeCompany(rIcPartner."Inbox Details");
+            if rLinCompraDef.get(rLinCompra."Document Type", rLinCompra."Document No.", rLinCompra."Line No.") then
+                rLinCompraDef.Delete();
+            rLinCompraDef := rLinCompra;
+            rLinCompraDef."No." := rLinCompra."Vendor Item No.";
+            rLinCompraDef."Vendor Item No." := '';
+            rLinCompraDef.Insert;
+        until rLinCompra.NEXT = 0;
+    end;
+
     procedure CreaFacturaCompraOtraEmpresa(var Factura: Record "Sales Header")
     var
         rCabCompr: Record "Purchase Header";

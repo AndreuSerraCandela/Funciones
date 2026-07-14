@@ -129,6 +129,10 @@ pageextension 80111 "JobKuara" extends "Job Card"
             {
                 ApplicationArea = all;
             }
+            field("Tipo soporte"; Rec."Tipo soporte")
+            {
+                ApplicationArea = ALL;
+            }
             field(Subtipo; Rec.Subtipo)
             {
                 ApplicationArea = ALL;

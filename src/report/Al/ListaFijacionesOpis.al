@@ -3,6 +3,9 @@
 /// </summary>
 Report 50056 "Lista Fijaciones OPIs Semanal"
 {
+    Caption = 'Lista Fijaciones Semanal';
+    //Añadir busquedas
+    AdditionalSearchTerms = 'Lista Fijaciones OPIs Semanal, Lista Fijaciones Vallas Semanal, Lista Fijaciones Soportes Semanal';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     DefaultLayout = Word;
@@ -18,6 +21,7 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
             column(FechaHasta; Format(FechaHasta, 0, '<Weekday Text>, <Day,2> de <Month Text> de <Year4>')) { }
             column(NumeroSemana; NumeroSemana) { }
             column(TotalOpis; TotalOpis) { }
+            column(TipoSoporte; Format(TipoSoporte)) { }
             column(DebugCabCount; DebugCabCount) { }
             column(DebugMessage; 'Registros encontrados en CabFijacion') { }
 
@@ -38,6 +42,16 @@ Report 50056 "Lista Fijaciones OPIs Semanal"
                     CampañasRetirar: Record "Campañas a retirar";
                 begin
                     CampañasRetirar.SetRange("Fecha", FechaDesde, FechaHasta);
+                    case TipoSoporte of
+                        TipoSoporte::Opis:
+                            CampañasRetirar.SetFilter("Tipo Soporte", '%1|%2', CampañasRetirar."Tipo Soporte"::" ", CampañasRetirar."Tipo Soporte"::Opis);
+                        TipoSoporte::Vallas:
+                            CampañasRetirar.SetFilter("Tipo Soporte", '%1|%2', CampañasRetirar."Tipo Soporte"::" ", CampañasRetirar."Tipo Soporte"::Vallas);
+                        TipoSoporte::"Vallas Peantones":
+                            CampañasRetirar.SetFilter("Tipo Soporte", '%1|%2', CampañasRetirar."Tipo Soporte"::" ", CampañasRetirar."Tipo Soporte"::"Vallas Peatones");
+                        TipoSoporte::Indicadores:
+                            CampañasRetirar.SetFilter("Tipo Soporte", '%1|%2', CampañasRetirar."Tipo Soporte"::" ", CampañasRetirar."Tipo Soporte"::Indicadores);
+                    end;
                     DebugCampanasCount := CampañasRetirar.Count;
                     if CampañasRetirar.FindSet() then
                         repeat

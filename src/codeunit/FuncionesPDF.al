@@ -205,6 +205,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         if rCabVenta."Ship-to Code" <> '' then
                             if Dir.Get(Cliente."No.", rCabVenta."Ship-to Code") then
                                 if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                        if rCabVenta."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rCabVenta."E-Mail-Facturación";
                     END;
                 END;
             pTipo::Factura:
@@ -234,6 +235,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         if rHisFac."Ship-to Code" <> '' then
                             if Dir.Get(Cliente."No.", rHisFac."Ship-to Code") then
                                 if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                        if rHisFac."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisFac."E-Mail-Facturación";
                     END;
                 END;
             pTipo::Abono:
@@ -263,6 +265,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         if rHisAbo."Ship-to Code" <> '' then
                             if Dir.Get(Cliente."No.", rHisAbo."Ship-to Code") then
                                 if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                        if rHisAbo."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisAbo."E-Mail-Facturación";
                     END;
                 END;
             END;
@@ -487,6 +490,7 @@ codeunit 7001111 "Funciones Correo PDF"
                                 if rCabVenta."Ship-to Code" <> '' then
                                     if Dir.Get(Cliente."No.", rCabVenta."Ship-to Code") then
                                         if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                                if rCabVenta."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rCabVenta."E-Mail-Facturación";
                             END;
                         END;
                     pTipo::Factura:
@@ -499,6 +503,7 @@ codeunit 7001111 "Funciones Correo PDF"
                                 if rHisFac."Ship-to Code" <> '' then
                                     if Dir.Get(Cliente."No.", rHisFac."Ship-to Code") then
                                         if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                                if rHisFac."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisFac."E-Mail-Facturación";
                             END;
                         END;
                     pTipo::Abono:
@@ -511,6 +516,7 @@ codeunit 7001111 "Funciones Correo PDF"
                                 if rHisAbo."Ship-to Code" <> '' then
                                     if Dir.Get(Cliente."No.", rHisAbo."Ship-to Code") then
                                         if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                                if rHisAbo."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisAbo."E-Mail-Facturación";
                             END;
                         END;
                 END;
@@ -825,6 +831,7 @@ codeunit 7001111 "Funciones Correo PDF"
             if rHisFac."Ship-to Code" <> '' then
                 if Dir.Get(Cliente."No.", rHisfac."Ship-to Code") then
                     if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+            if rHisFac."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisFac."E-Mail-Facturación";
             Abono := FALSE;
         END;
         rHisAbo.RESET;
@@ -853,6 +860,7 @@ codeunit 7001111 "Funciones Correo PDF"
             if rHisAbo."Ship-to Code" <> '' then
                 if Dir.Get(Cliente."No.", rHisAbo."Ship-to Code") then
                     if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+            if rHisAbo."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisAbo."E-Mail-Facturación";
             Abono := TRUE
         END;
 
@@ -912,6 +920,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         if rHisFac."Ship-to Code" <> '' then
                             if Dir.Get(Cliente."No.", rHisFac."Ship-to Code") then
                                 if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                        if rHisFac."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisFac."E-Mail-Facturación";
                     END;
                     rHisAbo.RESET;
                     rHisAbo.SETRANGE("No.", pNumero);
@@ -921,6 +930,7 @@ codeunit 7001111 "Funciones Correo PDF"
                         if rHisAbo."Ship-to Code" <> '' then
                             if Dir.Get(Cliente."No.", rHisAbo."Ship-to Code") then
                                 if dir."E-Mail-Facturación" <> '' Then Cliente."E-Mail-Facturación" := Dir."E-Mail-Facturación";
+                        if rHisAbo."E-Mail-Facturación" <> '' then Cliente."E-Mail-Facturación" := rHisAbo."E-Mail-Facturación";
                     END;
 
                 END;
@@ -938,6 +948,7 @@ codeunit 7001111 "Funciones Correo PDF"
             REPEAT
                 if r18.GET(SalesInvoiceHeader."Sell-to Customer No.") THEN BEGIN
                     if r18."E-Mail-Facturación" = '' THEN r18."E-Mail-Facturación" := r18."E-Mail";
+                    if SalesInvoiceHeader."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := SalesInvoiceHeader."E-Mail-Facturación";
                     if r18."E-Mail-Facturación" <> '' THEN BEGIN
                         EmailF.Name := SalesInvoiceHeader."No.";
                         EmailF.Email := r18."E-Mail-Facturación";
@@ -1236,6 +1247,7 @@ codeunit 7001111 "Funciones Correo PDF"
             if r18."E-Mail-Facturación" = '' THEN r18."E-Mail-Facturación" := r18."E-Mail";
             if DirEnvio.Get(r18."No.", SalesInvoiceHeader."Ship-to Code") then
                 if DirEnvio."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := DirEnvio."E-Mail-Facturación";
+            if SalesInvoiceHeader."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := SalesInvoiceHeader."E-Mail-Facturación";
             if r18."E-Mail-Facturación" <> '' THEN BEGIN
                 EmailF.Name := SalesInvoiceHeader."No.";
                 EmailF.Email := r18."E-Mail-Facturación";
@@ -1335,6 +1347,7 @@ codeunit 7001111 "Funciones Correo PDF"
     BEGIN
         if r18.GET(SalesInvoiceHeader."Sell-to Customer No.") THEN BEGIN
             if r18."E-Mail-Facturación" = '' THEN r18."E-Mail-Facturación" := r18."E-Mail";
+            if SalesInvoiceHeader."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := SalesInvoiceHeader."E-Mail-Facturación";
             if r18."E-Mail-Facturación" <> '' THEN BEGIN
                 EmailF.Name := SalesInvoiceHeader."No.";
                 EmailF.Email := r18."E-Mail-Facturación";
@@ -1549,6 +1562,7 @@ codeunit 7001111 "Funciones Correo PDF"
             REPEAT
                 if r18.GET(SalesInvoiceHeader."Sell-to Customer No.") THEN BEGIN
                     if r18."E-Mail-Facturación" = '' THEN r18."E-Mail-Facturación" := r18."E-Mail";
+                    if SalesInvoiceHeader."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := SalesInvoiceHeader."E-Mail-Facturación";
                     if r18."E-Mail-Facturación" <> '' THEN BEGIN
                         EmailF.Name := SalesInvoiceHeader."No.";
                         EmailF.Email := r18."E-Mail-Facturación";
@@ -1625,6 +1639,7 @@ codeunit 7001111 "Funciones Correo PDF"
     BEGIN
         if r18.GET(SalesInvoiceHeader."Sell-to Customer No.") THEN BEGIN
             if r18."E-Mail-Facturación" = '' THEN r18."E-Mail-Facturación" := r18."E-Mail";
+            if SalesInvoiceHeader."E-Mail-Facturación" <> '' then r18."E-Mail-Facturación" := SalesInvoiceHeader."E-Mail-Facturación";
             if r18."E-Mail-Facturación" <> '' THEN BEGIN
                 EmailF.Name := SalesInvoiceHeader."No.";
                 EmailF.Email := r18."E-Mail-Facturación";
