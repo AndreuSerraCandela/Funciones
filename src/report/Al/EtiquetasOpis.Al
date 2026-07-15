@@ -79,7 +79,7 @@ Report 50040 "Etiqueta orden fijacion Opis"
         }
         dataItem("Det_Orden_fijacion"; "Orden fijación")
         {
-            DataItemTableView = Sorting("Nº Recurso");
+            DataItemTableView = Sorting(Zona, "Nº Recurso");
 
 
             column("Num"; a) { }
